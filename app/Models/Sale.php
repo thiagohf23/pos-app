@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-#[Fillable(['user_id', 'subtotal', 'discount', 'total', 'status', 'payment_method', 'cash_tendered', 'change_amount', 'notes'])]
+#[Fillable(['user_id', 'subtotal', 'discount', 'total', 'status', 'payment_method', 'cash_tendered', 'change_amount', 'notes', 'coupon_id', 'coupon_code'])]
 class Sale extends Model
 {
     /** @use HasFactory<SaleFactory> */
@@ -35,5 +35,10 @@ class Sale extends Model
     public function items(): HasMany
     {
         return $this->hasMany(SaleItem::class);
+    }
+
+    public function coupon(): BelongsTo
+    {
+        return $this->belongsTo(Coupon::class);
     }
 }
