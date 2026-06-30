@@ -92,7 +92,9 @@ export function CouponTable({
                                 </Badge>
                             </td>
                             <td className="px-6 py-4 font-medium text-neutral-900 dark:text-neutral-100">
-                                {parseFloat(coupon.discount_percent).toFixed(0)}
+                                {parseFloat(coupon.discount_percent)
+                                    .toFixed(2)
+                                    .replace(/\.?0+$/, '')}
                                 %
                             </td>
                             <td className="px-6 py-4 text-sm text-neutral-500 dark:text-neutral-400">
