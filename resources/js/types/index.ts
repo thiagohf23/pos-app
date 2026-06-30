@@ -2,6 +2,23 @@ export type * from './auth';
 export type * from './navigation';
 export type * from './ui';
 
+export type CouponScope = 'all' | 'category' | 'product';
+
+export interface Coupon {
+    id: number;
+    code: string;
+    description: string | null;
+    discount_percent: string;
+    scope: CouponScope;
+    max_uses: number | null;
+    used_count: number;
+    starts_at: string;
+    expires_at: string;
+    is_active: boolean;
+    categories?: { id: number; name: string }[];
+    products?: { id: number; name: string }[];
+}
+
 export interface Category {
     id: number;
     name: string;
@@ -60,6 +77,8 @@ export interface Sale {
     cash_tendered: string | null;
     change_amount: string | null;
     notes: string | null;
+    coupon_id: number | null;
+    coupon_code: string | null;
     sold_at: string;
     created_at: string;
     updated_at: string;

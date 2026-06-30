@@ -6,6 +6,7 @@ import {
     LayoutGrid,
     Package,
     ShoppingCart,
+    Ticket,
 } from 'lucide-react';
 import AppLogo from '@/components/app-logo';
 import { NavFooter } from '@/components/nav-footer';
@@ -22,6 +23,7 @@ import {
 } from '@/components/ui/sidebar';
 import { dashboard } from '@/routes';
 import { index as categoriesIndex } from '@/routes/categories';
+import { index as couponsIndex } from '@/routes/coupons';
 import { index as posIndex } from '@/routes/pos';
 import { index as productsIndex } from '@/routes/products';
 import type { NavItem } from '@/types';
@@ -46,6 +48,11 @@ const mainNavItems: NavItem[] = [
         title: 'Categories',
         href: categoriesIndex().url,
         icon: Folder,
+    },
+    {
+        title: 'Coupons',
+        href: couponsIndex().url,
+        icon: Ticket,
     },
 ];
 
