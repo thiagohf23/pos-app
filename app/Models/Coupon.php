@@ -61,6 +61,9 @@ class Coupon extends Model
      */
     public function calculateDiscount(array $lineItems): float
     {
+        $categoryIds = null;
+        $productIds = null;
+
         if ($this->scope === 'category') {
             $this->loadMissing('categories');
             $categoryIds = $this->categories->pluck('id');
@@ -76,8 +79,8 @@ class Coupon extends Model
             $quantity = $item['quantity'];
 
             $matches = match ($this->scope) {
-                'category' => $categoryIds->contains($product->category_id),
-                'product' => $productIds->contains($product->id),
+                'category' => (bool) $categoryIds?->contains($product->category_id),
+                'product' => (bool) $productIds?->contains($product->id),
                 default => true,
             };
 
