@@ -143,7 +143,12 @@ export default function ReceiptPage({ sale }: Props) {
                         </div>
                         {parseFloat(sale.discount as string) > 0 && (
                             <div className="flex justify-between text-emerald-600 print:text-black">
-                                <span>Discount</span>
+                                <span>
+                                    Discount
+                                    {sale.coupon_code
+                                        ? ` (${sale.coupon_code})`
+                                        : ''}
+                                </span>
                                 <span className="font-semibold">
                                     -$
                                     {parseFloat(

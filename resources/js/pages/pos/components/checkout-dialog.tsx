@@ -19,7 +19,7 @@ import {
     DialogTitle,
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
-import { checkout, receipt } from '@/routes/pos';
+import { checkout, coupon as couponRoute, receipt } from '@/routes/pos';
 import type { CartItem } from '@/types';
 
 interface Props {
@@ -50,8 +50,6 @@ export function CheckoutDialog({
     onOpenChange,
     cart,
     subtotal,
-    discount,
-    total,
     clearCart,
 }: Props) {
     const [paymentMethod, setPaymentMethod] =
@@ -69,16 +67,77 @@ export function CheckoutDialog({
         change: 0,
     });
 
+    const [couponCode, setCouponCode] = useState('');
+    const [appliedCoupon, setAppliedCoupon] = useState<{
+        code: string;
+        discount: number;
+    } | null>(null);
+    const [couponLoading, setCouponLoading] = useState(false);
+    const [couponError, setCouponError] = useState<string | null>(null);
+
     // Reset local state on close so the next open starts clean (avoids setState-in-effect)
     function handleOpenChange(next: boolean) {
         if (!next) {
             setPaymentMethod('credit_card');
             setAmountPaid('');
             setNotes('');
+            setCouponCode('');
+            setAppliedCoupon(null);
+            setCouponError(null);
+            setCouponLoading(false);
         }
 
         onOpenChange(next);
     }
+
+    async function applyCoupon() {
+        if (!couponCode.trim()) {
+            return;
+        }
+
+        setCouponLoading(true);
+        setCouponError(null);
+
+        try {
+            const response = await fetch(couponRoute.url(), {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN':
+                        document
+                            .querySelector('meta[name="csrf-token"]')
+                            ?.getAttribute('content') || '',
+                    Accept: 'application/json',
+                },
+                body: JSON.stringify({
+                    code: couponCode.trim(),
+                    items: cart.map((i) => ({
+                        product_id: i.product.id,
+                        quantity: i.quantity,
+                    })),
+                }),
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                setAppliedCoupon({
+                    code: data.coupon_code,
+                    discount: Number(data.discount),
+                });
+                toast.success(`Coupon ${data.coupon_code} applied`);
+            } else {
+                setCouponError(data.message);
+                setAppliedCoupon(null);
+                toast.error(data.message);
+            }
+        } finally {
+            setCouponLoading(false);
+        }
+    }
+
+    const couponDiscount = appliedCoupon?.discount ?? 0;
+    const finalTotal = Math.max(0, subtotal - couponDiscount);
 
     const parsedAmountPaid = useMemo(() => {
         const parsed = parseFloat(amountPaid);
@@ -87,12 +146,12 @@ export function CheckoutDialog({
     }, [amountPaid]);
 
     const calculatedChange = useMemo(() => {
-        if (paymentMethod !== 'cash' || parsedAmountPaid < total) {
+        if (paymentMethod !== 'cash' || parsedAmountPaid < finalTotal) {
             return 0;
         }
 
-        return Math.round((parsedAmountPaid - total) * 100) / 100;
-    }, [paymentMethod, parsedAmountPaid, total]);
+        return Math.round((parsedAmountPaid - finalTotal) * 100) / 100;
+    }, [paymentMethod, parsedAmountPaid, finalTotal]);
 
     async function handleCheckout() {
         const saleData = {
@@ -101,8 +160,9 @@ export function CheckoutDialog({
                 quantity: item.quantity,
             })),
             subtotal,
-            discount,
-            total,
+            discount: couponDiscount,
+            total: finalTotal,
+            coupon_code: appliedCoupon?.code ?? null,
             payment_method: paymentMethod,
             cash_tendered: paymentMethod === 'cash' ? parsedAmountPaid : null,
             notes: notes.trim() || null,
@@ -132,17 +192,22 @@ export function CheckoutDialog({
             setSaleId(data.sale.id);
             setCheckoutDetails({
                 subtotal,
-                total,
-                discount,
+                total: finalTotal,
+                discount: couponDiscount,
                 paymentMethod: paymentMethod,
-                amountPaid: paymentMethod === 'cash' ? parsedAmountPaid : total,
+                amountPaid:
+                    paymentMethod === 'cash' ? parsedAmountPaid : finalTotal,
                 change: calculatedChange,
             });
             handleOpenChange(false);
             setShowCheckoutSuccess(true);
             toast.success('Checkout completed successfully!');
-        } catch (error: any) {
-            toast.error(error.message || 'Failed to process sale');
+        } catch (error: unknown) {
+            const message =
+                error instanceof Error
+                    ? error.message
+                    : 'Failed to process sale';
+            toast.error(message);
         }
     }
 
@@ -164,10 +229,62 @@ export function CheckoutDialog({
                         <DialogDescription className="text-sm text-neutral-500 dark:text-neutral-400">
                             Choose how the customer will pay. Total:{' '}
                             <strong className="text-neutral-900 dark:text-neutral-200">
-                                ${total.toFixed(2)}
+                                ${finalTotal.toFixed(2)}
                             </strong>
                         </DialogDescription>
                     </DialogHeader>
+
+                    {/* Coupon Code */}
+                    <div className="flex flex-col gap-1.5 pb-2">
+                        <label className="text-xs font-semibold text-neutral-600 dark:text-neutral-400">
+                            Coupon code
+                        </label>
+                        {appliedCoupon ? (
+                            <div className="flex items-center justify-between rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 dark:border-emerald-900 dark:bg-emerald-950/20">
+                                <span className="text-sm font-semibold text-emerald-700 dark:text-emerald-400">
+                                    {appliedCoupon.code} &mdash; &minus;$
+                                    {appliedCoupon.discount.toFixed(2)}
+                                </span>
+                                <button
+                                    onClick={() => {
+                                        setAppliedCoupon(null);
+                                        setCouponCode('');
+                                        setCouponError(null);
+                                    }}
+                                    className="ml-2 cursor-pointer text-xs font-semibold text-red-500 hover:text-red-600"
+                                >
+                                    Remove
+                                </button>
+                            </div>
+                        ) : (
+                            <div className="flex gap-2">
+                                <Input
+                                    type="text"
+                                    placeholder="Enter coupon code"
+                                    value={couponCode}
+                                    onChange={(e) =>
+                                        setCouponCode(e.target.value)
+                                    }
+                                    className="flex-1"
+                                />
+                                <Button
+                                    variant="outline"
+                                    onClick={applyCoupon}
+                                    disabled={
+                                        couponLoading || !couponCode.trim()
+                                    }
+                                    className="cursor-pointer font-semibold"
+                                >
+                                    {couponLoading ? 'Applying...' : 'Apply'}
+                                </Button>
+                            </div>
+                        )}
+                        {couponError && (
+                            <p className="text-xs font-medium text-red-500 dark:text-red-400">
+                                {couponError}
+                            </p>
+                        )}
+                    </div>
 
                     <div className="grid grid-cols-2 gap-3 py-4">
                         {PAYMENT_METHODS.map((method) => {
@@ -224,7 +341,7 @@ export function CheckoutDialog({
                                 </div>
                             </div>
 
-                            {parsedAmountPaid >= total &&
+                            {parsedAmountPaid >= finalTotal &&
                                 parsedAmountPaid > 0 && (
                                     <div className="flex items-center justify-between rounded-lg border border-emerald-200 bg-emerald-50 p-3 dark:border-emerald-900 dark:bg-emerald-950/20">
                                         <span className="text-sm font-semibold text-emerald-700 dark:text-emerald-400">
@@ -237,11 +354,14 @@ export function CheckoutDialog({
                                 )}
 
                             {parsedAmountPaid > 0 &&
-                                parsedAmountPaid < total && (
+                                parsedAmountPaid < finalTotal && (
                                     <p className="text-xs font-medium text-amber-600 dark:text-amber-400">
                                         Amount received is less than the total.
                                         Customer still owes $
-                                        {(total - parsedAmountPaid).toFixed(2)}.
+                                        {(
+                                            finalTotal - parsedAmountPaid
+                                        ).toFixed(2)}
+                                        .
                                     </p>
                                 )}
                         </div>
@@ -273,13 +393,13 @@ export function CheckoutDialog({
                             onClick={handleCheckout}
                             disabled={
                                 paymentMethod === 'cash'
-                                    ? parsedAmountPaid < total
+                                    ? parsedAmountPaid < finalTotal
                                     : false
                             }
                             className="flex-1 cursor-pointer gap-2 bg-emerald-600 font-semibold text-white hover:bg-emerald-500"
                         >
                             <Banknote className="size-4" />
-                            Pay ${total.toFixed(2)}
+                            Pay ${finalTotal.toFixed(2)}
                         </Button>
                     </DialogFooter>
                 </DialogContent>
