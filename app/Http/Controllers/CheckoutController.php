@@ -28,19 +28,9 @@ class CheckoutController extends Controller
         ]);
 
         $cashTendered = $validated['cash_tendered'] ?? null;
-        $changeAmount = null;
-
-        if ($validated['payment_method'] === 'cash') {
-            if ($cashTendered < $validated['total']) {
-                return response()->json([
-                    'message' => 'Amount paid is less than total.',
-                ], 422);
-            }
-            $changeAmount = round($cashTendered - $validated['total'], 2);
-        }
 
         try {
-            $sale = DB::transaction(function () use ($validated, $cashTendered, $changeAmount) {
+            $sale = DB::transaction(function () use ($validated, $cashTendered) {
                 /** @var array<int, Product> $lockedProducts */
                 $lockedProducts = [];
 
@@ -78,6 +68,15 @@ class CheckoutController extends Controller
                     $total = round($validated['subtotal'] - $discount, 2);
                     $couponId = $coupon->id;
                     $couponCode = $coupon->code;
+                }
+
+                $changeAmount = null;
+
+                if ($validated['payment_method'] === 'cash') {
+                    if ($cashTendered < $total) {
+                        throw new \Exception('Amount paid is less than total.');
+                    }
+                    $changeAmount = round($cashTendered - $total, 2);
                 }
 
                 $sale = Sale::create([
