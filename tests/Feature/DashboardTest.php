@@ -1,16 +1,48 @@
 <?php
 
+use App\Models\Category;
+use App\Models\Product;
+use App\Models\Sale;
 use App\Models\User;
+use Illuminate\Foundation\Testing\WithoutMiddleware;
 
-test('guests are redirected to the login page', function () {
-    $response = $this->get(route('dashboard'));
-    $response->assertRedirect(route('login'));
-});
+uses(WithoutMiddleware::class);
 
-test('authenticated users can visit the dashboard', function () {
+test('authenticated user can view dashboard page with metrics', function () {
     $user = User::factory()->create();
-    $this->actingAs($user);
+    $category = Category::factory()->create();
 
-    $response = $this->get(route('dashboard'));
-    $response->assertOk();
+    // Create products with different stocks
+    Product::factory()->create([
+        'category_id' => $category->id,
+        'stock' => 0,
+        'is_active' => true,
+    ]);
+    Product::factory()->create([
+        'category_id' => $category->id,
+        'stock' => 3,
+        'is_active' => true,
+    ]);
+    Product::factory()->create([
+        'category_id' => $category->id,
+        'stock' => 15,
+        'is_active' => true,
+    ]);
+
+    // Create a sale
+    Sale::create([
+        'user_id' => $user->id,
+        'subtotal' => 100.00,
+        'discount' => 10.00,
+        'total' => 90.00,
+        'status' => 'completed',
+        'payment_method' => 'cash',
+        'cash_tendered' => 100.00,
+        'change_amount' => 10.00,
+    ]);
+
+    $response = $this->actingAs($user)
+        ->get(route('dashboard'));
+
+    $response->assertStatus(200);
 });

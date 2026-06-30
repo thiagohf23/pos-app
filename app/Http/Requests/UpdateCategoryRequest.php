@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Models\Category;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
@@ -23,16 +24,16 @@ class UpdateCategoryRequest extends FormRequest
      */
     public function rules(): array
     {
-        $categoryId = $this->route('category') instanceof \App\Models\Category 
-            ? $this->route('category')->id 
+        $categoryId = $this->route('category') instanceof Category
+            ? $this->route('category')->id
             : $this->route('category');
 
         return [
             'name' => [
-                'required', 
-                'string', 
-                'max:255', 
-                Rule::unique('categories', 'name')->ignore($categoryId)
+                'required',
+                'string',
+                'max:255',
+                Rule::unique('categories', 'name')->ignore($categoryId),
             ],
             'description' => ['nullable', 'string'],
             'is_active' => ['boolean'],

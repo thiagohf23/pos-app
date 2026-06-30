@@ -2,7 +2,6 @@ export type * from './auth';
 export type * from './navigation';
 export type * from './ui';
 
-
 export interface Category {
     id: number;
     name: string;
@@ -45,7 +44,7 @@ export interface SaleItem {
     id: number;
     product_id: number;
     product_name: string;
-    price: string;
+    unit_price: string;
     quantity: number;
     total: string;
 }
@@ -57,6 +56,10 @@ export interface Sale {
     discount: string;
     total: string;
     status: string;
+    payment_method: string;
+    cash_tendered: string | null;
+    change_amount: string | null;
+    notes: string | null;
     sold_at: string;
     created_at: string;
     updated_at: string;

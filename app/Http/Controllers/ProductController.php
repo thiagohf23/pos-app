@@ -7,7 +7,6 @@ use App\Http\Requests\UpdateProductRequest;
 use App\Models\Category;
 use App\Models\Product;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 
@@ -41,7 +40,7 @@ class ProductController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreProductRequest $request) : RedirectResponse
+    public function store(StoreProductRequest $request): RedirectResponse
     {
         $data = $request->validated();
 
@@ -94,7 +93,7 @@ class ProductController extends Controller
      */
     public function destroy(Product $product)
     {
-        if($product->image) {
+        if ($product->image) {
             Storage::disk('public')->delete($product->image);
         }
         $product->delete();

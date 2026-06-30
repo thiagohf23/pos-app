@@ -1,6 +1,13 @@
-import { Loader2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Loader2 } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+} from '@/components/ui/dialog';
 
 interface Props {
     open: boolean;
@@ -11,29 +18,37 @@ interface Props {
     loading?: boolean;
 }
 
-export function DeleteConfirmDialog({ open, onClose, onConfirm, title, description, loading }: Props) {
+export function DeleteConfirmDialog({
+    open,
+    onClose,
+    onConfirm,
+    title,
+    description,
+    loading,
+}: Props) {
     return (
-        <Dialog open={open} onOpenChange={(openState) => !openState && onClose()}>
+        <Dialog
+            open={open}
+            onOpenChange={(openState) => !openState && onClose()}
+        >
             <DialogContent className="sm:max-w-[420px]">
                 <DialogHeader>
                     <DialogTitle>{title}</DialogTitle>
-                    <DialogDescription>
-                        {description}
-                    </DialogDescription>
+                    <DialogDescription>{description}</DialogDescription>
                 </DialogHeader>
 
-                <DialogFooter className="gap-2 sm:gap-0 mt-4">
-                    <Button 
-                        type="button" 
-                        variant="outline" 
+                <DialogFooter className="mt-4 gap-2 sm:gap-0">
+                    <Button
+                        type="button"
+                        variant="outline"
                         onClick={onClose}
                         disabled={loading}
                         className="cursor-pointer"
                     >
                         Cancel
                     </Button>
-                    <Button 
-                        type="button" 
+                    <Button
+                        type="button"
                         variant="destructive"
                         onClick={onConfirm}
                         disabled={loading}

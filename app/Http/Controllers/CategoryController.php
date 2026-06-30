@@ -40,9 +40,9 @@ class CategoryController extends Controller
     {
         $data = $request->validated();
 
-        if (isset($data['is_active']) && !$data['is_active'] && $category->products()->exists()) {
+        if (isset($data['is_active']) && ! $data['is_active'] && $category->products()->exists()) {
             return redirect()->back()->withErrors([
-                'is_active' => 'Cannot deactivate this category because it is linked to one or more products.'
+                'is_active' => 'Cannot deactivate this category because it is linked to one or more products.',
             ]);
         }
 
@@ -58,7 +58,7 @@ class CategoryController extends Controller
     {
         if ($category->products()->exists()) {
             return redirect()->back()->withErrors([
-                'delete' => 'Cannot delete this category because it is linked to one or more products.'
+                'delete' => 'Cannot delete this category because it is linked to one or more products.',
             ]);
         }
 

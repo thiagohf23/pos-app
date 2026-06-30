@@ -1,5 +1,12 @@
 import { Link } from '@inertiajs/react';
-import { BookOpen, Folder, FolderGit2, LayoutGrid, Package, ShoppingCart } from 'lucide-react';
+import {
+    BookOpen,
+    Folder,
+    FolderGit2,
+    LayoutGrid,
+    Package,
+    ShoppingCart,
+} from 'lucide-react';
 import AppLogo from '@/components/app-logo';
 import { NavFooter } from '@/components/nav-footer';
 import { NavMain } from '@/components/nav-main';
@@ -57,12 +64,12 @@ const footerNavItems: NavItem[] = [
 
 export function AppSidebar() {
     return (
-        <Sidebar collapsible="icon" variant="inset">
+        <Sidebar collapsible="offcanvas" variant="inset">
             <SidebarHeader>
                 <SidebarMenu>
                     <SidebarMenuItem>
                         <SidebarMenuButton size="lg" asChild>
-                            <Link href={dashboard()} prefetch>
+                            <Link href={posIndex().url} prefetch>
                                 <AppLogo />
                             </Link>
                         </SidebarMenuButton>

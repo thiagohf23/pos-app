@@ -2,13 +2,18 @@
 
 namespace App\Models;
 
+use Database\Factories\SaleFactory;
+use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
+#[Fillable(['user_id', 'subtotal', 'discount', 'total', 'status', 'payment_method', 'cash_tendered', 'change_amount', 'notes'])]
 class Sale extends Model
 {
-    protected $fillable = ['user_id', 'subtotal', 'discount', 'total', 'status', 'sold_at'];
+    /** @use HasFactory<SaleFactory> */
+    use HasFactory;
 
     protected function casts(): array
     {
@@ -16,6 +21,8 @@ class Sale extends Model
             'subtotal' => 'decimal:2',
             'discount' => 'decimal:2',
             'total' => 'decimal:2',
+            'cash_tendered' => 'decimal:2',
+            'change_amount' => 'decimal:2',
             'sold_at' => 'timestamp',
         ];
     }

@@ -2,29 +2,27 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Category;
 use App\Models\Product;
 use App\Models\Sale;
 use App\Models\SaleItem;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use Inertia\Response;
 
 class PosController extends Controller
 {
-    public function index(): \Inertia\Response
+    public function index(): Response
     {
-        $products = Product::with('category')
-            ->where('is_active', true)
-            ->where('stock', '>', 0)
-            ->orderBy('name', 'asc')
-            ->get();
-
-        $categories = \App\Models\Category::where('is_active', true)
-            ->orderBy('name', 'asc')
-            ->get();
-
         return Inertia::render('pos/index', [
-            'products' => $products,
-            'categories' => $categories,
+            'products' => Inertia::defer(fn () => Product::with('category')
+                ->where('is_active', true)
+                ->where('stock', '>', 0)
+                ->orderBy('name', 'asc')
+                ->get(), 'catalog'),
+            'categories' => Inertia::defer(fn () => Category::where('is_active', true)
+                ->orderBy('name', 'asc')
+                ->get(), 'catalog'),
         ]);
     }
 
@@ -37,7 +35,14 @@ class PosController extends Controller
             'subtotal' => 'required|numeric|min:0',
             'discount' => 'required|numeric|min:0',
             'total' => 'required|numeric|min:0',
+            'payment_method' => 'required|string|in:cash,credit_card,debit_card,pix',
+            'cash_tendered' => 'nullable|required_if:payment_method,cash|numeric|min:0',
+            'notes' => 'nullable|string|max:1000',
         ]);
+
+        $isCash = $validated['payment_method'] === 'cash';
+        $cashTendered = $isCash ? ($validated['cash_tendered'] ?? $validated['total']) : null;
+        $changeAmount = $isCash ? round(max(0, $cashTendered - $validated['total']), 2) : null;
 
         $sale = Sale::create([
             'user_id' => auth()->id(),
@@ -45,6 +50,10 @@ class PosController extends Controller
             'discount' => $validated['discount'],
             'total' => $validated['total'],
             'status' => 'completed',
+            'payment_method' => $validated['payment_method'],
+            'cash_tendered' => $cashTendered,
+            'change_amount' => $changeAmount,
+            'notes' => $validated['notes'] ?? null,
         ]);
 
         foreach ($validated['items'] as $item) {
@@ -53,7 +62,7 @@ class PosController extends Controller
                 'sale_id' => $sale->id,
                 'product_id' => $product->id,
                 'product_name' => $product->name,
-                'price' => $product->price,
+                'unit_price' => $product->price,
                 'quantity' => $item['quantity'],
                 'total' => $product->price * $item['quantity'],
             ]);
@@ -66,7 +75,7 @@ class PosController extends Controller
         ]);
     }
 
-    public function show(Sale $sale): \Inertia\Response
+    public function show(Sale $sale): Response
     {
         return Inertia::render('pos/receipt', [
             'sale' => $sale->load('items'),
