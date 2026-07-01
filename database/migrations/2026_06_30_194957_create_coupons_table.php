@@ -22,7 +22,7 @@ return new class extends Migration
             $table->timestamps();
         });
 
-        Schema::create('coupon_category', function (Blueprint $table) {
+        Schema::create('category_coupon', function (Blueprint $table) {
             $table->foreignId('coupon_id')->constrained()->cascadeOnDelete();
             $table->foreignId('category_id')->constrained()->cascadeOnDelete();
         });
@@ -36,7 +36,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::dropIfExists('coupon_product');
-        Schema::dropIfExists('coupon_category');
+        Schema::dropIfExists('category_coupon');
         Schema::dropIfExists('coupons');
     }
 };
