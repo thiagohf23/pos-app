@@ -15,14 +15,14 @@ class PosController extends Controller
     public function index(): Response
     {
         return Inertia::render('pos/index', [
-            'products' => Inertia::defer(fn () => Product::with('category')
+            'products' => Product::with('category')
                 ->where('is_active', true)
                 ->where('stock', '>', 0)
                 ->orderBy('name', 'asc')
-                ->get(), 'catalog'),
-            'categories' => Inertia::defer(fn () => Category::where('is_active', true)
+                ->get(),
+            'categories' => Category::where('is_active', true)
                 ->orderBy('name', 'asc')
-                ->get(), 'catalog'),
+                ->get(),
         ]);
     }
 
