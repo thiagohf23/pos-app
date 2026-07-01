@@ -39,11 +39,11 @@ const PAYMENT_METHODS: {
     label: string;
     icon: React.ElementType;
 }[] = [
-    { value: 'credit_card', label: 'Credit Card', icon: CreditCard },
-    { value: 'debit_card', label: 'Debit Card', icon: Landmark },
-    { value: 'cash', label: 'Cash', icon: Coins },
-    { value: 'pix', label: 'PIX', icon: Smartphone },
-];
+        { value: 'credit_card', label: 'Credit Card', icon: CreditCard },
+        { value: 'debit_card', label: 'Debit Card', icon: Landmark },
+        { value: 'cash', label: 'Cash', icon: Coins },
+        { value: 'pix', label: 'PIX', icon: Smartphone },
+    ];
 
 export function CheckoutDialog({
     open,
@@ -302,11 +302,10 @@ export function CheckoutDialog({
                                     onClick={() =>
                                         setPaymentMethod(method.value)
                                     }
-                                    className={`flex cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border-2 p-4 transition-all ${
-                                        isSelected
+                                    className={`flex cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border-2 p-4 transition-all ${isSelected
                                             ? 'border-emerald-500 bg-emerald-50 text-emerald-700 dark:bg-emerald-950/20 dark:text-emerald-400'
                                             : 'border-neutral-200 bg-white text-neutral-600 hover:border-neutral-400 dark:border-neutral-800 dark:bg-neutral-900/50 dark:text-neutral-400 dark:hover:border-neutral-600'
-                                    }`}
+                                        }`}
                                 >
                                     <Icon
                                         className={`size-8 ${isSelected ? 'text-emerald-600' : ''}`}
@@ -439,15 +438,15 @@ export function CheckoutDialog({
                                 <span>Payment</span>
                                 <span className="font-semibold text-neutral-800 capitalize dark:text-neutral-200">
                                     {checkoutDetails.paymentMethod ===
-                                    'credit_card'
+                                        'credit_card'
                                         ? 'Credit Card'
                                         : checkoutDetails.paymentMethod ===
                                             'debit_card'
-                                          ? 'Debit Card'
-                                          : checkoutDetails.paymentMethod ===
-                                              'pix'
-                                            ? 'PIX'
-                                            : 'Cash'}
+                                            ? 'Debit Card'
+                                            : checkoutDetails.paymentMethod ===
+                                                'pix'
+                                                ? 'PIX'
+                                                : 'Cash'}
                                 </span>
                             </div>
                             <div className="flex justify-between">
