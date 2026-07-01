@@ -30,7 +30,7 @@ export default function Profile({
     const { auth } = usePage<PageProps>().props;
     const getInitials = useInitials();
     const fileInputRef = useRef<HTMLInputElement>(null);
-    const [avatarPreview, setAvatarPreview] = useState<string | null>(auth.user.avatar);
+    const [avatarPreview, setAvatarPreview] = useState<string | null>(auth.user.avatar ?? null);
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
     const [isCropperOpen, setIsCropperOpen] = useState(false);
 

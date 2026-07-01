@@ -9,7 +9,11 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('employees', function (Blueprint $table) {
-            $table->foreignId('user_id')->nullable()->constrained()->nullOnDelete();
+            $table->dropUnique(['email']);
+        });
+
+        Schema::table('employees', function (Blueprint $table) {
+            $table->foreignId('user_id')->constrained()->cascadeOnDelete();
             $table->dropColumn(['name', 'email']);
         });
     }
@@ -19,6 +23,9 @@ return new class extends Migration
         Schema::table('employees', function (Blueprint $table) {
             $table->string('name');
             $table->string('email')->unique();
+        });
+
+        Schema::table('employees', function (Blueprint $table) {
             $table->dropForeign(['user_id']);
             $table->dropColumn('user_id');
         });

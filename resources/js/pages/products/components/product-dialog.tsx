@@ -37,7 +37,7 @@ export function ProductDialog({ open, onClose, editing, categories }: Props) {
     // State is initialized from `editing` at mount; the parent remounts this dialog
     // via a `key` whenever it opens, so we never sync props to state inside an effect.
     const [imagePreview, setImagePreview] = useState<string | null>(
-        editing?.image ? `/storage/${editing.image}` : null,
+        editing?.image ? (editing.image.startsWith('http') ? editing.image : `/storage/${editing.image}`) : null,
     );
     const [categorySearchQuery, setCategorySearchQuery] = useState('');
     const [selectedFile, setSelectedFile] = useState<File | null>(null);

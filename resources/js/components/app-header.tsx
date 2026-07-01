@@ -74,26 +74,31 @@ const mainNavItems: NavItem[] = [
         title: 'Coupons',
         href: couponsIndex().url,
         icon: Ticket,
+        roles: ['Admin'],
     },
     {
         title: 'Employees',
         href: employeesIndex().url,
         icon: Users,
+        roles: ['Admin'],
     },
     {
         title: 'Suppliers',
         href: suppliersIndex().url,
         icon: Truck,
+        roles: ['Admin'],
     },
     {
         title: 'Roles',
         href: rolesIndex().url,
         icon: Users,
+        roles: ['Admin'],
     },
     {
         title: 'Permissions',
         href: permissionsIndex().url,
         icon: Users,
+        roles: ['Admin'],
     },
 ];
 
@@ -113,6 +118,10 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
     const { auth } = page.props;
     const getInitials = useInitials();
     const { isCurrentUrl, whenCurrentUrl } = useCurrentUrl();
+
+    const visibleNavItems = mainNavItems.filter(
+        (item) => !item.roles || item.roles.some((role) => auth.roles.includes(role)),
+    );
 
     return (
         <>
@@ -143,7 +152,7 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
                                 <div className="flex h-full flex-1 flex-col space-y-4 p-4">
                                     <div className="flex h-full flex-col justify-between text-sm">
                                         <div className="flex flex-col space-y-4">
-                                            {mainNavItems.map((item) => (
+                                            {visibleNavItems.map((item) => (
                                                 <Link
                                                     key={item.title}
                                                     href={item.href}
@@ -191,7 +200,7 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
                     <div className="ml-6 hidden h-full items-center space-x-6 lg:flex">
                         <NavigationMenu className="flex h-full items-stretch">
                             <NavigationMenuList className="flex h-full items-stretch space-x-2">
-                                {mainNavItems.map((item, index) => (
+                                {visibleNavItems.map((item, index) => (
                                     <NavigationMenuItem
                                         key={index}
                                         className="relative flex h-full items-center"

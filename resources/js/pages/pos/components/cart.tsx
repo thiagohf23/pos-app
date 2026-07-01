@@ -67,7 +67,7 @@ export function Cart({
                             <div className="dark:bg-neutral-850 flex size-12 shrink-0 items-center justify-center overflow-hidden rounded-md border border-neutral-200 bg-neutral-100 dark:border-neutral-800">
                                 {item.product.image ? (
                                     <img
-                                        src={`/storage/${item.product.image}`}
+                                        src={item.product.image.startsWith('http') ? item.product.image : `/storage/${item.product.image}`}
                                         alt={item.product.name}
                                         className="size-full object-cover"
                                     />

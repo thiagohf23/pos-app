@@ -15,10 +15,8 @@ class EmployeeFactory extends Factory
 
     public function definition(): array
     {
-        $user = User::factory()->create();
-
         return [
-            'user_id' => $user->id,
+            'user_id' => User::factory(),
             'phone' => $this->faker->phoneNumber(),
             'cpf' => $this->faker->unique()->numerify('###.###.###-##'),
             'salary' => $this->faker->randomFloat(2, 1500, 15000),

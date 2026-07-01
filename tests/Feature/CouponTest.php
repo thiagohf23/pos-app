@@ -4,11 +4,14 @@ use App\Models\Category;
 use App\Models\Coupon;
 use App\Models\Product;
 use App\Models\User;
+use Database\Seeders\RolesAndPermissionsSeeder;
+
+beforeEach(fn () => $this->seed(RolesAndPermissionsSeeder::class));
 
 // ── CRUD ──────────────────────────────────────────────────────────────────────
 
 test('authenticated user can create a coupon with scope all', function () {
-    $user = User::factory()->create();
+    $user = User::factory()->create()->assignRole('Admin');
 
     $response = $this->actingAs($user)
         ->post(route('coupons.store'), [
@@ -27,7 +30,7 @@ test('authenticated user can create a coupon with scope all', function () {
 });
 
 test('creating a category-scoped coupon syncs the coupon_category pivot', function () {
-    $user = User::factory()->create();
+    $user = User::factory()->create()->assignRole('Admin');
     $categoryA = Category::factory()->create();
     $categoryB = Category::factory()->create();
 
@@ -47,7 +50,7 @@ test('creating a category-scoped coupon syncs the coupon_category pivot', functi
 });
 
 test('coupon code must be unique', function () {
-    $user = User::factory()->create();
+    $user = User::factory()->create()->assignRole('Admin');
     Coupon::factory()->create(['code' => 'UNIQUE10']);
 
     // WithoutMiddleware + FormRequest redirects with session errors instead of 422 JSON,
@@ -65,7 +68,7 @@ test('coupon code must be unique', function () {
 });
 
 test('user can update a coupon and scope change re-syncs pivots', function () {
-    $user = User::factory()->create();
+    $user = User::factory()->create()->assignRole('Admin');
     $categoryA = Category::factory()->create();
     $product = Product::factory()->create(['is_active' => true]);
 
@@ -95,7 +98,7 @@ test('user can update a coupon and scope change re-syncs pivots', function () {
 });
 
 test('user can delete a coupon', function () {
-    $user = User::factory()->create();
+    $user = User::factory()->create()->assignRole('Admin');
     $coupon = Coupon::factory()->create();
 
     $this->actingAs($user)->delete(route('coupons.destroy', $coupon));

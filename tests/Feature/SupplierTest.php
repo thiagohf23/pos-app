@@ -2,9 +2,12 @@
 
 use App\Models\Supplier;
 use App\Models\User;
+use Database\Seeders\RolesAndPermissionsSeeder;
+
+beforeEach(fn () => $this->seed(RolesAndPermissionsSeeder::class));
 
 test('authenticated user can create a supplier', function () {
-    $user = User::factory()->create();
+    $user = User::factory()->create()->assignRole('Admin');
 
     $response = $this->actingAs($user)
         ->post(route('suppliers.store'), [
@@ -24,7 +27,7 @@ test('authenticated user can create a supplier', function () {
 });
 
 test('authenticated user can update a supplier', function () {
-    $user = User::factory()->create();
+    $user = User::factory()->create()->assignRole('Admin');
     $supplier = Supplier::factory()->create();
 
     $this->actingAs($user)
@@ -40,7 +43,7 @@ test('authenticated user can update a supplier', function () {
 });
 
 test('supplier email must be unique', function () {
-    $user = User::factory()->create();
+    $user = User::factory()->create()->assignRole('Admin');
     Supplier::factory()->create(['email' => 'taken@example.com']);
 
     $this->actingAs($user)->post(route('suppliers.store'), [
@@ -52,7 +55,7 @@ test('supplier email must be unique', function () {
 });
 
 test('authenticated user can delete a supplier', function () {
-    $user = User::factory()->create();
+    $user = User::factory()->create()->assignRole('Admin');
     $supplier = Supplier::factory()->create();
 
     $this->actingAs($user)

@@ -1,4 +1,4 @@
-import { Link } from '@inertiajs/react';
+import { Link, usePage } from '@inertiajs/react';
 import {
     BookOpen,
     Folder,
@@ -59,26 +59,31 @@ const mainNavItems: NavItem[] = [
         title: 'Coupons',
         href: couponsIndex().url,
         icon: Ticket,
+        roles: ['Admin'],
     },
     {
         title: 'Employees',
         href: employeesIndex().url,
         icon: Users,
+        roles: ['Admin'],
     },
     {
         title: 'Suppliers',
         href: suppliersIndex().url,
         icon: Truck,
+        roles: ['Admin'],
     },
     {
         title: 'Roles',
         href: rolesIndex().url,
         icon: Users,
+        roles: ['Admin'],
     },
     {
         title: 'Permissions',
         href: permissionsIndex().url,
         icon: Users,
+        roles: ['Admin'],
     },
 ];
 
@@ -96,6 +101,12 @@ const footerNavItems: NavItem[] = [
 ];
 
 export function AppSidebar() {
+    const { auth } = usePage().props;
+
+    const visibleNavItems = mainNavItems.filter(
+        (item) => !item.roles || item.roles.some((role) => auth.roles.includes(role)),
+    );
+
     return (
         <Sidebar collapsible="offcanvas" variant="inset">
             <SidebarHeader>
@@ -111,7 +122,7 @@ export function AppSidebar() {
             </SidebarHeader>
 
             <SidebarContent>
-                <NavMain items={mainNavItems} />
+                <NavMain items={visibleNavItems} />
             </SidebarContent>
 
             <SidebarFooter>

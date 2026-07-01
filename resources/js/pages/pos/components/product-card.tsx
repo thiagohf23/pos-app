@@ -23,7 +23,7 @@ export function ProductCard({ product, cartQty, onAdd }: Props) {
             <div className="relative flex aspect-square w-full items-center justify-center overflow-hidden border-b border-neutral-100 bg-neutral-50 dark:border-neutral-800 dark:bg-neutral-900">
                 {product.image ? (
                     <img
-                        src={`/storage/${product.image}`}
+                        src={product.image.startsWith('http') ? product.image : `/storage/${product.image}`}
                         alt={product.name}
                         className="size-full object-cover transition-transform duration-300 group-hover:scale-105"
                     />
