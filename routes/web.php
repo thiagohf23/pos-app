@@ -25,7 +25,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::resource('coupons', CouponController::class)->except(['create', 'show', 'edit']);
     Route::get('pos', [PosController::class, 'index'])->name('pos.index');
     Route::post('pos/checkout', [CheckoutController::class, 'store'])->name('pos.checkout');
-    Route::post('pos/coupon', CouponValidationController::class)->name('pos.coupon');
+    Route::get('pos/coupon', CouponValidationController::class)->name('pos.coupon');
     Route::get('pos/receipt/{sale}', [PosController::class, 'show'])->name('pos.receipt');
 });
 
