@@ -131,6 +131,11 @@ export function CheckoutDialog({
                 setAppliedCoupon(null);
                 toast.error(data.message);
             }
+        } catch {
+            const message = 'Failed to apply coupon. Please try again.';
+            setCouponError(message);
+            setAppliedCoupon(null);
+            toast.error(message);
         } finally {
             setCouponLoading(false);
         }
