@@ -44,8 +44,16 @@ class CheckoutController extends Controller
                     $lockedProducts[$item['product_id']] = $product;
                 }
 
+                $serverSubtotal = 0.0;
+
+                foreach ($validated['items'] as $item) {
+                    $serverSubtotal += (float) $lockedProducts[$item['product_id']]->price * $item['quantity'];
+                }
+
+                $serverSubtotal = round($serverSubtotal, 2);
+
                 $discount = $validated['discount'];
-                $total = $validated['total'];
+                $total = round(max(0, $serverSubtotal - $discount), 2);
                 $couponId = null;
                 $couponCode = null;
 
@@ -65,7 +73,12 @@ class CheckoutController extends Controller
                     }
 
                     $discount = $coupon->calculateDiscount($lineItems);
-                    $total = round($validated['subtotal'] - $discount, 2);
+
+                    if ($discount <= 0) {
+                        throw new \Exception('Coupon does not apply to any item in the cart.');
+                    }
+
+                    $total = round($serverSubtotal - $discount, 2);
                     $couponId = $coupon->id;
                     $couponCode = $coupon->code;
                 }
@@ -81,7 +94,7 @@ class CheckoutController extends Controller
 
                 $sale = Sale::create([
                     'user_id' => auth()->id(),
-                    'subtotal' => $validated['subtotal'],
+                    'subtotal' => $serverSubtotal,
                     'discount' => $discount,
                     'total' => $total,
                     'status' => 'completed',
