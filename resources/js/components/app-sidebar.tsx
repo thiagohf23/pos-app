@@ -7,6 +7,8 @@ import {
     Package,
     ShoppingCart,
     Ticket,
+    Truck,
+    Users,
 } from 'lucide-react';
 import AppLogo from '@/components/app-logo';
 import { NavFooter } from '@/components/nav-footer';
@@ -23,9 +25,13 @@ import {
 } from '@/components/ui/sidebar';
 import { dashboard } from '@/routes';
 import { index as categoriesIndex } from '@/routes/categories';
+import { index as employeesIndex } from '@/routes/employees';
+import { index as suppliersIndex } from '@/routes/suppliers';
 import { index as couponsIndex } from '@/routes/coupons';
 import { index as posIndex } from '@/routes/pos';
 import { index as productsIndex } from '@/routes/products';
+import { index as rolesIndex } from '@/routes/roles';
+import { index as permissionsIndex } from '@/routes/permissions';
 import type { NavItem } from '@/types';
 
 const mainNavItems: NavItem[] = [
@@ -53,6 +59,26 @@ const mainNavItems: NavItem[] = [
         title: 'Coupons',
         href: couponsIndex().url,
         icon: Ticket,
+    },
+    {
+        title: 'Employees',
+        href: employeesIndex().url,
+        icon: Users,
+    },
+    {
+        title: 'Suppliers',
+        href: suppliersIndex().url,
+        icon: Truck,
+    },
+    {
+        title: 'Roles',
+        href: rolesIndex().url,
+        icon: Users,
+    },
+    {
+        title: 'Permissions',
+        href: permissionsIndex().url,
+        icon: Users,
     },
 ];
 
