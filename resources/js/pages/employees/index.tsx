@@ -38,8 +38,8 @@ export default function EmployeesIndex({ employees, roles }: Props) {
         router.put(
             update.url(employee.id),
             {
-                name: employee.name,
-                email: employee.email,
+                name: employee.user?.name ?? '',
+                email: employee.user?.email ?? '',
                 phone: employee.phone || '',
                 cpf: employee.cpf || '',
                 salary: employee.salary,
@@ -49,7 +49,7 @@ export default function EmployeesIndex({ employees, roles }: Props) {
             {
                 onSuccess: () => {
                     toast.success(
-                        `Employee "${employee.name}" status updated!`,
+                        `Employee "${employee.user?.name}" status updated!`,
                     );
                 },
                 onError: () => {
@@ -70,7 +70,7 @@ export default function EmployeesIndex({ employees, roles }: Props) {
             onSuccess: () => {
                 router.flushAll();
                 toast.success(
-                    `Employee "${deletingEmployee.name}" deleted successfully!`,
+                    `Employee "${deletingEmployee.user?.name}" deleted successfully!`,
                 );
                 setDeletingEmployee(null);
             },
@@ -85,8 +85,8 @@ export default function EmployeesIndex({ employees, roles }: Props) {
 
         return employees.data.filter(
             (employee) =>
-                employee.name.toLowerCase().includes(query) ||
-                employee.email.toLowerCase().includes(query) ||
+                (employee.user?.name ?? '').toLowerCase().includes(query) ||
+                (employee.user?.email ?? '').toLowerCase().includes(query) ||
                 employee.cpf?.toLowerCase().includes(query),
         );
     }, [employees.data, searchTerm]);
@@ -165,7 +165,7 @@ export default function EmployeesIndex({ employees, roles }: Props) {
                 onClose={() => setDeletingEmployee(null)}
                 onConfirm={confirmDelete}
                 title="Delete Employee"
-                description={`Are you sure you want to delete "${deletingEmployee?.name}"? This action cannot be undone.`}
+                description={`Are you sure you want to delete "${deletingEmployee?.user?.name}"? This action cannot be undone.`}
                 loading={isDeleting}
             />
         </>

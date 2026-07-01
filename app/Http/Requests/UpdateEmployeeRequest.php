@@ -30,8 +30,8 @@ class UpdateEmployeeRequest extends FormRequest
                 'string',
                 'email',
                 'max:255',
-                Rule::unique('employees', 'email')->ignore($employeeId),
             ],
+            'password' => ['nullable', 'string', 'min:8'],
             'phone' => ['nullable', 'string', 'max:20'],
             'cpf' => [
                 'nullable',

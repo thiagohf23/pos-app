@@ -35,6 +35,7 @@ export function EmployeeDialog({ open, onClose, editing, roles = [] }: Props) {
         useForm({
             name: '',
             email: '',
+            password: '',
             phone: '',
             cpf: '',
             salary: '',
@@ -47,14 +48,15 @@ export function EmployeeDialog({ open, onClose, editing, roles = [] }: Props) {
         if (open) {
             if (editing) {
                 setData({
-                    name: editing.name,
-                    email: editing.email,
+                    name: editing.user?.name ?? '',
+                    email: editing.user?.email ?? '',
+                    password: '',
                     phone: editing.phone || '',
                     cpf: editing.cpf || '',
                     salary: editing.salary,
                     hire_date: editing.hire_date || '',
                     is_active: editing.is_active,
-                    role_id: String(editing.roles[0]?.id ?? ''),
+                    role_id: String(editing.user?.roles[0]?.id ?? ''),
                 });
             } else {
                 reset();
@@ -146,6 +148,24 @@ export function EmployeeDialog({ open, onClose, editing, roles = [] }: Props) {
                             />
                             {errors.email && (
                                 <p className="text-xs text-destructive">{errors.email}</p>
+                            )}
+                        </div>
+
+                        {/* Password */}
+                        <div className="space-y-1.5">
+                            <Label htmlFor="password">
+                                Password {editing ? '(leave blank to keep)' : '*'}
+                            </Label>
+                            <Input
+                                id="password"
+                                type="password"
+                                value={data.password}
+                                onChange={(e) => setData('password', e.target.value)}
+                                placeholder={editing ? 'Leave blank to keep' : 'Min. 8 characters'}
+                                required={!editing}
+                            />
+                            {errors.password && (
+                                <p className="text-xs text-destructive">{errors.password}</p>
                             )}
                         </div>
 

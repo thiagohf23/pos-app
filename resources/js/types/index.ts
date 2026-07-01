@@ -4,14 +4,18 @@ export type * from './ui';
 
 export interface Employee {
     id: number;
-    name: string;
-    email: string;
+    user_id: number | null;
     phone: string | null;
     cpf: string | null;
     salary: string;
     hire_date: string | null;
     is_active: boolean;
-    roles: { id: number; name: string }[];
+    user: {
+        id: number;
+        name: string;
+        email: string;
+        roles: { id: number; name: string }[];
+    } | null;
 }
 
 export type CouponScope = 'all' | 'category' | 'product';

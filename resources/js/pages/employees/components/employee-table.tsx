@@ -68,13 +68,13 @@ export function EmployeeTable({
                             className="transition-colors hover:bg-neutral-50/50 dark:hover:bg-neutral-900/20"
                         >
                             <td className="px-6 py-4 font-semibold text-neutral-900 dark:text-neutral-100">
-                                {employee.name}
+                                {employee.user?.name ?? '—'}
                             </td>
                             <td className="px-6 py-4 text-sm text-neutral-600 dark:text-neutral-400">
-                                {employee.email}
+                                {employee.user?.email ?? '—'}
                             </td>
                             <td className="px-6 py-4 text-sm text-neutral-600 dark:text-neutral-400">
-                                {employee.roles?.[0]?.name ?? '—'}
+                                {employee.user?.roles?.[0]?.name ?? '—'}
                             </td>
                             <td className="px-6 py-4 text-right text-sm font-semibold text-neutral-700 dark:text-neutral-300">
                                 {new Intl.NumberFormat('pt-BR', {
