@@ -1,6 +1,6 @@
 'use client';
 
-import { Head, Deferred } from '@inertiajs/react';
+import { Head } from '@inertiajs/react';
 import { Search } from 'lucide-react';
 import { useState, useMemo } from 'react';
 import { toast } from 'sonner';
@@ -114,31 +114,25 @@ export default function PosIndex({ products = [], categories = [] }: Props) {
                         </p>
                     </div>
 
-                    {/* Search and Filters */}
-                    <div className="flex flex-col gap-4">
-                        <div className="relative w-full">
+                    {/* Search and Filters side-by-side */}
+                    <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                        <div className="relative w-full sm:max-w-xs">
                             <Search className="pointer-events-none absolute top-3 left-3 size-4 text-neutral-400" />
                             <Input
-                                placeholder="Search by name, description or barcode..."
+                                placeholder="Search by name, description..."
                                 value={search}
                                 onChange={(e) => setSearch(e.target.value)}
                                 className="h-11 bg-white pl-9 dark:bg-neutral-900/50"
                             />
                         </div>
-                    </div>
 
-                    <Deferred
-                        data={['products', 'categories']}
-                        fallback={<CatalogSkeleton />}
-                    >
-                        <>
-                            {/* Category Badges */}
-                            <div className="flex scrollbar-none gap-2 overflow-x-auto pb-2">
+                        <div className="scrollbar-none overflow-x-auto py-1">
+                            <div className="flex items-center gap-2">
                                 <button
                                     onClick={() => setSelectedCategoryId(null)}
-                                    className={`shrink-0 cursor-pointer rounded-full px-4 py-2 text-xs font-semibold transition-all ${
+                                    className={`shrink-0 cursor-pointer whitespace-nowrap rounded-full border px-4 py-2 text-xs font-semibold transition-all ${
                                         selectedCategoryId === null
-                                            ? 'bg-neutral-950 text-white shadow-xs dark:bg-white dark:text-neutral-950'
+                                            ? 'border-transparent bg-neutral-950 text-white shadow-xs dark:bg-white dark:text-neutral-950'
                                             : 'border border-neutral-200 bg-white text-neutral-600 hover:bg-neutral-50 dark:border-neutral-800 dark:bg-neutral-900 dark:text-neutral-400 dark:hover:bg-neutral-800'
                                     }`}
                                 >
@@ -147,12 +141,10 @@ export default function PosIndex({ products = [], categories = [] }: Props) {
                                 {categories.map((category) => (
                                     <button
                                         key={category.id}
-                                        onClick={() =>
-                                            setSelectedCategoryId(category.id)
-                                        }
-                                        className={`shrink-0 cursor-pointer rounded-full px-4 py-2 text-xs font-semibold transition-all ${
+                                        onClick={() => setSelectedCategoryId(category.id)}
+                                        className={`shrink-0 cursor-pointer whitespace-nowrap rounded-full border px-4 py-2 text-xs font-semibold transition-all ${
                                             selectedCategoryId === category.id
-                                                ? 'bg-neutral-950 text-white shadow-xs dark:bg-white dark:text-neutral-950'
+                                                ? 'border-transparent bg-neutral-950 text-white shadow-xs dark:bg-white dark:text-neutral-950'
                                                 : 'border border-neutral-200 bg-white text-neutral-600 hover:bg-neutral-50 dark:border-neutral-800 dark:bg-neutral-900 dark:text-neutral-400 dark:hover:bg-neutral-800'
                                         }`}
                                     >
@@ -160,15 +152,14 @@ export default function PosIndex({ products = [], categories = [] }: Props) {
                                     </button>
                                 ))}
                             </div>
+                        </div>
+                    </div>
 
-                            {/* Products Grid */}
-                            <ProductGrid
-                                products={filteredProducts}
-                                cart={cart}
-                                onAddToCart={addToCart}
-                            />
-                        </>
-                    </Deferred>
+                    <ProductGrid
+                        products={filteredProducts}
+                        cart={cart}
+                        onAddToCart={addToCart}
+                    />
                 </div>
 
                 {/* Checkout / Cart Side Panel (Right) */}

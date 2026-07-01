@@ -55,13 +55,9 @@ export function useCart() {
         );
     }, [cart]);
 
-    const discount = useMemo(() => {
-        return subtotal > 100 ? subtotal * 0.05 : 0;
-    }, [subtotal]);
+    const discount = 0;
 
-    const total = useMemo(() => {
-        return subtotal - discount;
-    }, [subtotal, discount]);
+    const total = subtotal;
 
     return {
         cart,

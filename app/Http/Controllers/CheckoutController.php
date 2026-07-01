@@ -2,15 +2,17 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Coupon;
 use App\Models\Product;
 use App\Models\Sale;
 use App\Models\SaleItem;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class CheckoutController extends Controller
 {
-    public function store(Request $request)
+    public function store(Request $request): JsonResponse
     {
         $validated = $request->validate([
             'items' => 'required|array|min:1',
@@ -22,40 +24,90 @@ class CheckoutController extends Controller
             'payment_method' => 'required|string|in:cash,credit_card,debit_card,pix',
             'cash_tendered' => 'nullable|required_if:payment_method,cash|numeric|min:0',
             'notes' => 'nullable|string',
+            'coupon_code' => 'nullable|string',
         ]);
 
         $cashTendered = $validated['cash_tendered'] ?? null;
-        $changeAmount = null;
-
-        if ($validated['payment_method'] === 'cash') {
-            if ($cashTendered < $validated['total']) {
-                return response()->json([
-                    'message' => 'Amount paid is less than total.',
-                ], 422);
-            }
-            $changeAmount = round($cashTendered - $validated['total'], 2);
-        }
 
         try {
-            $sale = DB::transaction(function () use ($validated, $cashTendered, $changeAmount) {
+            $sale = DB::transaction(function () use ($validated, $cashTendered) {
+                /** @var array<int, Product> $lockedProducts */
+                $lockedProducts = [];
+
+                foreach ($validated['items'] as $item) {
+                    $product = Product::where('id', $item['product_id'])->lockForUpdate()->firstOrFail();
+
+                    if ($product->stock < $item['quantity']) {
+                        throw new \Exception("Product {$product->name} is out of stock.");
+                    }
+
+                    $lockedProducts[$item['product_id']] = $product;
+                }
+
+                $serverSubtotal = 0.0;
+
+                foreach ($validated['items'] as $item) {
+                    $serverSubtotal += (float) $lockedProducts[$item['product_id']]->price * $item['quantity'];
+                }
+
+                $serverSubtotal = round($serverSubtotal, 2);
+
+                $discount = $validated['discount'];
+                $total = round(max(0, $serverSubtotal - $discount), 2);
+                $couponId = null;
+                $couponCode = null;
+
+                if (! empty($validated['coupon_code'])) {
+                    $coupon = Coupon::where('code', $validated['coupon_code'])->lockForUpdate()->first();
+
+                    if (! $coupon || ! $coupon->isValid()) {
+                        throw new \Exception('Invalid or expired coupon.');
+                    }
+
+                    $lineItems = [];
+                    foreach ($validated['items'] as $item) {
+                        $lineItems[] = [
+                            'product' => $lockedProducts[$item['product_id']],
+                            'quantity' => $item['quantity'],
+                        ];
+                    }
+
+                    $discount = $coupon->calculateDiscount($lineItems);
+
+                    if ($discount <= 0) {
+                        throw new \Exception('Coupon does not apply to any item in the cart.');
+                    }
+
+                    $total = round($serverSubtotal - $discount, 2);
+                    $couponId = $coupon->id;
+                    $couponCode = $coupon->code;
+                }
+
+                $changeAmount = null;
+
+                if ($validated['payment_method'] === 'cash') {
+                    if ($cashTendered < $total) {
+                        throw new \Exception('Amount paid is less than total.');
+                    }
+                    $changeAmount = round($cashTendered - $total, 2);
+                }
+
                 $sale = Sale::create([
                     'user_id' => auth()->id(),
-                    'subtotal' => $validated['subtotal'],
-                    'discount' => $validated['discount'],
-                    'total' => $validated['total'],
+                    'subtotal' => $serverSubtotal,
+                    'discount' => $discount,
+                    'total' => $total,
                     'status' => 'completed',
                     'payment_method' => $validated['payment_method'],
                     'cash_tendered' => $cashTendered,
                     'change_amount' => $changeAmount,
                     'notes' => $validated['notes'] ?? null,
+                    'coupon_id' => $couponId,
+                    'coupon_code' => $couponCode,
                 ]);
 
                 foreach ($validated['items'] as $item) {
-                    $product = Product::lockForUpdate()->findOrFail($item['product_id']);
-
-                    if ($product->stock < $item['quantity']) {
-                        throw new \Exception("Product {$product->name} is out of stock.");
-                    }
+                    $product = $lockedProducts[$item['product_id']];
 
                     SaleItem::create([
                         'sale_id' => $sale->id,
@@ -67,6 +119,10 @@ class CheckoutController extends Controller
                     ]);
 
                     $product->decrement('stock', $item['quantity']);
+                }
+
+                if (! empty($validated['coupon_code']) && isset($coupon)) {
+                    $coupon->increment('used_count');
                 }
 
                 return $sale;

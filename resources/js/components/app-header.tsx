@@ -1,5 +1,5 @@
 import { Link, usePage } from '@inertiajs/react';
-import { BookOpen, Folder, LayoutGrid, Menu, Search } from 'lucide-react';
+import { BookOpen, Folder, LayoutGrid, Menu, Search, Package, ShoppingCart, Ticket } from 'lucide-react';
 import AppLogo from '@/components/app-logo';
 import AppLogoIcon from '@/components/app-logo-icon';
 import { Breadcrumbs } from '@/components/breadcrumbs';
@@ -33,7 +33,12 @@ import { useCurrentUrl } from '@/hooks/use-current-url';
 import { useInitials } from '@/hooks/use-initials';
 import { cn, toUrl } from '@/lib/utils';
 import { dashboard } from '@/routes';
+import { index as categoriesIndex } from '@/routes/categories';
+import { index as couponsIndex } from '@/routes/coupons';
+import { index as posIndex } from '@/routes/pos';
+import { index as productsIndex } from '@/routes/products';
 import type { BreadcrumbItem, NavItem } from '@/types';
+import AppearanceToggleTab from './appearance-tabs';
 
 type Props = {
     breadcrumbs?: BreadcrumbItem[];
@@ -45,14 +50,29 @@ const mainNavItems: NavItem[] = [
         href: dashboard(),
         icon: LayoutGrid,
     },
+    {
+        title: 'POS Terminal',
+        href: posIndex().url,
+        icon: ShoppingCart,
+    },
+    {
+        title: 'Products',
+        href: productsIndex().url,
+        icon: Package,
+    },
+    {
+        title: 'Categories',
+        href: categoriesIndex().url,
+        icon: Folder,
+    },
+    {
+        title: 'Coupons',
+        href: couponsIndex().url,
+        icon: Ticket,
+    },
 ];
 
 const rightNavItems: NavItem[] = [
-    {
-        title: 'Repository',
-        href: 'https://github.com/laravel/react-starter-kit',
-        icon: Folder,
-    },
     {
         title: 'Documentation',
         href: 'https://laravel.com/docs/starter-kits#react',
@@ -72,7 +92,7 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
     return (
         <>
             <div className="border-b border-sidebar-border/80">
-                <div className="mx-auto flex h-16 items-center px-4 md:max-w-7xl">
+                <div className="flex h-16 items-center px-6 w-full">
                     {/* Mobile Menu */}
                     <div className="lg:hidden">
                         <Sheet>
@@ -178,12 +198,13 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
 
                     <div className="ml-auto flex items-center space-x-2">
                         <div className="relative flex items-center space-x-1">
+                            <AppearanceToggleTab className="max-lg:hidden" />
+
                             <Button
                                 variant="ghost"
                                 size="icon"
                                 className="group h-9 w-9 cursor-pointer"
                             >
-                                <Search className="!size-5 opacity-80 group-hover:opacity-100" />
                             </Button>
                             <div className="ml-1 hidden gap-1 lg:flex">
                                 {rightNavItems.map((item) => (
@@ -238,7 +259,7 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
             </div>
             {breadcrumbs.length > 1 && (
                 <div className="flex w-full border-b border-sidebar-border/70">
-                    <div className="mx-auto flex h-12 w-full items-center justify-start px-4 text-neutral-500 md:max-w-7xl">
+                    <div className="flex h-12 w-full items-center justify-start px-6 text-neutral-500">
                         <Breadcrumbs breadcrumbs={breadcrumbs} />
                     </div>
                 </div>

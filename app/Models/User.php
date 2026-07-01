@@ -24,12 +24,29 @@ use Illuminate\Support\Carbon;
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  */
-#[Fillable(['name', 'email', 'password'])]
+#[Fillable(['name', 'email', 'password', 'avatar_path'])]
 #[Hidden(['password', 'two_factor_secret', 'two_factor_recovery_codes', 'remember_token'])]
 class User extends Authenticatable
 {
     /** @use HasFactory<UserFactory> */
     use HasFactory, Notifiable;
+
+    /**
+     * The accessors to append to the model's array form.
+     *
+     * @var array<int, string>
+     */
+    protected $appends = [
+        'avatar',
+    ];
+
+    /**
+     * Get the user's avatar URL.
+     */
+    public function getAvatarAttribute(): ?string
+    {
+        return $this->avatar_path ? asset('storage/'.$this->avatar_path) : null;
+    }
 
     /**
      * Get the attributes that should be cast.

@@ -24,7 +24,6 @@ interface Props {
 export function Cart({
     cart,
     subtotal,
-    discount,
     total,
     updateQuantity,
     removeFromCart,
@@ -133,12 +132,6 @@ export function Cart({
                         ${subtotal.toFixed(2)}
                     </span>
                 </div>
-                {discount > 0 && (
-                    <div className="flex justify-between text-xs font-medium text-emerald-600">
-                        <span>Discount (5% off &gt; $100)</span>
-                        <span>-${discount.toFixed(2)}</span>
-                    </div>
-                )}
                 <div className="flex items-baseline justify-between border-t border-neutral-200 pt-3 dark:border-neutral-800">
                     <span className="text-sm font-bold text-neutral-900 dark:text-neutral-100">
                         Total

@@ -1,5 +1,5 @@
 import { useForm } from '@inertiajs/react';
-import { Image as ImageIcon, Loader2 } from 'lucide-react';
+import { Image as ImageIcon, Loader2, Crop } from 'lucide-react';
 import { useRef, useState, useMemo } from 'react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
@@ -21,6 +21,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
+import { AvatarCropper } from '../../settings/components/avatar-cropper';
 import { store, update } from '@/routes/products';
 import type { Category, Product } from '@/types';
 
@@ -39,6 +40,8 @@ export function ProductDialog({ open, onClose, editing, categories }: Props) {
         editing?.image ? `/storage/${editing.image}` : null,
     );
     const [categorySearchQuery, setCategorySearchQuery] = useState('');
+    const [selectedFile, setSelectedFile] = useState<File | null>(null);
+    const [isCropperOpen, setIsCropperOpen] = useState(false);
 
     const { data, setData, post, processing, errors, reset, clearErrors } =
         useForm({
@@ -67,12 +70,40 @@ export function ProductDialog({ open, onClose, editing, categories }: Props) {
         const file = e.target.files?.[0];
 
         if (file) {
-            setData('image', file);
-            const reader = new FileReader();
-            reader.onloadend = () => {
-                setImagePreview(reader.result as string);
-            };
-            reader.readAsDataURL(file);
+            setSelectedFile(file);
+            setIsCropperOpen(true);
+        }
+    }
+
+    function handleCropComplete(croppedFile: File) {
+        setData('image', croppedFile);
+
+        const reader = new FileReader();
+        reader.onloadend = () => {
+            setImagePreview(reader.result as string);
+        };
+        reader.readAsDataURL(croppedFile);
+
+        const dataTransfer = new DataTransfer();
+        dataTransfer.items.add(croppedFile);
+        if (fileInputRef.current) {
+            fileInputRef.current.files = dataTransfer.files;
+        }
+
+        setIsCropperOpen(false);
+    }
+
+    async function handleEditCurrentImage() {
+        if (!imagePreview) return;
+
+        try {
+            const response = await fetch(imagePreview);
+            const blob = await response.blob();
+            const file = new File([blob], 'product.jpg', { type: blob.type || 'image/jpeg' });
+            setSelectedFile(file);
+            setIsCropperOpen(true);
+        } catch (error) {
+            console.error('Failed to load product image for editing', error);
         }
     }
 
@@ -298,9 +329,23 @@ export function ProductDialog({ open, onClose, editing, categories }: Props) {
                                     onChange={handleImageChange}
                                     className="text-xs file:mr-2 file:cursor-pointer file:rounded-md file:border-0 file:bg-neutral-100 file:px-2 file:py-1 file:text-xs file:font-semibold file:text-neutral-700 dark:file:bg-neutral-800 dark:file:text-neutral-300"
                                 />
-                                <p className="text-[10px] text-neutral-500 dark:text-neutral-400">
-                                    Max size 2MB (JPG, PNG, WEBP)
-                                </p>
+                                <div className="flex items-center justify-between">
+                                    <p className="text-[10px] text-neutral-500 dark:text-neutral-400">
+                                        Max size 25MB (JPG, PNG, WEBP)
+                                    </p>
+                                    {imagePreview && (
+                                        <Button
+                                            type="button"
+                                            variant="outline"
+                                            size="sm"
+                                            onClick={handleEditCurrentImage}
+                                            className="h-7 px-2 flex items-center gap-1 text-[10px]"
+                                        >
+                                            <Crop className="size-3" />
+                                            Crop Image
+                                        </Button>
+                                    )}
+                                </div>
                             </div>
                         </div>
                         {errors.image && (
@@ -352,6 +397,14 @@ export function ProductDialog({ open, onClose, editing, categories }: Props) {
                     </DialogFooter>
                 </form>
             </DialogContent>
+
+            <AvatarCropper
+                imageFile={selectedFile}
+                open={isCropperOpen}
+                onClose={() => setIsCropperOpen(false)}
+                onCrop={handleCropComplete}
+                shape="square"
+            />
         </Dialog>
     );
 }
