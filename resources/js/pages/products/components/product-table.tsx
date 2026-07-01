@@ -73,7 +73,7 @@ export function ProductTable({
                                     <div className="flex size-12 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-neutral-200 bg-neutral-100 dark:border-neutral-800 dark:bg-neutral-900">
                                         {product.image ? (
                                             <img
-                                                src={`/storage/${product.image}`}
+                                                src={product.image.startsWith('http') ? product.image : `/storage/${product.image}`}
                                                 alt={product.name}
                                                 className="size-full object-cover"
                                             />

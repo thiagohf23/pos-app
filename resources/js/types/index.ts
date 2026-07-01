@@ -2,6 +2,22 @@ export type * from './auth';
 export type * from './navigation';
 export type * from './ui';
 
+export interface Employee {
+    id: number;
+    user_id: number | null;
+    phone: string | null;
+    cpf: string | null;
+    salary: string;
+    hire_date: string | null;
+    is_active: boolean;
+    user: {
+        id: number;
+        name: string;
+        email: string;
+        roles: { id: number; name: string }[];
+    } | null;
+}
+
 export type CouponScope = 'all' | 'category' | 'product';
 
 export interface Coupon {
@@ -17,6 +33,33 @@ export interface Coupon {
     is_active: boolean;
     categories?: { id: number; name: string }[];
     products?: { id: number; name: string }[];
+}
+
+export interface Permission {
+    id: number;
+    name: string;
+    guard_name: string;
+    created_at: string;
+    updated_at: string;
+}
+
+export interface Role {
+    id: number;
+    name: string;
+    guard_name: string;
+    created_at: string;
+    updated_at: string;
+    permissions: Permission[];
+}
+
+export interface Supplier {
+    id: number;
+    name: string;
+    email: string | null;
+    phone: string | null;
+    cpf_cnpj: string | null;
+    address: string | null;
+    is_active: boolean;
 }
 
 export interface Category {

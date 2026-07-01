@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Employee;
 use App\Models\User;
 use Illuminate\Support\Facades\RateLimiter;
 use Laravel\Fortify\Features;
@@ -40,6 +41,28 @@ test('users with two factor enabled are redirected to two factor challenge', fun
     $response->assertRedirect(route('two-factor.login'));
     $response->assertSessionHas('login.id', $user->id);
     $this->assertGuest();
+});
+
+test('inactive employees can not authenticate', function () {
+    $employee = Employee::factory()->create(['is_active' => false]);
+
+    $this->post(route('login.store'), [
+        'email' => $employee->user->email,
+        'password' => 'password',
+    ]);
+
+    $this->assertGuest();
+});
+
+test('active employees can authenticate', function () {
+    $employee = Employee::factory()->create(['is_active' => true]);
+
+    $this->post(route('login.store'), [
+        'email' => $employee->user->email,
+        'password' => 'password',
+    ]);
+
+    $this->assertAuthenticated();
 });
 
 test('users can not authenticate with invalid password', function () {

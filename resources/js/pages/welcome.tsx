@@ -1,10 +1,16 @@
 import { Head, Link, usePage } from '@inertiajs/react';
 import { login, register, home } from '@/routes';
 import { index as posIndex } from '@/routes/pos';
-import { LayoutGrid, ShoppingCart, ShieldCheck, ArrowRight, Printer } from 'lucide-react';
+import { LayoutGrid, ShoppingCart, ShieldCheck, ArrowRight, Printer, Sun, Moon } from 'lucide-react';
+import { useAppearance } from '@/hooks/use-appearance';
 
 export default function Welcome() {
     const { auth } = usePage().props as any;
+    const { appearance, resolvedAppearance, updateAppearance } = useAppearance();
+
+    const toggleAppearance = () => {
+        updateAppearance(resolvedAppearance === 'dark' ? 'light' : 'dark');
+    };
 
     return (
         <>
@@ -22,6 +28,19 @@ export default function Welcome() {
                         </div>
 
                         <nav className="flex items-center gap-4">
+                            <button
+                                onClick={toggleAppearance}
+                                className="rounded-full p-2 text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100 dark:text-neutral-400 dark:hover:text-neutral-100 dark:hover:bg-neutral-800 transition-colors cursor-pointer"
+                                aria-label="Toggle theme"
+                                title={`Switch to ${resolvedAppearance === 'dark' ? 'light' : 'dark'} mode`}
+                            >
+                                {resolvedAppearance === 'dark' ? (
+                                    <Sun className="size-5" />
+                                ) : (
+                                    <Moon className="size-5" />
+                                )}
+                            </button>
+
                             {auth.user ? (
                                 <Link
                                     href={posIndex().url}
