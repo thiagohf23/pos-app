@@ -6,8 +6,10 @@ use App\Http\Requests\StoreEmployeeRequest;
 use App\Http\Requests\UpdateEmployeeRequest;
 use App\Models\Employee;
 use App\Models\User;
+use App\Notifications\EmployeeInvitation;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Password;
+use Illuminate\Support\Str;
 use Inertia\Inertia;
 use Inertia\Response as InertiaResponse;
 use Spatie\Permission\Models\Role;
@@ -29,7 +31,7 @@ class EmployeeController extends Controller
         $user = User::create([
             'name' => $request->input('name'),
             'email' => $request->input('email'),
-            'password' => Hash::make($request->input('password')),
+            'password' => Str::password(32),
         ]);
 
         $employee = Employee::create([
@@ -45,6 +47,8 @@ class EmployeeController extends Controller
             $user->syncRoles([$request->input('role_id')]);
         }
 
+        $user->notify(new EmployeeInvitation(Password::createToken($user)));
+
         return redirect()->route('employees.index');
     }
 
@@ -59,7 +63,7 @@ class EmployeeController extends Controller
             ]);
 
             if ($request->filled('password')) {
-                $user->update(['password' => Hash::make($request->input('password'))]);
+                $user->update(['password' => $request->input('password')]);
             }
 
             if ($request->has('role_id')) {
@@ -83,5 +87,21 @@ class EmployeeController extends Controller
         $employee->delete();
 
         return redirect()->route('employees.index');
+    }
+
+    public function resendInvitation(Employee $employee): RedirectResponse
+    {
+        $user = $employee->user;
+
+        $user->notify(new EmployeeInvitation(Password::createToken($user)));
+
+        return back()->with('success', 'Convite reenviado.');
+    }
+
+    public function resetPassword(Employee $employee): RedirectResponse
+    {
+        Password::sendResetLink(['email' => $employee->user->email]);
+
+        return back()->with('success', 'Link de redefinição de senha enviado.');
     }
 }

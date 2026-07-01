@@ -34,7 +34,7 @@ export default function ResetPassword({ token, email, passwordRules }: Props) {
                                 autoComplete="email"
                                 value={email}
                                 className="mt-1 block w-full"
-                                readOnly
+                                disabled
                             />
                             <InputError
                                 message={errors.email}

@@ -6,7 +6,7 @@ import { DeleteConfirmDialog } from '@/components/delete-confirm-dialog';
 import { Pagination } from '@/components/pagination';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { destroy, update } from '@/routes/employees';
+import { destroy, resendInvitation, resetPassword, update } from '@/routes/employees';
 import type { Employee, Paginated, Role } from '@/types';
 import { EmployeeDialog } from './components/employee-dialog';
 import { EmployeeTable } from './components/employee-table';
@@ -80,6 +80,20 @@ export default function EmployeesIndex({ employees, roles }: Props) {
         });
     }
 
+    function handleResendInvitation(employee: Employee) {
+        router.post(resendInvitation.url(employee.id), {}, {
+            onSuccess: () => toast.success('Convite reenviado!'),
+            onError: () => toast.error('Falha ao reenviar convite.'),
+        });
+    }
+
+    function handleResetPassword(employee: Employee) {
+        router.post(resetPassword.url(employee.id), {}, {
+            onSuccess: () => toast.success('Link de redefinição enviado!'),
+            onError: () => toast.error('Falha ao enviar link.'),
+        });
+    }
+
     const filteredEmployees = useMemo(() => {
         const query = searchTerm.toLowerCase();
 
@@ -137,6 +151,8 @@ export default function EmployeesIndex({ employees, roles }: Props) {
                         onEdit={handleEdit}
                         onDelete={handleDelete}
                         onToggleActive={handleToggleActive}
+                        onResendInvitation={handleResendInvitation}
+                        onResetPassword={handleResetPassword}
                         onAddClick={() => {
                             setEditing(null);
                             setShowForm(true);

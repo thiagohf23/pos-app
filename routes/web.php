@@ -16,7 +16,7 @@ use Inertia\Inertia;
 
 Route::get('/', function () {
 
-    return Inertia::render('welcome');
+    return Inertia::render('home');
 })->name('home');
 
 Route::middleware(['auth', 'verified'])->group(function () {
@@ -26,6 +26,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::resource('categories', CategoryController::class)->except(['create', 'show', 'edit']);
 
     Route::resource('employees', EmployeeController::class)->except(['create', 'show', 'edit'])->middleware('role:Admin');
+    Route::post('employees/{employee}/resend-invitation', [EmployeeController::class, 'resendInvitation'])
+        ->name('employees.resend-invitation')
+        ->middleware('role:Admin');
+    Route::post('employees/{employee}/reset-password', [EmployeeController::class, 'resetPassword'])
+        ->name('employees.reset-password')
+        ->middleware('role:Admin');
     Route::resource('suppliers', SupplierController::class)->except(['create', 'show', 'edit'])->middleware('role:Admin');
 
     Route::resource('coupons', CouponController::class)->except(['create', 'show', 'edit'])->middleware('role:Admin');
