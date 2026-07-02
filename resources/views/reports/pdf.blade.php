@@ -23,7 +23,10 @@
 <body>
     <h1>Sales Report</h1>
     <div class="subtitle">
-        {{ $startDate }} — $endDate }}
+        {{ $startDate }} — {{ $endDate }}
+        @if(!empty($activeFilters))
+            &nbsp;·&nbsp; {{ implode(' · ', $activeFilters) }}
+        @endif
     </div>
 
     <div class="cards">
@@ -58,7 +61,7 @@
         <tbody>
             @foreach($topProducts as $item)
             <tr>
-                <td>{{ $item->product->name ?? 'N/A' }}</td>
+                <td>{{ $item->product_name ?? 'N/A' }}</td>
                 <td class="text-right">{{ $item->total_quantity }}</td>
                 <td class="text-right">R$ {{ number_format($item->total_revenue, 2, ',', '.') }}</td>
             </tr>
@@ -104,7 +107,7 @@
             <tr>
                 <td>{{ $day->date }}</td>
                 <td class="text-right">{{ $day->count }}</td>
-                <td class="text-right">R$ {{ number_format($day->revenue, 2, ',', '.') }}</td>
+                <td class="text-right">R$ {{ number_format($day->total, 2, ',', '.') }}</td>
             </tr>
             @endforeach
         </tbody>

@@ -5,9 +5,11 @@ import {
     ShoppingCart,
     Percent,
     Download,
-    CalendarIcon,
-    PrinterIcon,
-    FileText,
+    Printer,
+    FileDown,
+    Search,
+    ChevronDown,
+    Check,
 } from 'lucide-react';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
@@ -43,6 +45,24 @@ interface DailySale {
 interface Filters {
     start_date: string;
     end_date: string;
+    payment_method: string | null;
+    category_id: number | null;
+    product_id: number | null;
+}
+
+interface PaymentMethodOption {
+    value: string;
+    label: string;
+}
+
+interface CategoryOption {
+    id: number;
+    name: string;
+}
+
+interface ProductOption {
+    id: number;
+    name: string;
 }
 
 interface Props {
@@ -51,6 +71,111 @@ interface Props {
     topProducts: TopProduct[];
     dailySales: DailySale[];
     filters: Filters;
+    paymentMethods: PaymentMethodOption[];
+    categories: CategoryOption[];
+    products: ProductOption[];
+}
+
+interface SearchableSelectProps {
+    value: string;
+    onChange: (value: string) => void;
+    options: { id: string | number; name: string }[];
+    placeholder: string;
+    label: string;
+}
+
+function SearchableSelect({ value, onChange, options, placeholder, label }: SearchableSelectProps) {
+    const [isOpen, setIsOpen] = useState(false);
+    const [search, setSearch] = useState('');
+
+    const selectedOption = options.find((opt) => String(opt.id) === value);
+
+    const filteredOptions = options.filter((opt) =>
+        opt.name.toLowerCase().includes(search.toLowerCase())
+    );
+
+    return (
+        <div className="relative flex flex-col gap-1.5 min-w-[200px]">
+            <label className="text-xs font-semibold tracking-wider text-neutral-500 uppercase dark:text-neutral-400">
+                {label}
+            </label>
+            <div className="relative">
+                <button
+                    type="button"
+                    onClick={() => setIsOpen(!isOpen)}
+                    className="flex h-[38px] w-full items-center justify-between rounded-lg border border-neutral-200 bg-white px-3 py-2 text-left text-sm text-neutral-900 shadow-xs focus:outline-none focus:ring-2 focus:ring-neutral-950 dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-50 dark:focus:ring-neutral-300 cursor-pointer"
+                >
+                    <span className="block truncate">
+                        {selectedOption ? selectedOption.name : placeholder}
+                    </span>
+                    <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                </button>
+
+                {isOpen && (
+                    <>
+                        <div className="fixed inset-0 z-10" onClick={() => setIsOpen(false)} />
+                        
+                        <div className="absolute left-0 right-0 z-20 mt-1 max-h-60 overflow-auto rounded-md border border-neutral-200 bg-white py-1 text-base shadow-lg ring-1 ring-black/5 focus:outline-none sm:text-sm dark:border-neutral-700 dark:bg-neutral-800">
+                            <div className="sticky top-0 z-10 bg-white px-2 py-1.5 dark:bg-neutral-800">
+                                <div className="flex items-center rounded-md border border-neutral-200 px-2 py-1 dark:border-neutral-700">
+                                    <Search className="mr-2 h-3.5 w-3.5 shrink-0 opacity-50 text-neutral-505 dark:text-neutral-400" />
+                                    <input
+                                        type="text"
+                                        placeholder="Search..."
+                                        value={search}
+                                        onChange={(e) => setSearch(e.target.value)}
+                                        className="w-full bg-transparent py-1 text-xs outline-none text-neutral-900 dark:text-neutral-50 placeholder:text-neutral-400"
+                                        autoFocus
+                                    />
+                                </div>
+                            </div>
+                            <ul className="max-h-48 overflow-y-auto py-1">
+                                <li
+                                    onClick={() => {
+                                        onChange('');
+                                        setIsOpen(false);
+                                        setSearch('');
+                                    }}
+                                    className="relative cursor-pointer select-none py-1.5 pl-8 pr-4 text-neutral-900 hover:bg-neutral-100 dark:text-neutral-50 dark:hover:bg-neutral-700 text-xs"
+                                >
+                                    {!value && (
+                                        <span className="absolute inset-y-0 left-0 flex items-center pl-2.5">
+                                            <Check className="h-3.5 w-3.5 text-neutral-950 dark:text-neutral-50" />
+                                        </span>
+                                    )}
+                                    {placeholder}
+                                </li>
+                                {filteredOptions.length === 0 ? (
+                                    <li className="relative cursor-default select-none py-2 px-4 text-neutral-500 text-xs">
+                                        No results found
+                                    </li>
+                                ) : (
+                                    filteredOptions.map((opt) => (
+                                        <li
+                                            key={opt.id}
+                                            onClick={() => {
+                                                onChange(String(opt.id));
+                                                setIsOpen(false);
+                                                setSearch('');
+                                            }}
+                                            className="relative cursor-pointer select-none py-1.5 pl-8 pr-4 text-neutral-900 hover:bg-neutral-100 dark:text-neutral-50 dark:hover:bg-neutral-700 text-xs"
+                                        >
+                                            {String(opt.id) === value && (
+                                                <span className="absolute inset-y-0 left-0 flex items-center pl-2.5">
+                                                    <Check className="h-3.5 w-3.5 text-neutral-950 dark:text-neutral-50" />
+                                                </span>
+                                            )}
+                                            <span className="block truncate">{opt.name}</span>
+                                        </li>
+                                    ))
+                                )}
+                            </ul>
+                        </div>
+                    </>
+                )}
+            </div>
+        </div>
+    );
 }
 
 export default function ReportsIndex({
@@ -59,24 +184,50 @@ export default function ReportsIndex({
     topProducts,
     dailySales,
     filters,
+    paymentMethods,
+    categories,
+    products,
 }: Props) {
     const [startDate, setStartDate] = useState(filters.start_date);
     const [endDate, setEndDate] = useState(filters.end_date);
+    const [paymentMethod, setPaymentMethod] = useState(filters.payment_method ?? '');
+    const [categoryId, setCategoryId] = useState(filters.category_id ? String(filters.category_id) : '');
+    const [productId, setProductId] = useState(filters.product_id ? String(filters.product_id) : '');
+
+    function buildQuery(): Record<string, string> {
+        const query: Record<string, string> = {
+            start_date: startDate,
+            end_date: endDate,
+        };
+
+        if (paymentMethod) {
+            query.payment_method = paymentMethod;
+        }
+        if (categoryId) {
+            query.category_id = categoryId;
+        }
+        if (productId) {
+            query.product_id = productId;
+        }
+
+        return query;
+    }
 
     function handleFilter() {
-        router.get(
-            reportsIndex().url,
-            { start_date: startDate, end_date: endDate },
-            { preserveState: true },
-        );
+        router.get(reportsIndex().url, buildQuery(), { preserveState: true });
+    }
+    
+    function handleClearFilters() {
+        setStartDate(new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().split('T')[0]);
+        setEndDate(new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0).toISOString().split('T')[0]);
+        setPaymentMethod('');
+        setCategoryId('');
+        setProductId('');
+        router.get(reportsIndex().url, {}, { preserveState: false });
     }
 
     function handleExport() {
-        const url = exportMethod.url({
-            start_date: startDate,
-            end_date: endDate,
-        });
-        window.location.href = url;
+        window.location.href = exportMethod.url({ query: buildQuery() });
     }
 
     function handlePrint() {
@@ -84,11 +235,7 @@ export default function ReportsIndex({
     }
 
     function handleExportPdf() {
-        const url = exportPdf.url({
-            start_date: startDate,
-            end_date: endDate,
-        });
-        window.location.href = url;
+        window.location.href = exportPdf.url({ query: buildQuery() });
     }
 
     const maxDailyTotal = Math.max(...dailySales.map((d) => d.total), 1);
@@ -207,12 +354,59 @@ export default function ReportsIndex({
                             className="rounded-lg border border-neutral-200 bg-white px-3 py-2 text-sm text-neutral-900 dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-50"
                         />
                     </div>
-                    <Button
-                        onClick={handleFilter}
-                        className="cursor-pointer bg-neutral-900 text-white hover:bg-neutral-800 dark:bg-neutral-100 dark:text-neutral-900 dark:hover:bg-neutral-200"
-                    >
-                        Apply Filter
-                    </Button>
+                    <div className="flex flex-col gap-1.5">
+                        <label className="text-xs font-semibold tracking-wider text-neutral-500 uppercase dark:text-neutral-400">
+                            Payment
+                        </label>
+                        <select
+                            value={paymentMethod}
+                            onChange={(e) => setPaymentMethod(e.target.value)}
+                            className="rounded-lg border border-neutral-200 bg-white px-3 py-2 text-sm text-neutral-900 dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-50"
+                        >
+                            <option value="">All methods</option>
+                            {paymentMethods.map((method) => (
+                                <option key={method.value} value={method.value}>
+                                    {method.label}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+                    <SearchableSelect
+                        value={categoryId}
+                        onChange={setCategoryId}
+                        options={categories}
+                        placeholder="All categories"
+                        label="Category"
+                    />
+                    <SearchableSelect
+                        value={productId}
+                        onChange={setProductId}
+                        options={products}
+                        placeholder="All products"
+                        label="Product"
+                    />
+                    <div className="flex gap-2">
+                        <Button
+                            onClick={handleFilter}
+                            className="cursor-pointer bg-neutral-900 text-white hover:bg-neutral-800 dark:bg-neutral-100 dark:text-neutral-900 dark:hover:bg-neutral-200"
+                        >
+                            Apply Filter
+                        </Button>
+                        {(paymentMethod !== '' ||
+                          categoryId !== '' ||
+                          productId !== '' ||
+                          startDate !== new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().split('T')[0] ||
+                          endDate !== new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0).toISOString().split('T')[0]) && (
+                            <Button
+                                type="button"
+                                variant="outline"
+                                onClick={handleClearFilters}
+                                className="cursor-pointer border border-neutral-200 bg-white hover:bg-neutral-50 dark:border-neutral-700 dark:bg-neutral-900 dark:hover:bg-neutral-800 text-neutral-700 dark:text-neutral-300"
+                            >
+                                Clear Filters
+                            </Button>
+                        )}
+                    </div>
                 </div>
 
                 {/* Summary Cards */}
