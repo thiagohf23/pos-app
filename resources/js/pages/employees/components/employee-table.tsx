@@ -1,5 +1,6 @@
-import { Edit, Plus, Users, Trash2 } from 'lucide-react';
+import { Edit, KeyRound, Mail, MoreHorizontal, Plus, Trash2, Users } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Switch } from '@/components/ui/switch';
 import type { Employee } from '@/types';
 
@@ -10,6 +11,8 @@ interface Props {
     onDelete: (employee: Employee) => void;
     onToggleActive: (employee: Employee, checked: boolean) => void;
     onAddClick: () => void;
+    onResendInvitation: (employee: Employee) => void;
+    onResetPassword: (employee: Employee) => void;
 }
 
 export function EmployeeTable({
@@ -19,6 +22,8 @@ export function EmployeeTable({
     onDelete,
     onToggleActive,
     onAddClick,
+    onResendInvitation,
+    onResetPassword,
 }: Props) {
     if (employees.length === 0) {
         return (
@@ -93,23 +98,50 @@ export function EmployeeTable({
                                 </div>
                             </td>
                             <td className="px-6 py-4 text-right">
-                                <div className="flex items-center justify-end gap-2">
-                                    <Button
-                                        variant="ghost"
-                                        size="icon"
-                                        onClick={() => onEdit(employee)}
-                                        className="size-8 cursor-pointer text-neutral-500 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-neutral-100"
-                                    >
-                                        <Edit className="size-4" />
-                                    </Button>
-                                    <Button
-                                        variant="ghost"
-                                        size="icon"
-                                        onClick={() => onDelete(employee)}
-                                        className="size-8 cursor-pointer text-destructive hover:text-destructive/95 dark:text-red-400 dark:hover:text-red-300"
-                                    >
-                                        <Trash2 className="size-4" />
-                                    </Button>
+                                <div className="flex items-center justify-end">
+                                    <DropdownMenu>
+                                        <DropdownMenuTrigger asChild>
+                                            <Button
+                                                variant="ghost"
+                                                size="icon"
+                                                className="size-8 cursor-pointer text-neutral-500 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-neutral-100"
+                                            >
+                                                <MoreHorizontal className="size-4" />
+                                            </Button>
+                                        </DropdownMenuTrigger>
+                                        <DropdownMenuContent align="end">
+                                            <DropdownMenuItem
+                                                onClick={() => onResendInvitation(employee)}
+                                                className="cursor-pointer"
+                                            >
+                                                <Mail className="size-4" />
+                                                Resend invitation
+                                            </DropdownMenuItem>
+                                            <DropdownMenuItem
+                                                onClick={() => onResetPassword(employee)}
+                                                className="cursor-pointer"
+                                            >
+                                                <KeyRound className="size-4" />
+                                                Reset password
+                                            </DropdownMenuItem>
+                                            <DropdownMenuSeparator />
+                                            <DropdownMenuItem
+                                                onClick={() => onEdit(employee)}
+                                                className="cursor-pointer"
+                                            >
+                                                <Edit className="size-4" />
+                                                Edit
+                                            </DropdownMenuItem>
+                                            <DropdownMenuItem
+                                                onClick={() => onDelete(employee)}
+                                                variant="destructive"
+                                                className="cursor-pointer"
+                                            >
+                                                <Trash2 className="size-4" />
+                                                Delete
+                                            </DropdownMenuItem>
+                                        </DropdownMenuContent>
+                                    </DropdownMenu>
                                 </div>
                             </td>
                         </tr>

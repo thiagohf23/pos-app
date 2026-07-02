@@ -23,7 +23,7 @@ class Sale extends Model
             'total' => 'decimal:2',
             'cash_tendered' => 'decimal:2',
             'change_amount' => 'decimal:2',
-            'sold_at' => 'timestamp',
+            'sold_at' => 'datetime',
         ];
     }
 

@@ -151,23 +151,31 @@ export function EmployeeDialog({ open, onClose, editing, roles = [] }: Props) {
                             )}
                         </div>
 
-                        {/* Password */}
-                        <div className="space-y-1.5">
-                            <Label htmlFor="password">
-                                Password {editing ? '(leave blank to keep)' : '*'}
-                            </Label>
-                            <Input
-                                id="password"
-                                type="password"
-                                value={data.password}
-                                onChange={(e) => setData('password', e.target.value)}
-                                placeholder={editing ? 'Leave blank to keep' : 'Min. 8 characters'}
-                                required={!editing}
-                            />
-                            {errors.password && (
-                                <p className="text-xs text-destructive">{errors.password}</p>
-                            )}
-                        </div>
+                        {/* Password - only in edit mode */}
+                        {editing && (
+                            <div className="space-y-1.5">
+                                <Label htmlFor="password">
+                                    Password (leave blank to keep)
+                                </Label>
+                                <Input
+                                    id="password"
+                                    type="password"
+                                    value={data.password}
+                                    onChange={(e) => setData('password', e.target.value)}
+                                    placeholder="Leave blank to keep"
+                                />
+                                {errors.password && (
+                                    <p className="text-xs text-destructive">{errors.password}</p>
+                                )}
+                            </div>
+                        )}
+
+                        {/* Invitation notice - only in create mode */}
+                        {!editing && (
+                            <div className="col-span-2 rounded-md bg-blue-50 p-3 text-sm text-blue-700 dark:bg-blue-950/50 dark:text-blue-300">
+                                An email will be sent to the employee to set their password.
+                            </div>
+                        )}
 
                         {/* Phone */}
                         <div className="space-y-1.5">

@@ -9,6 +9,7 @@ use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\PosController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\ReportController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\SupplierController;
 use Illuminate\Support\Facades\Route;
@@ -16,7 +17,7 @@ use Inertia\Inertia;
 
 Route::get('/', function () {
 
-    return Inertia::render('welcome');
+    return Inertia::render('home');
 })->name('home');
 
 Route::middleware(['auth', 'verified'])->group(function () {
@@ -26,6 +27,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::resource('categories', CategoryController::class)->except(['create', 'show', 'edit']);
 
     Route::resource('employees', EmployeeController::class)->except(['create', 'show', 'edit'])->middleware('role:Admin');
+    Route::post('employees/{employee}/resend-invitation', [EmployeeController::class, 'resendInvitation'])
+        ->name('employees.resend-invitation')
+        ->middleware('role:Admin');
+    Route::post('employees/{employee}/reset-password', [EmployeeController::class, 'resetPassword'])
+        ->name('employees.reset-password')
+        ->middleware('role:Admin');
     Route::resource('suppliers', SupplierController::class)->except(['create', 'show', 'edit'])->middleware('role:Admin');
 
     Route::resource('coupons', CouponController::class)->except(['create', 'show', 'edit'])->middleware('role:Admin');
@@ -34,6 +41,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('pos/checkout', [CheckoutController::class, 'store'])->name('pos.checkout');
     Route::post('pos/coupon', CouponValidationController::class)->name('pos.coupon');
     Route::get('pos/receipt/{sale}', [PosController::class, 'show'])->name('pos.receipt');
+
+    Route::get('reports', [ReportController::class, 'index'])->name('reports.index')->middleware('role:Admin');
+    Route::get('reports/export', [ReportController::class, 'export'])->name('reports.export')->middleware('role:Admin');
+    Route::get('reports/export-pdf', [ReportController::class, 'exportPdf'])->name('reports.export-pdf')->middleware('role:Admin');
 
     Route::resource('roles', RoleController::class)->except(['create', 'show', 'edit'])->middleware('role:Admin');
     Route::resource('permissions', PermissionController::class)->except(['create', 'show', 'edit'])->middleware('role:Admin');

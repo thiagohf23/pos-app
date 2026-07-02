@@ -1,5 +1,6 @@
 import { Link, usePage } from '@inertiajs/react';
 import {
+    BarChart3,
     BookOpen,
     Folder,
     FolderGit2,
@@ -32,6 +33,7 @@ import { index as posIndex } from '@/routes/pos';
 import { index as productsIndex } from '@/routes/products';
 import { index as rolesIndex } from '@/routes/roles';
 import { index as permissionsIndex } from '@/routes/permissions';
+import { index as reportsIndex } from '@/routes/reports';
 import type { NavItem } from '@/types';
 
 const mainNavItems: NavItem[] = [
@@ -83,6 +85,12 @@ const mainNavItems: NavItem[] = [
         title: 'Permissions',
         href: permissionsIndex().url,
         icon: Users,
+        roles: ['Admin'],
+    },
+    {
+        title: 'Reports',
+        href: reportsIndex().url,
+        icon: BarChart3,
         roles: ['Admin'],
     },
 ];

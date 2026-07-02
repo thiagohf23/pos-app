@@ -15,7 +15,6 @@ test('authenticated user can create an employee', function () {
         ->post(route('employees.store'), [
             'name' => 'John Doe',
             'email' => 'john@example.com',
-            'password' => 'secret123',
             'phone' => '(11) 99999-9999',
             'cpf' => '123.456.789-00',
             'salary' => 2500.00,
@@ -59,7 +58,6 @@ test('employee email must be unique', function () {
     $this->actingAs($user)->post(route('employees.store'), [
         'name' => 'Dupe',
         'email' => 'taken@example.com',
-        'password' => 'secret123',
         'salary' => 2000,
     ]);
 
