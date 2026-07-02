@@ -46,13 +46,24 @@ class ReportController extends Controller
             ->groupBy('product_id', 'product_name')
             ->orderByDesc('total_revenue')
             ->limit(10)
-            ->get();
+            ->get()
+            ->map(fn ($item) => [
+                'product_id' => $item->product_id,
+                'product_name' => $item->product_name,
+                'total_quantity' => (int) $item->total_quantity,
+                'total_revenue' => (float) $item->total_revenue,
+            ]);
 
         $dailySales = (clone $sales)
             ->selectRaw('date(sold_at) as date, count(*) as count, sum(total) as total')
             ->groupBy('date')
             ->orderBy('date')
-            ->get();
+            ->get()
+            ->map(fn ($item) => [
+                'date' => $item->date,
+                'count' => (int) $item->count,
+                'total' => (float) $item->total,
+            ]);
 
         return Inertia::render('reports/index', [
             'summary' => [

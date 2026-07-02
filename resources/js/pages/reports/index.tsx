@@ -5,12 +5,9 @@ import {
     ShoppingCart,
     Percent,
     Download,
-    CreditCard,
-    Smartphone,
-    Banknote,
-    Package,
-    FileDown,
-    Printer,
+    CalendarIcon,
+    PrinterIcon,
+    FileText,
 } from 'lucide-react';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
@@ -303,36 +300,95 @@ export default function ReportsIndex({
                     <div className="flex flex-col gap-6 lg:col-span-2">
                         {/* Daily Sales Chart */}
                         <div className="rounded-xl border border-neutral-200 bg-white p-5 shadow-xs dark:border-neutral-800 dark:bg-neutral-900/30">
-                            <h2 className="mb-4 text-lg font-bold text-neutral-900 dark:text-neutral-50">
-                                Daily Sales
-                            </h2>
+                            <div className="mb-4 flex items-center justify-between">
+                                <h2 className="text-lg font-bold text-neutral-900 dark:text-neutral-50">
+                                    Daily Sales
+                                </h2>
+                                {dailySales.length > 0 && (
+                                    <span className="text-xs font-semibold text-neutral-400 dark:text-neutral-500">
+                                        Total: ${dailySales.reduce((a, d) => a + d.total, 0).toFixed(2)}
+                                    </span>
+                                )}
+                            </div>
                             {dailySales.length === 0 ? (
                                 <p className="py-8 text-center text-sm text-neutral-400">
                                     No sales data for this period
                                 </p>
                             ) : (
-                                <div className="flex items-end gap-1.5" style={{ height: '200px' }}>
-                                    {dailySales.map((day) => (
-                                        <div
-                                            key={day.date}
-                                            className="group flex flex-1 flex-col items-center gap-1"
-                                        >
-                                            <div className="relative w-full" style={{ height: '160px' }}>
-                                                <div
-                                                    className="absolute bottom-0 w-full rounded-t bg-emerald-500 transition-all group-hover:bg-emerald-600"
-                                                    style={{
-                                                        height: `${(day.total / maxDailyTotal) * 100}%`,
-                                                    }}
-                                                />
+                                <div className="flex gap-2">
+                                    {/* Y-Axis */}
+                                    <div className="flex flex-col justify-between py-1 text-right" style={{ height: '180px' }}>
+                                        <span className="text-[10px] font-mono text-neutral-400 dark:text-neutral-500">
+                                            ${maxDailyTotal.toFixed(0)}
+                                        </span>
+                                        <span className="text-[10px] font-mono text-neutral-400 dark:text-neutral-500">
+                                            ${(maxDailyTotal / 2).toFixed(0)}
+                                        </span>
+                                        <span className="text-[10px] font-mono text-neutral-400 dark:text-neutral-500">
+                                            $0
+                                        </span>
+                                    </div>
+
+                                    {/* Chart Area */}
+                                    <div className="flex-1">
+                                        {/* Grid lines */}
+                                        <div className="relative" style={{ height: '180px' }}>
+                                            <div className="absolute inset-0 flex flex-col justify-between">
+                                                <div className="border-b border-dashed border-neutral-100 dark:border-neutral-800" />
+                                                <div className="border-b border-dashed border-neutral-100 dark:border-neutral-800" />
+                                                <div className="border-b border-neutral-100 dark:border-neutral-800" />
                                             </div>
-                                            <span className="text-[9px] font-mono text-neutral-400 dark:text-neutral-500">
-                                                {new Date(day.date).getDate()}
-                                            </span>
-                                            <span className="hidden text-[10px] font-bold text-neutral-700 group-hover:block dark:text-neutral-300">
-                                                ${day.total.toFixed(0)}
-                                            </span>
+
+                                            {/* Bars */}
+                                            <div className="absolute inset-0 flex items-end gap-1 px-0.5">
+                                                {dailySales.map((day) => {
+                                                    const height = (day.total / maxDailyTotal) * 100;
+                                                    const dayName = new Date(day.date + 'T12:00:00').toLocaleDateString('en-US', { weekday: 'short' });
+                                                    const dayNum = new Date(day.date + 'T12:00:00').getDate();
+
+                                                    return (
+                                                        <div
+                                                            key={day.date}
+                                                            className="group relative flex flex-1 items-end"
+                                                        >
+                                                            {/* Tooltip */}
+                                                            <div className="pointer-events-none absolute bottom-full left-1/2 z-10 mb-2 -translate-x-1/2 whitespace-nowrap rounded-lg bg-neutral-900 px-3 py-2 text-[10px] text-white opacity-0 shadow-lg transition-opacity group-hover:opacity-100 dark:bg-neutral-50 dark:text-neutral-900">
+                                                                <div className="font-bold">{dayName}, {dayNum}</div>
+                                                                <div className="mt-0.5 font-mono">${day.total.toFixed(2)}</div>
+                                                                <div className="text-neutral-400 dark:text-neutral-500">{day.count} sale{day.count !== 1 ? 's' : ''}</div>
+                                                                {/* Arrow */}
+                                                                <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-neutral-900 dark:border-t-neutral-50" />
+                                                            </div>
+
+                                                            {/* Bar */}
+                                                            <div
+                                                                className="w-full rounded-t-sm bg-gradient-to-t from-emerald-600 to-emerald-400 transition-all duration-200 group-hover:from-emerald-700 group-hover:to-emerald-500 group-hover:shadow-md dark:from-emerald-500 dark:to-emerald-300 dark:group-hover:from-emerald-600 dark:group-hover:to-emerald-400"
+                                                                style={{ height: `${Math.max(height, 2)}%` }}
+                                                            />
+                                                        </div>
+                                                    );
+                                                })}
+                                            </div>
                                         </div>
-                                    ))}
+
+                                        {/* X-Axis Labels */}
+                                        <div className="mt-2 flex gap-1 px-0.5">
+                                            {dailySales.map((day) => {
+                                                const d = new Date(day.date + 'T12:00:00');
+                                                const showLabel = dailySales.length <= 14 || d.getDate() % Math.ceil(dailySales.length / 14) === 1;
+
+                                                return (
+                                                    <div key={day.date} className="flex flex-1 justify-center">
+                                                        {showLabel && (
+                                                            <span className="text-[9px] font-mono text-neutral-400 dark:text-neutral-500">
+                                                                {d.getDate()}/{d.getMonth() + 1}
+                                                            </span>
+                                                        )}
+                                                    </div>
+                                                );
+                                            })}
+                                        </div>
+                                    </div>
                                 </div>
                             )}
                         </div>
@@ -342,47 +398,54 @@ export default function ReportsIndex({
                             <h2 className="mb-4 text-lg font-bold text-neutral-900 dark:text-neutral-50">
                                 Top Products
                             </h2>
-                            <div className="overflow-x-auto">
-                                <table className="w-full text-left text-sm text-neutral-500 dark:text-neutral-400">
-                                    <thead className="border-b border-neutral-100 text-xs font-bold tracking-wider text-neutral-400 uppercase dark:border-neutral-800">
-                                        <tr>
-                                            <th className="px-1 py-3">#</th>
-                                            <th className="px-2 py-3">Product</th>
-                                            <th className="px-2 py-3 text-right">Qty Sold</th>
-                                            <th className="px-2 py-3 text-right">Revenue</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody className="divide-y divide-neutral-100 font-mono dark:divide-neutral-800">
-                                        {topProducts.length === 0 ? (
-                                            <tr>
-                                                <td colSpan={4} className="py-6 text-center text-xs text-neutral-400">
-                                                    No product data for this period
-                                                </td>
-                                            </tr>
-                                        ) : (
-                                            topProducts.map((product, index) => (
-                                                <tr
-                                                    key={product.product_id}
-                                                    className="hover:bg-neutral-50/50 dark:hover:bg-neutral-800/10"
-                                                >
-                                                    <td className="px-1 py-3.5 font-semibold text-neutral-900 dark:text-neutral-100">
-                                                        {index + 1}
-                                                    </td>
-                                                    <td className="px-2 py-3.5 font-sans text-neutral-700 dark:text-neutral-300">
-                                                        {product.product_name}
-                                                    </td>
-                                                    <td className="px-2 py-3.5 text-right">
-                                                        {product.total_quantity}
-                                                    </td>
-                                                    <td className="px-2 py-3.5 text-right font-bold text-emerald-600">
-                                                        ${product.total_revenue.toFixed(2)}
-                                                    </td>
-                                                </tr>
-                                            ))
-                                        )}
-                                    </tbody>
-                                </table>
-                            </div>
+                            {topProducts.length === 0 ? (
+                                <p className="py-8 text-center text-sm text-neutral-400">
+                                    No product data for this period
+                                </p>
+                            ) : (
+                                <div className="space-y-3">
+                                    {topProducts.map((product, index) => {
+                                        const maxRevenue = topProducts[0]?.total_revenue || 1;
+                                        const barWidth = (product.total_revenue / maxRevenue) * 100;
+                                        const colors = [
+                                            'from-emerald-500 to-emerald-400',
+                                            'from-blue-500 to-blue-400',
+                                            'from-purple-500 to-purple-400',
+                                            'from-amber-500 to-amber-400',
+                                            'from-rose-500 to-rose-400',
+                                        ];
+
+                                        return (
+                                            <div key={product.product_id} className="group">
+                                                <div className="mb-1 flex items-center justify-between">
+                                                    <div className="flex items-center gap-2">
+                                                        <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-md bg-neutral-100 text-[10px] font-bold text-neutral-500 dark:bg-neutral-800 dark:text-neutral-400">
+                                                            {index + 1}
+                                                        </span>
+                                                        <span className="text-xs font-semibold text-neutral-700 dark:text-neutral-300">
+                                                            {product.product_name}
+                                                        </span>
+                                                    </div>
+                                                    <div className="flex items-center gap-3">
+                                                        <span className="text-[10px] text-neutral-400 dark:text-neutral-500">
+                                                            {product.total_quantity} unit{product.total_quantity !== 1 ? 's' : ''}
+                                                        </span>
+                                                        <span className="font-mono text-xs font-bold text-emerald-600 dark:text-emerald-400">
+                                                            ${product.total_revenue.toFixed(2)}
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                                <div className="h-2 w-full overflow-hidden rounded-full bg-neutral-100 dark:bg-neutral-800">
+                                                    <div
+                                                        className={`h-full rounded-full bg-gradient-to-r ${colors[index % colors.length]} transition-all duration-500 group-hover:shadow-sm`}
+                                                        style={{ width: `${barWidth}%` }}
+                                                    />
+                                                </div>
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                            )}
                         </div>
                     </div>
 
@@ -392,52 +455,73 @@ export default function ReportsIndex({
                             <h2 className="mb-4 text-lg font-bold text-neutral-900 dark:text-neutral-50">
                                 Payment Methods
                             </h2>
-                            <div className="space-y-4">
-                                {salesByPaymentMethod.length === 0 ? (
-                                    <p className="py-4 text-center text-xs text-neutral-400">
-                                        No payment data for this period
-                                    </p>
-                                ) : (
-                                    salesByPaymentMethod.map((item) => {
-                                        const percent = Math.round(
-                                            (item.total / totalPaymentAmount) * 100,
-                                        );
+                            {salesByPaymentMethod.length === 0 ? (
+                                <p className="py-4 text-center text-xs text-neutral-400">
+                                    No payment data for this period
+                                </p>
+                            ) : (
+                                <>
+                                    {/* Stacked Bar */}
+                                    <div className="mb-5 flex h-4 overflow-hidden rounded-full bg-neutral-100 dark:bg-neutral-800">
+                                        {salesByPaymentMethod.map((item) => {
+                                            const percent = (item.total / totalPaymentAmount) * 100;
+                                            return (
+                                                <div
+                                                    key={item.method}
+                                                    className={`transition-all duration-300 ${
+                                                        item.method === 'cash'
+                                                            ? 'bg-emerald-500'
+                                                            : item.method === 'pix'
+                                                              ? 'bg-cyan-500'
+                                                              : 'bg-blue-500'
+                                                    }`}
+                                                    style={{ width: `${percent}%` }}
+                                                    title={`${item.label}: $${item.total.toFixed(2)} (${Math.round(percent)}%)`}
+                                                />
+                                            );
+                                        })}
+                                    </div>
 
-                                        return (
-                                            <div key={item.method} className="space-y-2">
-                                                <div className="flex items-center justify-between text-xs">
-                                                    <div className="flex items-center gap-1.5 font-semibold text-neutral-700 dark:text-neutral-300">
-                                                        {item.method === 'cash' && <Banknote className="size-4 text-emerald-500" />}
-                                                        {item.method === 'pix' && <Smartphone className="size-4 text-cyan-500" />}
-                                                        {item.method !== 'cash' && item.method !== 'pix' && (
-                                                            <CreditCard className="size-4 text-blue-500" />
-                                                        )}
-                                                        {item.label}
-                                                        <span className="font-normal text-neutral-400">
-                                                            ({item.count} sales)
-                                                        </span>
+                                    {/* Legend + Details */}
+                                    <div className="space-y-3">
+                                        {salesByPaymentMethod.map((item) => {
+                                            const percent = Math.round(
+                                                (item.total / totalPaymentAmount) * 100,
+                                            );
+
+                                            return (
+                                                <div key={item.method} className="flex items-center gap-3">
+                                                    <div className={`h-3 w-3 shrink-0 rounded-full ${
+                                                        item.method === 'cash'
+                                                            ? 'bg-emerald-500'
+                                                            : item.method === 'pix'
+                                                              ? 'bg-cyan-500'
+                                                              : 'bg-blue-500'
+                                                    }`} />
+                                                    <div className="flex flex-1 items-center justify-between">
+                                                        <div className="flex items-center gap-1.5">
+                                                            <span className="text-xs font-semibold text-neutral-700 dark:text-neutral-300">
+                                                                {item.label}
+                                                            </span>
+                                                            <span className="text-[10px] text-neutral-400 dark:text-neutral-500">
+                                                                {item.count} sale{item.count !== 1 ? 's' : ''}
+                                                            </span>
+                                                        </div>
+                                                        <div className="flex items-center gap-2">
+                                                            <span className="font-mono text-xs font-bold text-neutral-900 dark:text-neutral-100">
+                                                                ${item.total.toFixed(2)}
+                                                            </span>
+                                                            <span className="font-mono text-[10px] text-neutral-400 dark:text-neutral-500">
+                                                                {percent}%
+                                                            </span>
+                                                        </div>
                                                     </div>
-                                                    <span className="font-mono font-bold text-neutral-900 dark:text-neutral-100">
-                                                        ${item.total.toFixed(2)} ({percent}%)
-                                                    </span>
                                                 </div>
-                                                <div className="h-2 w-full overflow-hidden rounded-full bg-neutral-100 dark:bg-neutral-800">
-                                                    <div
-                                                        className={`h-full rounded-full ${
-                                                            item.method === 'cash'
-                                                                ? 'bg-emerald-500'
-                                                                : item.method === 'pix'
-                                                                  ? 'bg-cyan-500'
-                                                                  : 'bg-blue-500'
-                                                        }`}
-                                                        style={{ width: `${percent}%` }}
-                                                    />
-                                                </div>
-                                            </div>
-                                        );
-                                    })
-                                )}
-                            </div>
+                                            );
+                                        })}
+                                    </div>
+                                </>
+                            )}
                         </div>
                     </div>
                 </div>
