@@ -44,6 +44,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::get('reports', [ReportController::class, 'index'])->name('reports.index')->middleware('role:Admin');
     Route::get('reports/export', [ReportController::class, 'export'])->name('reports.export')->middleware('role:Admin');
+    Route::get('reports/export-pdf', [ReportController::class, 'exportPdf'])->name('reports.export-pdf')->middleware('role:Admin');
 
     Route::resource('roles', RoleController::class)->except(['create', 'show', 'edit'])->middleware('role:Admin');
     Route::resource('permissions', PermissionController::class)->except(['create', 'show', 'edit'])->middleware('role:Admin');

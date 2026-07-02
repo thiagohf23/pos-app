@@ -9,10 +9,12 @@ import {
     Smartphone,
     Banknote,
     Package,
+    FileDown,
+    Printer,
 } from 'lucide-react';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { index as reportsIndex, exportMethod } from '@/routes/reports';
+import { index as reportsIndex, exportMethod, exportPdf } from '@/routes/reports';
 
 interface Summary {
     total_sales: number;
@@ -80,6 +82,18 @@ export default function ReportsIndex({
         window.location.href = url;
     }
 
+    function handlePrint() {
+        window.print();
+    }
+
+    function handleExportPdf() {
+        const url = exportPdf.url({
+            start_date: startDate,
+            end_date: endDate,
+        });
+        window.location.href = url;
+    }
+
     const maxDailyTotal = Math.max(...dailySales.map((d) => d.total), 1);
 
     const totalPaymentAmount =
@@ -89,28 +103,91 @@ export default function ReportsIndex({
         <>
             <Head title="Reports" />
 
-            <div className="flex flex-col gap-6 p-6">
-                {/* Header */}
-                <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                    <div>
-                        <h1 className="text-3xl font-extrabold tracking-tight text-neutral-900 dark:text-neutral-50">
-                            Sales Reports
-                        </h1>
-                        <p className="mt-1 text-sm text-neutral-500 dark:text-neutral-400">
-                            Analyze sales performance across date ranges.
-                        </p>
-                    </div>
-                    <Button
-                        onClick={handleExport}
-                        className="w-full cursor-pointer gap-2 bg-neutral-950 shadow-md transition-all duration-200 hover:bg-neutral-800 sm:w-auto dark:bg-neutral-50 dark:text-neutral-950 dark:hover:bg-neutral-200"
-                    >
-                        <Download className="size-4" />
-                        Export CSV
-                    </Button>
+            <style>{`
+                @media print {
+                    body * {
+                        visibility: hidden;
+                    }
+                    .print-area, .print-area * {
+                        visibility: visible;
+                    }
+                    .print-area {
+                        position: absolute;
+                        left: 0;
+                        top: 0;
+                        width: 100%;
+                        padding: 20px;
+                    }
+                    .no-print {
+                        display: none !important;
+                    }
+                    .print-header {
+                        display: block !important;
+                        text-align: center;
+                        margin-bottom: 20px;
+                        padding-bottom: 15px;
+                        border-bottom: 2px solid #000;
+                    }
+                    .print-date {
+                        display: block !important;
+                        text-align: center;
+                        font-size: 12px;
+                        color: #666;
+                        margin-bottom: 20px;
+                    }
+                    .daily-sales-bars > div {
+                        background: #000 !important;
+                    }
+                }
+            `}</style>
+
+            <div className="print-area">
+                {/* Print Header - only visible when printing */}
+                <div className="print-header hidden">
+                    <h1 style={{ fontSize: '24px', fontWeight: 'bold', margin: 0 }}>Sales Report</h1>
+                </div>
+                <div className="print-date hidden">
+                    {new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
                 </div>
 
+                <div className="flex flex-col gap-6 p-6">
+                    {/* Header */}
+                    <div className="no-print flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                        <div>
+                            <h1 className="text-3xl font-extrabold tracking-tight text-neutral-900 dark:text-neutral-50">
+                                Sales Reports
+                            </h1>
+                            <p className="mt-1 text-sm text-neutral-500 dark:text-neutral-400">
+                                Analyze sales performance across date ranges.
+                            </p>
+                        </div>
+                        <div className="flex flex-wrap gap-2">
+                            <Button
+                                onClick={handlePrint}
+                                className="cursor-pointer gap-2 bg-neutral-200 text-neutral-700 shadow-md transition-all duration-200 hover:bg-neutral-300 dark:bg-neutral-800 dark:text-neutral-200 dark:hover:bg-neutral-700"
+                            >
+                                <Printer className="size-4" />
+                                Print
+                            </Button>
+                            <Button
+                                onClick={handleExportPdf}
+                                className="cursor-pointer gap-2 bg-red-600 text-white shadow-md transition-all duration-200 hover:bg-red-700"
+                            >
+                                <FileDown className="size-4" />
+                                PDF
+                            </Button>
+                            <Button
+                                onClick={handleExport}
+                                className="cursor-pointer gap-2 bg-neutral-950 shadow-md transition-all duration-200 hover:bg-neutral-800 dark:bg-neutral-50 dark:text-neutral-950 dark:hover:bg-neutral-200"
+                            >
+                                <Download className="size-4" />
+                                CSV
+                            </Button>
+                        </div>
+                    </div>
+
                 {/* Date Filters */}
-                <div className="flex flex-wrap items-end gap-4 rounded-xl border border-neutral-200 bg-white p-4 shadow-xs dark:border-neutral-800 dark:bg-neutral-900/30">
+                <div className="no-print flex flex-wrap items-end gap-4 rounded-xl border border-neutral-200 bg-white p-4 shadow-xs dark:border-neutral-800 dark:bg-neutral-900/30">
                     <div className="flex flex-col gap-1.5">
                         <label className="text-xs font-semibold tracking-wider text-neutral-500 uppercase dark:text-neutral-400">
                             Start Date
@@ -363,6 +440,7 @@ export default function ReportsIndex({
                             </div>
                         </div>
                     </div>
+                </div>
                 </div>
             </div>
         </>

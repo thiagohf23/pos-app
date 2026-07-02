@@ -4,14 +4,14 @@ namespace App\Http\Controllers;
 
 use App\Models\Sale;
 use App\Models\SaleItem;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 use Inertia\Inertia;
 
 class ReportController extends Controller
 {
-    public function index(Request $request): Response
+    public function index(Request $request): \Inertia\Response
     {
         $startDate = $request->input('start_date', Carbon::now()->startOfMonth()->toDateString());
         $endDate = $request->input('end_date', Carbon::now()->endOfMonth()->toDateString());
@@ -127,6 +127,60 @@ class ReportController extends Controller
         };
 
         return response()->stream($callback, 200, $headers);
+    }
+
+    public function exportPdf(Request $request): \Symfony\Component\HttpFoundation\Response
+    {
+        $startDate = $request->input('start_date', Carbon::now()->startOfMonth()->toDateString());
+        $endDate = $request->input('end_date', Carbon::now()->endOfMonth()->toDateString());
+
+        $start = Carbon::parse($startDate)->startOfDay();
+        $end = Carbon::parse($endDate)->endOfDay();
+
+        $sales = Sale::whereBetween('sold_at', [$start, $end])
+            ->where('status', 'completed');
+
+        $totalSales = (clone $sales)->count();
+        $totalRevenue = (clone $sales)->sum('total');
+        $totalDiscount = (clone $sales)->sum('discount');
+        $averageTicket = $totalSales > 0 ? round($totalRevenue / $totalSales, 2) : 0;
+
+        $paymentMethods = (clone $sales)
+            ->selectRaw('payment_method, count(*) as count, sum(total) as total')
+            ->groupBy('payment_method')
+            ->get();
+
+        $topProducts = SaleItem::whereHas('sale', function ($query) use ($start, $end) {
+            $query->whereBetween('sold_at', [$start, $end])
+                ->where('status', 'completed');
+        })
+            ->selectRaw('product_id, product_name, sum(quantity) as total_quantity, sum(total) as total_revenue')
+            ->groupBy('product_id', 'product_name')
+            ->orderByDesc('total_revenue')
+            ->limit(10)
+            ->get();
+
+        $dailySales = (clone $sales)
+            ->selectRaw('date(sold_at) as date, count(*) as count, sum(total) as total')
+            ->groupBy('date')
+            ->orderBy('date')
+            ->get();
+
+        $pdf = Pdf::loadView('reports.pdf', [
+            'startDate' => $startDate,
+            'endDate' => $endDate,
+            'summary' => [
+                'total_sales' => $totalSales,
+                'total_revenue' => (float) $totalRevenue,
+                'total_discount' => (float) $totalDiscount,
+                'average_ticket' => $averageTicket,
+            ],
+            'topProducts' => $topProducts,
+            'paymentMethods' => $paymentMethods,
+            'dailySales' => $dailySales,
+        ]);
+
+        return $pdf->download("sales_report_{$startDate}_{$endDate}.pdf");
     }
 
     private function paymentMethodLabel(string $method): string
