@@ -18,149 +18,118 @@
 
 ---
 
-## 📑 Table of Contents
-
-- [Features](#-features)
-- [Prerequisites](#-prerequisites)
-- [Quick Start](#-quick-start)
-- [Tech Stack](#-tech-stack)
-- [Port Customization](#-port-customization)
-- [Database Profiles (Docker)](#-database-profiles-docker)
-- [Default Credentials](#-default-credentials)
-- [Makefile Shortcuts](#-makefile-shortcuts)
-- [Testing & Code Quality](#-testing--code-quality)
-- [License](#-license)
-
----
-
 ## ✨ Features
 
-### 🛍️ Point of Sale (POS)
-- **Interactive POS Terminal** — Full-featured sales interface with product grid, real-time cart management, and instant checkout
-- **Multiple Payment Methods** — Support for Cash, Credit Card, Debit Card, and PIX
-- **Smart Cart** — Add/remove items, adjust quantities, and see live totals with discount calculations
-- **Coupon System** — Apply percentage-based coupons with flexible scoping (global, per-category, or per-product)
-- **Digital Receipt** — Auto-generated receipt with sale details, payment info, and change calculation
-- **Stock Validation** — Real-time stock checks during checkout with pessimistic locking to prevent overselling
-
-### 📊 Dashboard & Analytics
-- **Revenue Metrics** — Total revenue, sales count, and average ticket at a glance
-- **Payment Breakdown** — Visual breakdown of sales by payment method
-- **Top Selling Products** — Ranked list of best-performing products
-- **Low Stock Alerts** — Immediate visibility into products running low or out of stock
-- **Recent Sales Feed** — Live feed of the latest transactions
-
-### 📈 Reports & Exports
-- **Advanced Filtering** — Filter reports by date range, payment method, category, or specific product
-- **Sales Summary** — Total sales, revenue, discounts applied, and average ticket
-- **Daily Sales Chart** — Day-by-day sales visualization
-- **Export to CSV** — Download filtered sales data as spreadsheet
-- **Export to PDF** — Generate professional PDF reports via DomPDF
-
-### 📦 Inventory Management
-- **Product Catalog** — Full CRUD for products with name, price, stock, image, and category
-- **Category Management** — Organize products into categories
-- **Supplier Management** — Track and manage product suppliers
-- **Stock Tracking** — Automatic stock deduction on each sale
-
-### 👥 Employee & User Management
-- **Employee Profiles** — Manage employees with linked user accounts
-- **Role-Based Access Control** — Admin and Employee roles with granular permissions via Spatie Permission
-- **Role & Permission Management** — Create, edit, and assign roles and permissions from the UI
-
-### 🔐 Authentication & Security
-- **Laravel Fortify** — Login, registration, password reset, and email verification
-- **Two-Factor Authentication (2FA)** — TOTP-based 2FA with QR codes and recovery codes
-- **Profile Management** — Update name, email, and avatar with image cropping
-- **Password Management** — Change password from security settings
-
-### ⚙️ Settings & Personalization
-- **Profile Settings** — Edit personal info and avatar
-- **Security Settings** — Manage password and 2FA
-- **Appearance** — Light/dark mode theme toggle
+- **Point of Sale** — Interactive terminal with product grid, live cart, stock validation, and instant checkout (Cash, Credit, Debit, PIX)
+- **Coupons** — Percentage discounts scoped globally, per-category, or per-product
+- **Dashboard** — Revenue metrics, payment breakdown, top products, low-stock alerts
+- **Reports** — Filter by date/payment/category/product; export to CSV and PDF
+- **Inventory** — Products, categories, suppliers, and automatic stock tracking
+- **Employees & RBAC** — Admin/Employee roles and permissions via Spatie Permission
+- **Auth** — Laravel Fortify with 2FA (TOTP), password reset, and email verification
+- **Settings** — Profile, security, and light/dark theme
 
 ---
 
 ## 📋 Prerequisites
 
-Depending on the setup method you pick:
+Pick **one** path:
 
-| Method | Requirements |
-|---|---|
-| **Interactive wizard / Full Docker** | [Docker](https://www.docker.com/products/docker-desktop) & Docker Compose |
-| **Manual local setup** | PHP **8.4+**, Composer **2+**, Node.js **22+**, npm |
-
-> The interactive wizard (`./setup.sh`) checks all of these and can **install missing dependencies for you** (PHP, Composer, Node) via apt / Homebrew / winget after confirmation, or steer you to Docker. It also diagnoses Docker permission/daemon issues. Run `./setup.sh --dry-run` to preview the install plan without changing anything.
+- **Docker** — [Docker](https://www.docker.com/products/docker-desktop) & Docker Compose. Nothing else needed.
+- **Local** — PHP **8.4+**, Composer **2+**, Node.js **22+**, and npm.
 
 ---
 
-## ⚡ Quick Start
+## ⚡ Installation
 
-### Option 1 — Interactive Setup (Recommended)
-
-A guided wizard that checks prerequisites (PHP, Node, Composer, Docker), then walks you through setup mode, database, mail, ports, and seeding — with a live progress spinner for each step:
+### Option A — Docker (recommended)
 
 ```bash
-make setup
-# or, without make:
-chmod +x setup.sh && ./setup.sh
-```
-
-That's it. When it finishes you'll get the URLs and default credentials.
-
----
-
-### Option 2 — Full Docker (Zero Host Dependencies)
-
-Docker installed and running? Stand up the whole stack manually:
-
-```bash
-# 1. Copy the environment template
 cp .env.example .env
-
-# 2. Prepare the SQLite database file (bind-mounted into the container)
 touch database/database.sqlite
-
-# 3. Build and start the application + mail services
 docker compose up -d --build
-
-# 4. Generate the app key and run migrations/seeds inside the container
 docker compose exec app php artisan key:generate
 docker compose exec app php artisan migrate:fresh --seed
 ```
 
 | Service | URL |
 |---|---|
-| **Application** | [http://localhost:8000](http://localhost:8000) |
-| **Vite Dev Server (HMR)** | [http://localhost:5173](http://localhost:5173) |
-| **Mailpit Inbox** | [http://localhost:8025](http://localhost:8025) |
+| **Application** | http://localhost:8000 |
+| **Vite (HMR)** | http://localhost:5173 |
+| **Mailpit Inbox** | http://localhost:8025 |
 
----
-
-### Option 3 — Manual Local Setup
-
-Prefer running everything natively:
+### Option B — Local
 
 ```bash
-# 1. Install dependencies
+# 1. Dependencies
 composer install
 npm install
 
-# 2. Configure environment
+# 2. Environment
 cp .env.example .env
 php artisan key:generate
 
-# 3. Setup SQLite database
+# 3. Database (SQLite)
 touch database/database.sqlite
 php artisan migrate:fresh --seed
 
-# 4. Compile assets
+# 4. Build assets
 npm run build
 
-# 5. Start dev servers (two terminals, or `make dev` for both)
-php artisan serve    # Terminal 1
-npm run dev          # Terminal 2
+# 5. Run dev servers
+composer run dev
+# ...or in two terminals:
+#   php artisan serve
+#   npm run dev
 ```
+
+App runs at http://localhost:8000.
+
+---
+
+## 👥 Default Credentials
+
+Created when the database is seeded:
+
+| Role | Email | Password |
+|---|---|---|
+| **Administrator** | `admin@example.com` | `password` |
+| **Staff/Employee** | `employee@example.com` | `password` |
+
+> 15 additional demo employees are also seeded.
+
+---
+
+## 🗄️ Database Profiles (Docker)
+
+SQLite is the default. To use MySQL or PostgreSQL instead:
+
+```bash
+docker compose --profile mysql up -d      # MySQL 8.0
+docker compose --profile postgres up -d   # PostgreSQL 16
+```
+
+Then update `.env`:
+
+```ini
+# MySQL
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=pos_app
+DB_USERNAME=root
+DB_PASSWORD=password
+
+# PostgreSQL
+DB_CONNECTION=pgsql
+DB_HOST=127.0.0.1
+DB_PORT=5432
+DB_DATABASE=pos_app
+DB_USERNAME=postgres
+DB_PASSWORD=password
+```
+
+Ports are configurable in `.env` via `APP_PORT` (8000), `VITE_PORT` (5173), and `MAILPIT_PORT` (8025). Docker Compose maps them automatically.
 
 ---
 
@@ -172,9 +141,9 @@ npm run dev          # Terminal 2
 | **Frontend** | React 19, Inertia.js v3, TypeScript |
 | **Styling** | Tailwind CSS v4, shadcn/ui |
 | **Database** | SQLite · MySQL 8.0 · PostgreSQL 16 |
-| **Authentication** | Laravel Fortify (2FA, Passkeys) |
+| **Auth** | Laravel Fortify (2FA, Passkeys) |
 | **Authorization** | Spatie Laravel-Permission |
-| **PDF Generation** | Barryvdh DomPDF |
+| **PDF** | Barryvdh DomPDF |
 | **Email Testing** | Mailpit |
 | **Testing** | Pest PHP 4, Larastan |
 | **Code Style** | Laravel Pint, ESLint, Prettier |
@@ -182,129 +151,16 @@ npm run dev          # Terminal 2
 
 ---
 
-## ⚙️ Port Customization
-
-Ports are fully configurable via your `.env` file or dynamically through `./setup.sh`:
-
-| Variable | Description | Default Port |
-|---|---|---|
-| `APP_PORT` | Main application HTTP server | `8000` |
-| `VITE_PORT` | Vite Hot Module Replacement (HMR) | `5173` |
-| `MAILPIT_PORT` | Mailpit dashboard Web UI | `8025` |
-
-If you customize these values in `.env`, Docker Compose will automatically map them.
-
----
-
-## 🗄️ Database Profiles (Docker)
-
-SQLite is the default connection. If you wish to use other databases via Docker:
-
-### MySQL 8.0
-```bash
-docker compose --profile mysql up -d
-```
-Update your `.env`:
-```ini
-DB_CONNECTION=mysql
-DB_HOST=127.0.0.1
-DB_PORT=3306
-DB_DATABASE=pos_app
-DB_USERNAME=root
-DB_PASSWORD=password
-```
-
-### PostgreSQL 16
-```bash
-docker compose --profile postgres up -d
-```
-Update your `.env`:
-```ini
-DB_CONNECTION=pgsql
-DB_HOST=127.0.0.1
-DB_PORT=5432
-DB_DATABASE=pos_app
-DB_USERNAME=postgres
-DB_PASSWORD=password
-```
-
----
-
-## 👥 Default Credentials
-
-When database seeds are run, the following users are generated:
-
-| Role | Email | Password |
-|---|---|---|
-| **Administrator** | `admin@example.com` | `password` |
-| **Staff/Employee** | `employee@example.com` | `password` |
-
-> 15 additional fictitious employees are also seeded for testing.
-
----
-
-## 🚀 Makefile Shortcuts
-
-This project includes a `Makefile` with handy shortcuts. Run `make help` to see all available commands:
-
-```bash
-# Setup
-make help            # Show all available commands
-make install         # Install Composer + NPM dependencies
-make setup           # Run interactive setup wizard
-
-# Development
-make dev             # Start Laravel + Vite dev servers in parallel
-make serve           # Start Laravel dev server only
-make vite            # Start Vite dev server only
-make build           # Build frontend assets for production
-
-# Database
-make migrate         # Run database migrations
-make fresh           # Reset database with migrations + seeders
-make seed            # Run database seeders
-
-# Quality
-make test            # Run Pest test suite
-make lint            # Format code with Laravel Pint
-make lint-check      # Check formatting without fixing
-make analyse         # Run Larastan static analysis
-make check           # Run all quality checks (lint + test + analyse)
-
-# Docker
-make docker          # Start Docker services (app + mailpit)
-make docker-build    # Build Docker images
-make docker-down     # Stop Docker services
-make docker-mysql    # Start with MySQL profile
-make docker-postgres # Start with PostgreSQL profile
-make docker-logs     # Follow Docker container logs
-
-# Utilities
-make optimize        # Cache config, routes, views, and events
-make clear           # Clear all caches
-make routes          # List all routes
-make tinker          # Open Laravel Tinker REPL
-make wayfinder       # Generate Wayfinder route functions
-make queue           # Start queue worker
-```
-
----
-
 ## 🧪 Testing & Code Quality
 
 ```bash
-# Run test suite
-make test
-
-# Format code with Laravel Pint
-make lint
-
-# Run all quality checks at once (lint + test + static analysis)
-make check
+php artisan test        # Run the Pest test suite
+composer run lint       # Format code with Laravel Pint
+composer run ci:check   # Lint + format + types + tests
 ```
 
 ---
 
 ## 📄 License
 
-The POS App is open-sourced software licensed under the [MIT license](LICENSE).
+Open-sourced software licensed under the [MIT license](LICENSE).
