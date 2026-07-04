@@ -2,6 +2,19 @@
 
 set -e
 
+# Parse CLI args
+DRY_RUN=0
+for arg in "$@"; do
+    case "$arg" in
+        --dry-run) DRY_RUN=1 ;;
+        -h|--help)
+            echo "Usage: ./setup.sh [--dry-run]"
+            echo "  --dry-run   Detect platform and print the install plan without executing."
+            exit 0
+            ;;
+    esac
+done
+
 # Graceful CTRL+C handling
 cleanup() {
     printf '\033[?25h' # restore cursor
@@ -97,63 +110,312 @@ ask() {
     REPLY_VAL=${input:-$default}
 }
 
+# Detect OS platform and available package manager.
+# Sets PLATFORM (linux|mac|wsl|win) and PKG_MGR (apt|brew|winget|none).
+detect_platform() {
+    local uname_s
+    uname_s=$(uname -s 2>/dev/null || echo unknown)
+    case "$uname_s" in
+        MINGW*|MSYS*|CYGWIN*) PLATFORM="win" ;;
+        Darwin)               PLATFORM="mac" ;;
+        Linux)
+            if grep -qiE "microsoft" /proc/version 2>/dev/null; then
+                PLATFORM="wsl"
+            else
+                PLATFORM="linux"
+            fi
+            ;;
+        *) PLATFORM="linux" ;;
+    esac
+
+    if command -v apt-get >/dev/null 2>&1; then
+        PKG_MGR="apt"
+    elif command -v brew >/dev/null 2>&1; then
+        PKG_MGR="brew"
+    elif command -v winget >/dev/null 2>&1; then
+        PKG_MGR="winget"
+    else
+        PKG_MGR="none"
+    fi
+}
+
+# Prints the human-readable install command(s) for a dependency on the current PKG_MGR.
+describe_install() {
+    local dep=$1
+    case "$dep:$PKG_MGR" in
+        php:apt)
+            echo "sudo add-apt-repository -y ppa:ondrej/php   # only if 8.4 missing from repos"
+            echo "sudo apt-get install -y php8.4-cli php8.4-xml php8.4-sqlite3 php8.4-mysql php8.4-pgsql php8.4-gd php8.4-zip php8.4-bcmath php8.4-curl php8.4-mbstring"
+            ;;
+        php:brew)     echo "brew install php" ;;
+        composer:apt) echo "curl -sS https://getcomposer.org/installer | php   (then move to /usr/local/bin/composer)" ;;
+        composer:brew)   echo "brew install composer" ;;
+        composer:winget) echo "winget install --id Composer.Composer -e" ;;
+        node:apt)     echo "curl -fsSL https://deb.nodesource.com/setup_24.x | sudo -E bash -  &&  sudo apt-get install -y nodejs" ;;
+        node:brew)    echo "brew install node@24" ;;
+        node:winget)  echo "winget install --id OpenJS.NodeJS.LTS -e" ;;
+        *)            echo "(no automated installer for ${dep} on ${PKG_MGR})" ;;
+    esac
+}
+
+install_php() {
+    case "$PKG_MGR" in
+        apt)
+            if ! apt-cache show php8.4-cli >/dev/null 2>&1; then
+                sudo add-apt-repository -y ppa:ondrej/php
+                sudo apt-get update
+            fi
+            sudo apt-get install -y php8.4-cli php8.4-xml php8.4-sqlite3 \
+                php8.4-mysql php8.4-pgsql php8.4-gd php8.4-zip \
+                php8.4-bcmath php8.4-curl php8.4-mbstring
+            ;;
+        brew) brew install php ;;
+    esac
+}
+
+install_composer() {
+    case "$PKG_MGR" in
+        apt)
+            curl -sS https://getcomposer.org/installer -o /tmp/composer-setup.php
+            php /tmp/composer-setup.php --install-dir=/tmp --filename=composer
+            sudo mv /tmp/composer /usr/local/bin/composer
+            rm -f /tmp/composer-setup.php
+            ;;
+        brew)   brew install composer ;;
+        winget) winget install --id Composer.Composer -e ;;
+    esac
+}
+
+install_node() {
+    case "$PKG_MGR" in
+        apt)
+            curl -fsSL https://deb.nodesource.com/setup_24.x | sudo -E bash -
+            sudo apt-get install -y nodejs
+            ;;
+        brew)   brew install node@24 ;;
+        winget) winget install --id OpenJS.NodeJS.LTS -e ;;
+    esac
+}
+
+# Prints the ordered install plan for MISSING_DEPS.
+build_install_plan() {
+    local dep
+    for dep in php composer node; do
+        case " ${MISSING_DEPS[*]} " in
+            *" $dep "*)
+                echo -e "  ${BOLD}${dep}${NC}"
+                describe_install "$dep" | sed 's/^/      /'
+                ;;
+        esac
+    done
+}
+
+# Offers to install missing system dependencies. Exits 1 if unresolved.
+offer_install() {
+    # No supported package manager → manual hint.
+    if [ "$PKG_MGR" = "none" ]; then
+        err "${BOLD}Missing dependencies and no supported package manager detected.${NC}"
+        hint "Install manually: ${MISSING_DEPS[*]}"
+        build_install_plan
+        exit 1
+    fi
+
+    # PHP on native Windows is fragile → steer to Docker.
+    if [ "$PLATFORM" = "win" ]; then
+        case " ${MISSING_DEPS[*]} " in
+            *" php "*)
+                err "${BOLD}PHP is required and native Windows PHP setup is unreliable.${NC}"
+                hint "Re-run and choose option 1 (Full Docker) — it needs no host PHP/Node."
+                exit 1
+                ;;
+        esac
+    fi
+
+    print_section "Install Missing Dependencies"
+    echo -e "  The following will be installed with ${BOLD}${PKG_MGR}${NC}:"
+    build_install_plan
+    echo
+    ask "Install now? (y/n)" "y"
+    if [ "$REPLY_VAL" != "y" ] && [ "$REPLY_VAL" != "Y" ]; then
+        err "Dependencies required for Local Dev. Aborting."
+        hint "Install them manually (see commands above) or re-run and pick Full Docker."
+        exit 1
+    fi
+
+    # Prime sudo OUTSIDE the spinner so the password prompt is visible.
+    if [ "$PKG_MGR" = "apt" ]; then
+        echo
+        echo -e "  ${GRAY}Requesting sudo access...${NC}"
+        sudo -v || { err "sudo required to install packages."; exit 1; }
+    fi
+
+    step "Installing dependencies"
+    local dep
+    for dep in php composer node; do
+        case " ${MISSING_DEPS[*]} " in
+            *" $dep "*)
+                if ! "install_${dep}"; then
+                    err "Failed to install ${dep}."
+                    hint "Install it manually and re-run:"
+                    build_install_plan
+                    exit 1
+                fi
+                ;;
+        esac
+    done
+
+    # Re-check to confirm resolution (recheck mode skips Docker remediation).
+    run_prereq_checks recheck
+    if [ "${#MISSING_DEPS[@]}" -ne 0 ]; then
+        err "${BOLD}Still missing after install: ${MISSING_DEPS[*]}${NC}"
+        hint "Install manually and re-run:"
+        if [ "$PLATFORM" = "win" ]; then
+            hint "On Windows, newly installed tools may need a fresh terminal — reopen your shell and re-run."
+        fi
+        build_install_plan
+        exit 1
+    fi
+    ok "All system dependencies satisfied."
+}
+
+# Classifies Docker availability into DOCKER_STATE: ok | absent | denied | stopped.
+check_docker() {
+    if ! command -v docker >/dev/null 2>&1; then
+        DOCKER_STATE="absent"
+        return
+    fi
+    local out
+    if out=$(docker info 2>&1); then
+        DOCKER_STATE="ok"
+        return
+    fi
+    if echo "$out" | grep -qiE "permission denied|docker.sock"; then
+        DOCKER_STATE="denied"
+    else
+        DOCKER_STATE="stopped"
+    fi
+}
+
+# Offers to add the current user to the 'docker' group (Linux/WSL only).
+offer_docker_group_fix() {
+    case "$PLATFORM" in
+        linux|wsl) ;;
+        *) return ;;
+    esac
+    ask "Add your user to the 'docker' group now? (y/n)" "n"
+    if [ "$REPLY_VAL" = "y" ] || [ "$REPLY_VAL" = "Y" ]; then
+        sudo usermod -aG docker "$USER" \
+            && ok "Added ${USER} to 'docker' group." \
+            || { err "Failed to modify group."; return; }
+        warn "${BOLD}You must run 'newgrp docker' or log out/in for this to take effect.${NC}"
+        warn "This shell still lacks access — re-run setup afterwards to use Docker mode."
+    fi
+}
+
+# Runs the prerequisites check, prints results, and populates MISSING_DEPS.
+run_prereq_checks() {
+    local recheck="${1:-}"
+    print_section "Prerequisites Check"
+    HAS_PREREQS=true
+    MISSING_DEPS=()
+
+    # PHP
+    if command -v php >/dev/null 2>&1; then
+        PHP_VER=$(php -r 'echo PHP_VERSION;')
+        if php -r "exit(version_compare(PHP_VERSION, '8.4.0', '>=') ? 0 : 1);" >/dev/null 2>&1; then
+            ok "PHP ${GREEN}${PHP_VER}${NC}"
+        else
+            err "PHP ${PHP_VER} ${GRAY}(8.4+ required)${NC}"
+            hint "Upgrade: https://www.php.net/downloads.php"
+            HAS_PREREQS=false
+            MISSING_DEPS+=("php")
+        fi
+    else
+        err "PHP — not found"
+        HAS_PREREQS=false
+        MISSING_DEPS+=("php")
+    fi
+
+    # Composer
+    if command -v composer >/dev/null 2>&1; then
+        COMPOSER_VER=$(composer --version 2>/dev/null | head -1 | grep -oP '\d+\.\d+\.\d+')
+        ok "Composer ${GREEN}${COMPOSER_VER}${NC}"
+    else
+        err "Composer — not found"
+        HAS_PREREQS=false
+        MISSING_DEPS+=("composer")
+    fi
+
+    # Node.js (minimum v22; install target v24 LTS)
+    if command -v node >/dev/null 2>&1; then
+        NODE_VER=$(node -v)
+        NODE_MAJOR=$(echo "$NODE_VER" | cut -d'v' -f2 | cut -d'.' -f1)
+        if [ "$NODE_MAJOR" -ge 22 ]; then
+            ok "Node.js ${GREEN}${NODE_VER}${NC}"
+        else
+            err "Node.js ${NODE_VER} ${GRAY}(22+ required)${NC}"
+            hint "Use nvm or download from https://nodejs.org/"
+            HAS_PREREQS=false
+            MISSING_DEPS+=("node")
+        fi
+    else
+        err "Node.js — not found"
+        HAS_PREREQS=false
+        MISSING_DEPS+=("node")
+    fi
+
+    # Docker (optional but recommended). Skipped on post-install re-check so the
+    # docker-group remediation prompt never fires mid-install.
+    if [ "$recheck" != "recheck" ]; then
+        check_docker
+        case "$DOCKER_STATE" in
+            ok)
+                HAS_DOCKER=true
+                ok "Docker & Docker Compose"
+                ;;
+            absent)
+                HAS_DOCKER=false
+                warn "Docker — not found"
+                hint "Install Docker Desktop: https://www.docker.com/products/docker-desktop"
+                ;;
+            denied)
+                HAS_DOCKER=false
+                warn "Docker — installed but permission denied ${GRAY}(user not in 'docker' group)${NC}"
+                hint "Fix: ${CYAN}sudo usermod -aG docker \$USER${NC}"
+                hint "Then run ${CYAN}newgrp docker${NC} (or log out/in) and re-run this setup."
+                offer_docker_group_fix
+                ;;
+            stopped)
+                HAS_DOCKER=false
+                warn "Docker — installed but the daemon is not running"
+                if [ "$PLATFORM" = "mac" ] || [ "$PLATFORM" = "win" ]; then
+                    hint "Start Docker Desktop, then re-run."
+                else
+                    hint "Start it: ${CYAN}sudo systemctl start docker${NC}"
+                fi
+                ;;
+        esac
+    fi
+}
+
 print_header
+detect_platform
+run_prereq_checks
 
-# 1. Prerequisites Check
-print_section "Prerequisites Check"
-HAS_PREREQS=true
-
-# Check PHP
-if command -v php >/dev/null 2>&1; then
-    PHP_VER=$(php -r 'echo PHP_VERSION;')
-    if php -r "exit(version_compare(PHP_VERSION, '8.4.0', '>=') ? 0 : 1);" >/dev/null 2>&1; then
-        ok "PHP ${GREEN}${PHP_VER}${NC}"
+if [ "$DRY_RUN" = "1" ]; then
+    print_section "Dry Run — Install Plan"
+    echo -e "  Platform: ${BOLD}${PLATFORM}${NC}"
+    echo -e "  Package manager: ${BOLD}${PKG_MGR}${NC}"
+    if [ "${#MISSING_DEPS[@]}" -eq 0 ]; then
+        ok "No missing dependencies."
+    elif [ "$PKG_MGR" = "none" ]; then
+        warn "Missing: ${MISSING_DEPS[*]} — no supported package manager, manual install required."
     else
-        err "PHP ${PHP_VER} ${GRAY}(8.4+ required)${NC}"
-        hint "Upgrade: https://www.php.net/downloads.php"
-        HAS_PREREQS=false
+        echo -e "  Missing: ${BOLD}${MISSING_DEPS[*]}${NC}"
+        echo -e "  ${GRAY}Would run:${NC}"
+        build_install_plan
     fi
-else
-    err "PHP — not found"
-    hint "Install: ${CYAN}sudo apt install php-cli php-xml php-sqlite3 php-mysql php-pgsql php-gd php-zip php-bcmath php-curl${NC}"
-    HAS_PREREQS=false
-fi
-
-# Check Composer
-if command -v composer >/dev/null 2>&1; then
-    COMPOSER_VER=$(composer --version 2>/dev/null | head -1 | grep -oP '\d+\.\d+\.\d+')
-    ok "Composer ${GREEN}${COMPOSER_VER}${NC}"
-else
-    err "Composer — not found"
-    hint "Install: ${CYAN}curl -sS https://getcomposer.org/installer | php && sudo mv composer.phar /usr/local/bin/composer${NC}"
-    HAS_PREREQS=false
-fi
-
-# Check Node.js
-if command -v node >/dev/null 2>&1; then
-    NODE_VER=$(node -v)
-    NODE_MAJOR=$(echo "$NODE_VER" | cut -d'v' -f2 | cut -d'.' -f1)
-    if [ "$NODE_MAJOR" -ge 20 ]; then
-        ok "Node.js ${GREEN}${NODE_VER}${NC}"
-    else
-        err "Node.js ${NODE_VER} ${GRAY}(20+ required)${NC}"
-        hint "Use nvm or download from https://nodejs.org/"
-        HAS_PREREQS=false
-    fi
-else
-    err "Node.js — not found"
-    hint "Install: ${CYAN}curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash - && sudo apt-get install -y nodejs${NC}"
-    HAS_PREREQS=false
-fi
-
-# Check Docker (optional but highly recommended)
-HAS_DOCKER=true
-if command -v docker >/dev/null 2>&1 && docker info >/dev/null 2>&1; then
-    ok "Docker & Docker Compose"
-else
-    warn "Docker — not running or not found"
-    hint "Install Docker Desktop: https://www.docker.com/products/docker-desktop"
-    HAS_DOCKER=false
+    exit 0
 fi
 
 # 2. Setup Mode Selection
@@ -200,10 +462,7 @@ RUN_SEEDERS="yes"
 
 if [ "$SETUP_MODE" = "2" ]; then
     if [ "$HAS_PREREQS" = "false" ]; then
-        echo
-        err "${BOLD}Missing host dependencies (PHP, Composer, Node.js) for Local Dev.${NC}"
-        hint "Install them first, or pick option 1 (Docker)."
-        exit 1
+        offer_install
     fi
 
     # Database Selection

@@ -88,9 +88,9 @@ Depending on the setup method you pick:
 | Method | Requirements |
 |---|---|
 | **Interactive wizard / Full Docker** | [Docker](https://www.docker.com/products/docker-desktop) & Docker Compose |
-| **Manual local setup** | PHP **8.4+**, Composer **2+**, Node.js **20+**, npm |
+| **Manual local setup** | PHP **8.4+**, Composer **2+**, Node.js **22+**, npm |
 
-> The interactive wizard (`./setup.sh`) checks all of these for you and prints install hints for anything missing.
+> The interactive wizard (`./setup.sh`) checks all of these and can **install missing dependencies for you** (PHP, Composer, Node) via apt / Homebrew / winget after confirmation, or steer you to Docker. It also diagnoses Docker permission/daemon issues. Run `./setup.sh --dry-run` to preview the install plan without changing anything.
 
 ---
 
