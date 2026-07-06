@@ -137,7 +137,7 @@ export default function PermissionsIndex({ permissions }: Props) {
 PermissionsIndex.layout = {
     breadcrumbs: [
         {
-            title: 'Permissions',
+            title: 'nav.permissions',
             href: '/permissions',
         },
     ],

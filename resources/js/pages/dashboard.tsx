@@ -415,7 +415,7 @@ export default function Dashboard({ metrics }: Props) {
 Dashboard.layout = {
     breadcrumbs: [
         {
-            title: 'Dashboard',
+            title: 'nav.dashboard',
             href: dashboard(),
         },
     ],

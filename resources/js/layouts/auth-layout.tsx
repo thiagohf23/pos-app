@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import AuthLayoutTemplate from '@/layouts/auth/auth-simple-layout';
 
 export default function AuthLayout({
@@ -9,8 +10,10 @@ export default function AuthLayout({
     description?: string;
     children: React.ReactNode;
 }) {
+    const { t } = useTranslation();
+
     return (
-        <AuthLayoutTemplate title={title} description={description}>
+        <AuthLayoutTemplate title={t(title)} description={t(description)}>
             {children}
         </AuthLayoutTemplate>
     );

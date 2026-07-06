@@ -55,6 +55,7 @@ export function ProductTable({
                 <thead>
                     <tr className="border-b border-neutral-200 bg-neutral-50/50 text-xs font-semibold tracking-wider text-neutral-500 uppercase dark:border-neutral-800 dark:bg-neutral-900/50 dark:text-neutral-400">
                         <th className="px-6 py-4">Product</th>
+                        <th className="px-6 py-4">SKU / Barcode</th>
                         <th className="px-6 py-4">Category</th>
                         <th className="px-6 py-4">Price</th>
                         <th className="px-6 py-4 text-center">Stock</th>
@@ -93,12 +94,32 @@ export function ProductTable({
                                 </div>
                             </td>
                             <td className="px-6 py-4">
-                                <Badge
-                                    variant="secondary"
-                                    className="bg-neutral-100 text-neutral-800 dark:bg-neutral-800 dark:text-neutral-300"
-                                >
-                                    {product.category?.name || 'Uncategorized'}
-                                </Badge>
+                                <div className="flex flex-col gap-1">
+                                    <span className="text-sm font-medium text-neutral-900 dark:text-neutral-100">
+                                        {product.sku || '-'}
+                                    </span>
+                                    <span className="text-xs text-neutral-500 dark:text-neutral-400">
+                                        {product.barcode || '-'}
+                                    </span>
+                                </div>
+                            </td>
+                            <td className="px-6 py-4">
+                                <div className="flex flex-col items-start gap-1">
+                                    <Badge
+                                        variant="secondary"
+                                        className="bg-neutral-100 text-neutral-800 dark:bg-neutral-800 dark:text-neutral-300"
+                                    >
+                                        {product.category?.name || 'Uncategorized'}
+                                    </Badge>
+                                    {product.supplier && (
+                                        <Badge
+                                            variant="outline"
+                                            className="text-[10px] text-neutral-500 dark:text-neutral-400"
+                                        >
+                                            {product.supplier.name}
+                                        </Badge>
+                                    )}
+                                </div>
                             </td>
                             <td className="px-6 py-4 font-medium text-neutral-900 dark:text-neutral-100">
                                 ${parseFloat(product.price).toFixed(2)}

@@ -728,7 +728,7 @@ export default function ReportsIndex({
 ReportsIndex.layout = {
     breadcrumbs: [
         {
-            title: 'Reports',
+            title: 'nav.reports',
             href: '/reports',
         },
     ],

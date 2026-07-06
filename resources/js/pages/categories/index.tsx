@@ -199,7 +199,7 @@ export default function CategoriesIndex({ categories }: Props) {
 CategoriesIndex.layout = {
     breadcrumbs: [
         {
-            title: 'Categories',
+            title: 'nav.categories',
             href: '/categories',
         },
     ],

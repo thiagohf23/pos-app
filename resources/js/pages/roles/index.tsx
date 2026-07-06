@@ -136,7 +136,7 @@ export default function RolesIndex({ roles, permissions = [] }: Props) {
 RolesIndex.layout = {
     breadcrumbs: [
         {
-            title: 'Roles',
+            title: 'nav.roles',
             href: '/roles',
         },
     ],

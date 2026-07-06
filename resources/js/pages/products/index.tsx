@@ -7,16 +7,17 @@ import { Pagination } from '@/components/pagination';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { destroy, update } from '@/routes/products';
-import type { Category, Product, Paginated } from '@/types';
+import type { Category, Product, Paginated, Supplier } from '@/types';
 import { ProductDialog } from './components/product-dialog';
 import { ProductTable } from './components/product-table';
 
 interface Props {
     products: Paginated<Product>;
     categories: Category[];
+    suppliers: Supplier[];
 }
 
-export default function ProductsIndex({ products, categories }: Props) {
+export default function ProductsIndex({ products, categories, suppliers }: Props) {
     const [showForm, setShowForm] = useState(false);
     const [editing, setEditing] = useState<Product | null>(null);
     const [searchTerm, setSearchTerm] = useState('');
@@ -39,7 +40,10 @@ export default function ProductsIndex({ products, categories }: Props) {
             update.url(product.id),
             {
                 category_id: String(product.category_id),
+                supplier_id: product.supplier_id ? String(product.supplier_id) : '',
                 name: product.name,
+                sku: product.sku || '',
+                barcode: product.barcode || '',
                 description: product.description || '',
                 price: product.price,
                 stock: String(product.stock),
@@ -155,6 +159,7 @@ export default function ProductsIndex({ products, categories }: Props) {
                 }}
                 editing={editing}
                 categories={categories}
+                suppliers={suppliers}
             />
 
             {/* Delete Confirmation Dialog */}
@@ -174,7 +179,7 @@ export default function ProductsIndex({ products, categories }: Props) {
 ProductsIndex.layout = {
     breadcrumbs: [
         {
-            title: 'Products',
+            title: 'nav.products',
             href: '/products',
         },
     ],

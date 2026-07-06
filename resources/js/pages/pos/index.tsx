@@ -191,7 +191,7 @@ export default function PosIndex({ products = [], categories = [] }: Props) {
 PosIndex.layout = {
     breadcrumbs: [
         {
-            title: 'POS Terminal',
+            title: 'nav.pos',
             href: '/pos',
         },
     ],

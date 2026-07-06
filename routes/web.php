@@ -6,6 +6,7 @@ use App\Http\Controllers\CouponController;
 use App\Http\Controllers\CouponValidationController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\EmployeeController;
+use App\Http\Controllers\LanguageController;
 use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\PosController;
 use App\Http\Controllers\ProductController;
@@ -20,7 +21,10 @@ Route::get('/', function () {
     return Inertia::render('home');
 })->name('home');
 
+Route::post('locale', LanguageController::class)->name('locale');
+
 Route::middleware(['auth', 'verified'])->group(function () {
+
     Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
     Route::resource('products', ProductController::class)->except(['create', 'show', 'edit']);

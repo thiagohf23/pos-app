@@ -157,7 +157,7 @@ export default function CouponsIndex({ coupons, categories, products }: Props) {
 CouponsIndex.layout = {
     breadcrumbs: [
         {
-            title: 'Coupons',
+            title: 'nav.coupons',
             href: '/coupons',
         },
     ],
