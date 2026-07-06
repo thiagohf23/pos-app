@@ -35,7 +35,9 @@ import { index as permissionsIndex } from '@/routes/permissions';
 import { index as posIndex } from '@/routes/pos';
 import { index as productsIndex } from '@/routes/products';
 import { index as reportsIndex } from '@/routes/reports';
+import { index as rolesIndex } from '@/routes/roles';
 import { index as stockAdjustmentsIndex } from '@/routes/stock-adjustments';
+import { index as suppliersIndex } from '@/routes/suppliers';
 import type { NavItem } from '@/types';
 
 const mainNavItems: NavItem[] = [

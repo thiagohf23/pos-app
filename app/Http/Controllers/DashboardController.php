@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\PaymentMethod;
+use App\Enums\SaleStatus;
 use App\Models\Product;
 use App\Models\Sale;
 use App\Models\SaleItem;
@@ -19,15 +21,15 @@ class DashboardController extends Controller
 
         [$start, $end] = $this->resolvePeriod($period);
 
-        $salesQuery = fn () => Sale::where('status', 'completed')
+        $salesQuery = Sale::where('status', SaleStatus::Completed)
             ->whereBetween('sold_at', [$start, $end]);
 
         // 1. Basic sale summaries
-        $revenue = (float) $salesQuery()->sum('total');
-        $salesCount = $salesQuery()->count();
+        $revenue = (float) (clone $salesQuery)->sum('total');
+        $salesCount = (clone $salesQuery)->count();
         $avgTicket = $salesCount > 0 ? round($revenue / $salesCount, 2) : 0.0;
 
-        // 2. Active products stock levels (stock is not period-dependent)
+        // 2. Active products stock levels (not period-scoped) (stock is not period-dependent)
         $lowStockCount = Product::where('is_active', true)
             ->where('stock', '>', 0)
             ->where('stock', '<=', 5)
@@ -38,8 +40,11 @@ class DashboardController extends Controller
             ->count();
 
         // 3. Payment methods breakdown
-        $paymentMethodSales = $salesQuery()
+        $saleIds = (clone $salesQuery)->pluck('id');
+
+        $paymentMethodSales = (clone $salesQuery)
             ->select('payment_method', DB::raw('count(*) as count'), DB::raw('sum(total) as total'))
+            ->whereIn('id', $saleIds)
             ->groupBy('payment_method')
             ->get()
             ->keyBy('payment_method')
@@ -52,8 +57,11 @@ class DashboardController extends Controller
             ->toArray();
 
         $paymentMethods = [];
-        foreach (['cash', 'credit_card', 'debit_card', 'pix'] as $method) {
-            $paymentMethods[$method] = $paymentMethodSales[$method] ?? ['count' => 0, 'total' => 0.0];
+        foreach (PaymentMethod::cases() as $method) {
+            $paymentMethods[$method->value] = array_merge(
+                ['label' => $method->label()],
+                $paymentMethodSales[$method->value] ?? ['count' => 0, 'total' => 0.0]
+            );
         }
 
         // 4. Top selling products (within period)
@@ -61,6 +69,7 @@ class DashboardController extends Controller
             $q->where('status', 'completed')->whereBetween('sold_at', [$start, $end]);
         })
             ->select('product_id', 'product_name', DB::raw('sum(quantity) as quantity_sold'), DB::raw('sum(total) as revenue'))
+            ->whereIn('sale_id', $saleIds)
             ->groupBy('product_id', 'product_name')
             ->orderByDesc('quantity_sold')
             ->take(5)
@@ -75,13 +84,13 @@ class DashboardController extends Controller
             });
 
         // 5. Recent sales (latest 5 in period)
-        $recentSales = $salesQuery()
+        $recentSales = (clone $salesQuery)
             ->with('user')
             ->latest('sold_at')
             ->take(5)
             ->get();
 
-        // 6. Products with lowest stock levels (top 5 low stock products)
+        // 6. Products with lowest stock levels (top 5)
         $lowStockProducts = Product::with('category')
             ->where('is_active', true)
             ->orderBy('stock', 'asc')
@@ -89,6 +98,7 @@ class DashboardController extends Controller
             ->get();
 
         return Inertia::render('dashboard', [
+            'period' => $period,
             'metrics' => [
                 'revenue' => $revenue,
                 'sales_count' => $salesCount,

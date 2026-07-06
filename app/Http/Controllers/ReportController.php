@@ -272,4 +272,15 @@ class ReportController extends Controller
 
         return $labels;
     }
+
+    private function paymentMethodLabel(string|PaymentMethod $method): string
+    {
+        if ($method instanceof PaymentMethod) {
+            return $method->label();
+        }
+
+        $enum = PaymentMethod::tryFrom($method);
+
+        return $enum ? $enum->label() : $method;
+    }
 }

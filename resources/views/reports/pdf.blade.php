@@ -83,7 +83,7 @@
         <tbody>
             @foreach($paymentMethods as $method)
             <tr>
-                <td>{{ ucfirst(str_replace('_', ' ', $method->payment_method->value)) }}</td>
+                <td>{{ $method->payment_method instanceof \App\Enums\PaymentMethod ? $method->payment_method->label() : ucfirst(str_replace('_', ' ', $method->payment_method)) }}</td>
                 <td class="text-right">{{ $method->count }}</td>
                 <td class="text-right">R$ {{ number_format($method->total, 2, ',', '.') }}</td>
             </tr>

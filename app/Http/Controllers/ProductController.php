@@ -6,6 +6,7 @@ use App\Http\Requests\StoreProductRequest;
 use App\Http\Requests\UpdateProductRequest;
 use App\Models\Category;
 use App\Models\Product;
+use App\Models\Supplier;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
@@ -17,15 +18,17 @@ class ProductController extends Controller
      */
     public function index()
     {
-        $products = Product::with('category')
+        $products = Product::with('category', 'supplier')
             ->latest()
             ->paginate(10);
 
         $categories = Category::orderBy('name', 'asc')->get();
+        $suppliers = Supplier::orderBy('name', 'asc')->get();
 
         return Inertia::render('products/index', [
             'products' => $products,
             'categories' => $categories,
+            'suppliers' => $suppliers,
         ]);
     }
 

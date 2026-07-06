@@ -5,7 +5,6 @@ namespace App\Models;
 use App\Enums\PaymentMethod;
 use App\Enums\SaleStatus;
 use Carbon\Carbon;
-use Database\Factories\SaleFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -51,6 +50,8 @@ class Sale extends Model
             'cash_tendered' => 'decimal:2',
             'change_amount' => 'decimal:2',
             'sold_at' => 'datetime',
+            'status' => SaleStatus::class,
+            'payment_method' => PaymentMethod::class,
         ];
     }
 
@@ -67,5 +68,10 @@ class Sale extends Model
     public function coupon(): BelongsTo
     {
         return $this->belongsTo(Coupon::class);
+    }
+
+    public function stockMovements(): HasMany
+    {
+        return $this->hasMany(StockMovement::class);
     }
 }

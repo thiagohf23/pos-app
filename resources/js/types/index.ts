@@ -83,6 +83,7 @@ export interface Product {
     image: string | null;
     is_active: boolean;
     category: Category;
+    supplier?: Supplier | null;
 }
 
 export interface Paginated<T> {
@@ -129,4 +130,18 @@ export interface Sale {
     created_at: string;
     updated_at: string;
     items?: SaleItem[];
+}
+
+export type StockMovementReason = 'sale' | 'sale_cancellation' | 'manual_adjustment';
+
+export interface StockMovement {
+    id: number;
+    product_id: number;
+    user_id: number;
+    quantity_change: number;
+    reason: StockMovementReason;
+    notes: string | null;
+    created_at: string;
+    product: { id: number; name: string };
+    user: { id: number; name: string };
 }

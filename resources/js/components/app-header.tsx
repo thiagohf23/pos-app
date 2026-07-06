@@ -1,5 +1,5 @@
 import { Link, usePage } from '@inertiajs/react';
-import { BookOpen, Folder, LayoutGrid, Menu, Search, Package, ShoppingCart, Ticket, Sparkles, Truck, FileText } from 'lucide-react';
+import { BookOpen, Folder, LayoutGrid, Menu, Search, Package, ShoppingCart, Ticket, Sparkles, Truck, FileText, Users } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import AppLogo from '@/components/app-logo';
 import AppLogoIcon from '@/components/app-logo-icon';

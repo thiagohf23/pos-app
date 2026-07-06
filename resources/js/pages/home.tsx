@@ -3,6 +3,8 @@ import { LayoutGrid, ShoppingCart, ShieldCheck, ArrowRight, Printer, Sun, Moon }
 import { useAppearance } from '@/hooks/use-appearance';
 import { useTranslation } from 'react-i18next';
 import { LanguageSwitcher } from '@/components/language-switcher';
+import { login, register } from '@/routes';
+import { index as posIndex } from '@/routes/pos';
 
 export default function Home() {
     const { auth } = usePage().props as any;

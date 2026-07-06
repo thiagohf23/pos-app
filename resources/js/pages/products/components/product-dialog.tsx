@@ -23,6 +23,7 @@ import {
 } from '@/components/ui/select';
 import { store, update } from '@/routes/products';
 import type { Category, Product, Supplier } from '@/types';
+import { AvatarCropper } from '@/pages/settings/components/avatar-cropper';
 
 interface Props {
     open: boolean;
