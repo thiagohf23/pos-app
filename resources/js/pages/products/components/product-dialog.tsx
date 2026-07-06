@@ -1,6 +1,7 @@
 import { useForm } from '@inertiajs/react';
 import { Image as ImageIcon, Loader2, Crop } from 'lucide-react';
 import { useRef, useState, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -34,6 +35,7 @@ interface Props {
 }
 
 export function ProductDialog({ open, onClose, editing, categories, suppliers }: Props) {
+    const { t } = useTranslation();
     const fileInputRef = useRef<HTMLInputElement>(null);
     // State is initialized from `editing` at mount; the parent remounts this dialog
     // via a `key` whenever it opens, so we never sync props to state inside an effect.
@@ -113,8 +115,8 @@ export function ProductDialog({ open, onClose, editing, categories, suppliers }:
 
     async function handleEditCurrentImage() {
         if (!imagePreview) {
-return;
-}
+            return;
+        }
 
         try {
             const response = await fetch(imagePreview);
@@ -148,13 +150,13 @@ return;
             post(update.url(editing.id) + '?_method=PUT', {
                 onSuccess: () => {
                     toast.success(
-                        `Product "${data.name}" updated successfully!`,
+                        t('products.updated_success_alert', { defaultValue: `Product "${data.name}" updated successfully!`, name: data.name })
                     );
                     handleClose();
                 },
                 onError: () => {
                     toast.error(
-                        'Failed to update the product. Please check the form.',
+                        t('products.update_failed_form_alert', 'Failed to update the product. Please check the form.')
                     );
                 },
             });
@@ -162,13 +164,13 @@ return;
             post(store.url(), {
                 onSuccess: () => {
                     toast.success(
-                        `Product "${data.name}" created successfully!`,
+                        t('products.created_success_alert', { defaultValue: `Product "${data.name}" created successfully!`, name: data.name })
                     );
                     handleClose();
                 },
                 onError: () => {
                     toast.error(
-                        'Failed to create the product. Please check the form.',
+                        t('products.create_failed_form_alert', 'Failed to create the product. Please check the form.')
                     );
                 },
             });
@@ -183,26 +185,24 @@ return;
             <DialogContent className="sm:max-w-[480px]">
                 <DialogHeader>
                     <DialogTitle>
-                        {editing ? 'Edit Product' : 'Add Product'}
+                        {editing ? t('products.edit') : t('products.create')}
                     </DialogTitle>
                     <DialogDescription>
-                        Fill in the details below to{' '}
                         {editing
-                            ? 'update the product'
-                            : 'add a new product to your inventory'}
-                        .
+                            ? t('products.edit_description', 'Fill in the details below to update the product.')
+                            : t('products.create_description', 'Fill in the details below to add a new product to your inventory.')}
                     </DialogDescription>
                 </DialogHeader>
 
                 <form onSubmit={handleSubmit} className="space-y-4 py-2">
                     {/* Name */}
                     <div className="space-y-1.5">
-                        <Label htmlFor="name">Product Name *</Label>
+                        <Label htmlFor="name">{t('products.product_name_label', 'Product Name *')}</Label>
                         <Input
                             id="name"
                             value={data.name}
                             onChange={(e) => setData('name', e.target.value)}
-                            placeholder="e.g. Premium Wireless Mouse"
+                            placeholder={t('products.product_name_placeholder', 'e.g. Premium Wireless Mouse')}
                             required
                         />
                         {errors.name && (
@@ -215,7 +215,7 @@ return;
                     {/* SKU & Barcode Grid */}
                     <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-1.5">
-                            <Label htmlFor="sku">SKU</Label>
+                            <Label htmlFor="sku">{t('products.sku', 'SKU')}</Label>
                             <Input
                                 id="sku"
                                 value={data.sku}
@@ -230,12 +230,12 @@ return;
                         </div>
 
                         <div className="space-y-1.5">
-                            <Label htmlFor="barcode">Barcode</Label>
+                            <Label htmlFor="barcode">{t('products.barcode', 'Barcode')}</Label>
                             <Input
                                 id="barcode"
                                 value={data.barcode}
                                 onChange={(e) => setData('barcode', e.target.value)}
-                                placeholder="Scan or type barcode"
+                                placeholder={t('products.barcode_placeholder', 'Scan or type barcode')}
                             />
                             {errors.barcode && (
                                 <p className="text-xs text-destructive">
@@ -248,7 +248,7 @@ return;
                     {/* Category & Supplier Grid */}
                     <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-1.5">
-                            <Label htmlFor="category">Category *</Label>
+                            <Label htmlFor="category">{t('products.category_label', 'Category *')}</Label>
                             <Select
                                 value={data.category_id}
                                 onValueChange={(val) =>
@@ -257,12 +257,12 @@ return;
                                 required
                             >
                                 <SelectTrigger id="category" className="w-full">
-                                    <SelectValue placeholder="Select..." />
+                                    <SelectValue placeholder={t('common.select', 'Select...')} />
                                 </SelectTrigger>
                                 <SelectContent>
                                     <div className="border-b border-neutral-100 p-2 dark:border-neutral-800">
                                         <Input
-                                            placeholder="Search category..."
+                                            placeholder={t('products.search_category_placeholder', 'Search category...')}
                                             value={categorySearchQuery}
                                             onChange={(e) =>
                                                 setCategorySearchQuery(
@@ -277,7 +277,7 @@ return;
                                     </div>
                                     {filteredCategories.length === 0 ? (
                                         <div className="p-2 text-center text-xs text-neutral-400">
-                                            No categories found
+                                            {t('products.no_categories_found', 'No categories found')}
                                         </div>
                                     ) : (
                                         filteredCategories.map((category) => (
@@ -299,20 +299,20 @@ return;
                         </div>
 
                         <div className="space-y-1.5">
-                            <Label htmlFor="supplier">Supplier</Label>
+                            <Label htmlFor="supplier">{t('products.supplier', 'Supplier')}</Label>
                             <Select
                                 value={data.supplier_id}
                                 onValueChange={(val) =>
                                     setData('supplier_id', val)
                                 }
-                            >
+                             >
                                 <SelectTrigger id="supplier" className="w-full">
-                                    <SelectValue placeholder="Select supplier..." />
+                                    <SelectValue placeholder={t('products.select_supplier_placeholder', 'Select supplier...')} />
                                 </SelectTrigger>
                                 <SelectContent>
                                     <div className="border-b border-neutral-100 p-2 dark:border-neutral-800">
                                         <Input
-                                            placeholder="Search supplier..."
+                                            placeholder={t('products.search_supplier_placeholder', 'Search supplier...')}
                                             value={supplierSearchQuery}
                                             onChange={(e) =>
                                                 setSupplierSearchQuery(
@@ -325,10 +325,10 @@ return;
                                             className="h-8 bg-neutral-50 text-xs dark:bg-neutral-900"
                                         />
                                     </div>
-                                    <SelectItem value="">No Supplier</SelectItem>
+                                    <SelectItem value="">{t('products.no_supplier', 'No Supplier')}</SelectItem>
                                     {filteredSuppliers.length === 0 ? (
                                         <div className="p-2 text-center text-xs text-neutral-400">
-                                            No suppliers found
+                                            {t('products.no_suppliers_found', 'No suppliers found')}
                                         </div>
                                     ) : (
                                         filteredSuppliers.map((supplier) => (
@@ -353,7 +353,7 @@ return;
                     {/* Price & Stock Grid */}
                     <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-1.5">
-                            <Label htmlFor="price">Price ($) *</Label>
+                            <Label htmlFor="price">{t('products.price_label', 'Price ($) *')}</Label>
                             <Input
                                 id="price"
                                 type="number"
@@ -374,7 +374,7 @@ return;
                         </div>
 
                         <div className="space-y-1.5">
-                            <Label htmlFor="stock">Stock Quantity *</Label>
+                            <Label htmlFor="stock">{t('dashboard.stock_quantity', 'Stock Quantity *')}</Label>
                             <Input
                                 id="stock"
                                 type="number"
@@ -408,14 +408,14 @@ return;
                                 htmlFor="is_active"
                                 className="cursor-pointer text-sm font-medium select-none"
                             >
-                                Active on store
+                                {t('products.active_on_store', 'Active on store')}
                             </Label>
                         </div>
                     </div>
 
                     {/* Image */}
                     <div className="space-y-2">
-                        <Label htmlFor="image">Product Image</Label>
+                        <Label htmlFor="image">{t('products.product_image', 'Product Image')}</Label>
                         <div className="flex items-center gap-4">
                             <div className="flex size-20 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-neutral-200 bg-neutral-50 dark:border-neutral-800 dark:bg-neutral-900">
                                 {imagePreview ? (
@@ -439,7 +439,7 @@ return;
                                 />
                                 <div className="flex items-center justify-between">
                                     <p className="text-[10px] text-neutral-500 dark:text-neutral-400">
-                                        Max size 25MB (JPG, PNG, WEBP)
+                                        {t('products.image_max_size_hint', 'Max size 25MB (JPG, PNG, WEBP)')}
                                     </p>
                                     {imagePreview && (
                                         <Button
@@ -450,7 +450,7 @@ return;
                                             className="h-7 px-2 flex items-center gap-1 text-[10px]"
                                         >
                                             <Crop className="size-3" />
-                                            Crop Image
+                                            {t('products.crop_image', 'Crop Image')}
                                         </Button>
                                     )}
                                 </div>
@@ -465,14 +465,14 @@ return;
 
                     {/* Description */}
                     <div className="space-y-1.5">
-                        <Label htmlFor="description">Description</Label>
+                        <Label htmlFor="description">{t('products.description', 'Description')}</Label>
                         <textarea
                             id="description"
                             value={data.description}
                             onChange={(e) =>
                                 setData('description', e.target.value)
                             }
-                            placeholder="Describe the key features, size, materials, etc..."
+                            placeholder={t('products.description_placeholder', 'Describe the key features, size, materials, etc...')}
                             className="max-h-[160px] min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-hidden disabled:cursor-not-allowed disabled:opacity-50"
                         />
                         {errors.description && (
@@ -490,7 +490,7 @@ return;
                             disabled={processing}
                             className="cursor-pointer"
                         >
-                            Cancel
+                            {t('common.cancel')}
                         </Button>
                         <Button
                             type="submit"
@@ -500,7 +500,7 @@ return;
                             {processing && (
                                 <Loader2 className="size-4 animate-spin" />
                             )}
-                            {editing ? 'Save Changes' : 'Create Product'}
+                            {editing ? t('common.save_changes') : t('products.create')}
                         </Button>
                     </DialogFooter>
                 </form>

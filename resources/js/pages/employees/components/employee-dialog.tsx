@@ -1,6 +1,7 @@
 import { router, useForm } from '@inertiajs/react';
 import { Loader2 } from 'lucide-react';
 import { useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import {
@@ -31,6 +32,7 @@ interface Props {
 }
 
 export function EmployeeDialog({ open, onClose, editing, roles = [] }: Props) {
+    const { t } = useTranslation();
     const { data, setData, post, put, processing, errors, reset, clearErrors } =
         useForm({
             name: '',
@@ -78,22 +80,30 @@ export function EmployeeDialog({ open, onClose, editing, roles = [] }: Props) {
             put(update.url(editing.id), {
                 onSuccess: () => {
                     router.flushAll();
-                    toast.success(`Employee "${data.name}" updated successfully!`);
+                    toast.success(
+                        t('employees.updated_success_alert', { defaultValue: `Employee "${data.name}" updated successfully!`, name: data.name })
+                    );
                     handleClose();
                 },
                 onError: () => {
-                    toast.error('Failed to update the employee. Please check the form.');
+                    toast.error(
+                        t('employees.update_failed_form_alert', 'Failed to update the employee. Please check the form.')
+                    );
                 },
             });
         } else {
             post(store.url(), {
                 onSuccess: () => {
                     router.flushAll();
-                    toast.success(`Employee "${data.name}" created successfully!`);
+                    toast.success(
+                        t('employees.created_success_alert', { defaultValue: `Employee "${data.name}" created successfully!`, name: data.name })
+                    );
                     handleClose();
                 },
                 onError: () => {
-                    toast.error('Failed to create the employee. Please check the form.');
+                    toast.error(
+                        t('employees.create_failed_form_alert', 'Failed to create the employee. Please check the form.')
+                    );
                 },
             });
         }
@@ -107,14 +117,12 @@ export function EmployeeDialog({ open, onClose, editing, roles = [] }: Props) {
             <DialogContent className="sm:max-w-[520px]">
                 <DialogHeader>
                     <DialogTitle>
-                        {editing ? 'Edit Employee' : 'Add Employee'}
+                        {editing ? t('employees.edit') : t('employees.create')}
                     </DialogTitle>
                     <DialogDescription>
-                        Fill in the details below to{' '}
                         {editing
-                            ? 'update the employee'
-                            : 'register a new employee'}
-                        .
+                            ? t('employees.edit_description', 'Fill in the details below to update the employee.')
+                            : t('employees.create_description', 'Fill in the details below to register a new employee.')}
                     </DialogDescription>
                 </DialogHeader>
 
@@ -122,12 +130,12 @@ export function EmployeeDialog({ open, onClose, editing, roles = [] }: Props) {
                     <div className="grid grid-cols-2 gap-4">
                         {/* Name */}
                         <div className="col-span-2 space-y-1.5">
-                            <Label htmlFor="name">Full Name *</Label>
+                            <Label htmlFor="name">{t('employees.full_name_label', 'Full Name *')}</Label>
                             <Input
                                 id="name"
                                 value={data.name}
                                 onChange={(e) => setData('name', e.target.value)}
-                                placeholder="e.g. John Doe"
+                                placeholder={t('employees.full_name_placeholder', 'e.g. John Doe')}
                                 required
                             />
                             {errors.name && (
@@ -137,7 +145,7 @@ export function EmployeeDialog({ open, onClose, editing, roles = [] }: Props) {
 
                         {/* Email */}
                         <div className="space-y-1.5">
-                            <Label htmlFor="email">Email *</Label>
+                            <Label htmlFor="email">{t('common.email')} *</Label>
                             <Input
                                 id="email"
                                 type="email"
@@ -155,14 +163,14 @@ export function EmployeeDialog({ open, onClose, editing, roles = [] }: Props) {
                         {editing && (
                             <div className="space-y-1.5">
                                 <Label htmlFor="password">
-                                    Password (leave blank to keep)
+                                    {t('employees.password_keep_hint', 'Password (leave blank to keep)')}
                                 </Label>
                                 <Input
                                     id="password"
                                     type="password"
                                     value={data.password}
                                     onChange={(e) => setData('password', e.target.value)}
-                                    placeholder="Leave blank to keep"
+                                    placeholder={t('employees.password_blank_placeholder', 'Leave blank to keep')}
                                 />
                                 {errors.password && (
                                     <p className="text-xs text-destructive">{errors.password}</p>
@@ -173,13 +181,13 @@ export function EmployeeDialog({ open, onClose, editing, roles = [] }: Props) {
                         {/* Invitation notice - only in create mode */}
                         {!editing && (
                             <div className="col-span-2 rounded-md bg-blue-50 p-3 text-sm text-blue-700 dark:bg-blue-950/50 dark:text-blue-300">
-                                An email will be sent to the employee to set their password.
+                                {t('employees.invitation_email_notice', 'An email will be sent to the employee to set their password.')}
                             </div>
                         )}
 
                         {/* Phone */}
                         <div className="space-y-1.5">
-                            <Label htmlFor="phone">Phone</Label>
+                            <Label htmlFor="phone">{t('employees.phone', 'Phone')}</Label>
                             <Input
                                 id="phone"
                                 value={data.phone}
@@ -193,7 +201,7 @@ export function EmployeeDialog({ open, onClose, editing, roles = [] }: Props) {
 
                         {/* CPF */}
                         <div className="space-y-1.5">
-                            <Label htmlFor="cpf">CPF</Label>
+                            <Label htmlFor="cpf">{t('employees.cpf', 'CPF')}</Label>
                             <Input
                                 id="cpf"
                                 value={data.cpf}
@@ -207,7 +215,7 @@ export function EmployeeDialog({ open, onClose, editing, roles = [] }: Props) {
 
                         {/* Salary */}
                         <div className="space-y-1.5">
-                            <Label htmlFor="salary">Salary *</Label>
+                            <Label htmlFor="salary">{t('employees.salary', 'Salary')} *</Label>
                             <Input
                                 id="salary"
                                 type="number"
@@ -225,7 +233,7 @@ export function EmployeeDialog({ open, onClose, editing, roles = [] }: Props) {
 
                         {/* Hire Date */}
                         <div className="space-y-1.5">
-                            <Label htmlFor="hire_date">Hire Date</Label>
+                            <Label htmlFor="hire_date">{t('employees.hire_date', 'Hire Date')}</Label>
                             <Input
                                 id="hire_date"
                                 type="date"
@@ -239,13 +247,13 @@ export function EmployeeDialog({ open, onClose, editing, roles = [] }: Props) {
 
                         {/* Role */}
                         <div className="space-y-1.5">
-                            <Label htmlFor="role_id">Role</Label>
+                            <Label htmlFor="role_id">{t('employees.role', 'Role')}</Label>
                             <Select
                                 value={data.role_id}
                                 onValueChange={(value) => setData('role_id', value)}
                             >
                                 <SelectTrigger className="w-full cursor-pointer">
-                                    <SelectValue placeholder="Select a role" />
+                                    <SelectValue placeholder={t('employees.select_role_placeholder', 'Select a role')} />
                                 </SelectTrigger>
                                 <SelectContent>
                                     {roles.map((role) => (
@@ -272,7 +280,7 @@ export function EmployeeDialog({ open, onClose, editing, roles = [] }: Props) {
                                     className="size-4 rounded border-gray-300 text-neutral-950 focus:ring-neutral-950 dark:border-gray-600 dark:bg-gray-800"
                                 />
                                 <span className="text-sm font-medium select-none">
-                                    Active
+                                    {t('common.active')}
                                 </span>
                             </label>
                         </div>
@@ -286,7 +294,7 @@ export function EmployeeDialog({ open, onClose, editing, roles = [] }: Props) {
                             disabled={processing}
                             className="cursor-pointer"
                         >
-                            Cancel
+                            {t('common.cancel')}
                         </Button>
                         <Button
                             type="submit"
@@ -296,7 +304,7 @@ export function EmployeeDialog({ open, onClose, editing, roles = [] }: Props) {
                             {processing && (
                                 <Loader2 className="size-4 animate-spin" />
                             )}
-                            {editing ? 'Save Changes' : 'Create Employee'}
+                            {editing ? t('common.save_changes') : t('employees.create')}
                         </Button>
                     </DialogFooter>
                 </form>

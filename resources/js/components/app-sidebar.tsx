@@ -14,7 +14,7 @@ import {
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import AppLogo from '@/components/app-logo';
-import { LanguageSwitcher } from '@/components/language-switcher';
+
 import { NavFooter } from '@/components/nav-footer';
 import { NavMain } from '@/components/nav-main';
 import { NavUser } from '@/components/nav-user';
@@ -104,7 +104,7 @@ const mainNavItems: NavItem[] = [
         roles: ['Admin'],
     },
     {
-        title: 'Stock Adjustments',
+        title: 'nav.stock_adjustments',
         href: stockAdjustmentsIndex().url,
         icon: ClipboardList,
         roles: ['Admin'],
@@ -153,7 +153,6 @@ export function AppSidebar() {
             <SidebarFooter>
                 <NavFooter items={footerNavItems} className="mt-auto" />
                 <NavUser />
-                <LanguageSwitcher variant="mobile" />
             </SidebarFooter>
         </Sidebar>
     );

@@ -1,4 +1,5 @@
 import { Edit, Plus, Ticket, Trash2 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import type { Coupon, CouponScope } from '@/types';
@@ -11,18 +12,6 @@ interface Props {
     onAddClick: () => void;
 }
 
-function scopeLabel(scope: CouponScope): string {
-    if (scope === 'all') {
-        return 'All products';
-    }
-
-    if (scope === 'category') {
-        return 'Categories';
-    }
-
-    return 'Products';
-}
-
 export function CouponTable({
     coupons,
     searchTerm,
@@ -30,6 +19,20 @@ export function CouponTable({
     onDelete,
     onAddClick,
 }: Props) {
+    const { t } = useTranslation();
+
+    function scopeLabel(scope: CouponScope): string {
+        if (scope === 'all') {
+            return t('coupons.scope_all', 'All products');
+        }
+
+        if (scope === 'category') {
+            return t('coupons.scope_category', 'Categories');
+        }
+
+        return t('coupons.scope_product', 'Products');
+    }
+
     if (coupons.length === 0) {
         return (
             <div className="flex h-96 flex-col items-center justify-center p-12 text-center">
@@ -37,12 +40,12 @@ export function CouponTable({
                     <Ticket className="size-8 animate-pulse" />
                 </div>
                 <h3 className="text-lg font-semibold text-neutral-900 dark:text-neutral-100">
-                    No coupons found
+                    {t('common.no_results')}
                 </h3>
                 <p className="mt-1 max-w-sm text-sm text-neutral-500 dark:text-neutral-400">
                     {searchTerm
-                        ? 'Try adjusting your search terms or filter criteria.'
-                        : 'Get started by creating your first discount coupon.'}
+                        ? t('coupons.no_results_search_hint', 'Try adjusting your search terms or filter criteria.')
+                        : t('coupons.no_results_empty_hint', 'Get started by creating your first discount coupon.')}
                 </p>
                 {!searchTerm && (
                     <Button
@@ -51,7 +54,7 @@ export function CouponTable({
                         className="mt-4 cursor-pointer gap-2"
                     >
                         <Plus className="size-4" />
-                        Add Coupon
+                        {t('coupons.create')}
                     </Button>
                 )}
             </div>
@@ -63,13 +66,13 @@ export function CouponTable({
             <table className="w-full border-collapse text-left">
                 <thead>
                     <tr className="border-b border-neutral-200 bg-neutral-50/50 text-xs font-semibold tracking-wider text-neutral-500 uppercase dark:border-neutral-800 dark:bg-neutral-900/50 dark:text-neutral-400">
-                        <th className="px-6 py-4">Code</th>
-                        <th className="px-6 py-4">Scope</th>
-                        <th className="px-6 py-4">Discount</th>
-                        <th className="px-6 py-4">Validity</th>
-                        <th className="px-6 py-4 text-center">Usage</th>
-                        <th className="px-6 py-4 text-center">Status</th>
-                        <th className="px-6 py-4 text-right">Actions</th>
+                        <th className="px-6 py-4">{t('common.code')}</th>
+                        <th className="px-6 py-4">{t('coupons.scope', 'Scope')}</th>
+                        <th className="px-6 py-4">{t('common.discount')}</th>
+                        <th className="px-6 py-4">{t('coupons.validity', 'Validity')}</th>
+                        <th className="px-6 py-4 text-center">{t('coupons.usage', 'Usage')}</th>
+                        <th className="px-6 py-4 text-center">{t('common.status')}</th>
+                        <th className="px-6 py-4 text-right">{t('common.actions')}</th>
                     </tr>
                 </thead>
                 <tbody className="divide-y divide-neutral-200 dark:divide-neutral-800">
@@ -113,14 +116,14 @@ export function CouponTable({
                             <td className="px-6 py-4 text-center">
                                 {coupon.is_active ? (
                                     <Badge className="border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-800 dark:bg-emerald-950/50 dark:text-emerald-400">
-                                        Active
+                                        {t('common.active')}
                                     </Badge>
                                 ) : (
                                     <Badge
                                         variant="secondary"
                                         className="bg-neutral-100 text-neutral-500 dark:bg-neutral-800 dark:text-neutral-400"
                                     >
-                                        Inactive
+                                        {t('common.inactive')}
                                     </Badge>
                                 )}
                             </td>

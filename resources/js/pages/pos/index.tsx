@@ -6,6 +6,7 @@ import { useEffect, useState, useMemo } from 'react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { useSidebar } from '@/components/ui/sidebar';
 import {
     Tooltip,
     TooltipContent,
@@ -76,8 +77,9 @@ export default function PosIndex({ products = [], categories = [] }: Props) {
     );
     const [showPaymentDialog, setShowPaymentDialog] = useState(false);
     const [isFullscreen, setIsFullscreen] = useState(false);
+    const { setOpen } = useSidebar();
 
-    // Hide/show header when fullscreen toggles
+    // Hide/show header and toggle sidebar when fullscreen toggles
     useEffect(() => {
         const header = document.querySelector<HTMLElement>(
             'header, [class*="border-b"][class*="border-sidebar-border"]',
@@ -86,7 +88,9 @@ export default function PosIndex({ products = [], categories = [] }: Props) {
         if (header) {
             header.style.display = isFullscreen ? 'none' : '';
         }
-    }, [isFullscreen]);
+
+        setOpen(!isFullscreen);
+    }, [isFullscreen, setOpen]);
 
     // Restore header when leaving the page
     useEffect(() => {

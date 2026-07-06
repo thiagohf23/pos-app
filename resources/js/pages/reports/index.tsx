@@ -12,6 +12,7 @@ import {
     Check,
 } from 'lucide-react';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { index as reportsIndex, exportMethod, exportPdf } from '@/routes/reports';
 
@@ -87,6 +88,7 @@ interface SearchableSelectProps {
 function SearchableSelect({ value, onChange, options, placeholder, label }: SearchableSelectProps) {
     const [isOpen, setIsOpen] = useState(false);
     const [search, setSearch] = useState('');
+    const { t } = useTranslation();
 
     const selectedOption = options.find((opt) => String(opt.id) === value);
 
@@ -121,7 +123,7 @@ function SearchableSelect({ value, onChange, options, placeholder, label }: Sear
                                     <Search className="mr-2 h-3.5 w-3.5 shrink-0 opacity-50 text-neutral-505 dark:text-neutral-400" />
                                     <input
                                         type="text"
-                                        placeholder="Search..."
+                                        placeholder={`${t('common.search')}...`}
                                         value={search}
                                         onChange={(e) => setSearch(e.target.value)}
                                         className="w-full bg-transparent py-1 text-xs outline-none text-neutral-900 dark:text-neutral-50 placeholder:text-neutral-400"
@@ -146,8 +148,8 @@ function SearchableSelect({ value, onChange, options, placeholder, label }: Sear
                                     {placeholder}
                                 </li>
                                 {filteredOptions.length === 0 ? (
-                                    <li className="relative cursor-default select-none py-2 px-4 text-neutral-500 text-xs">
-                                        No results found
+                                    <li className="relative cursor-default select-none py-2 px-4 text-neutral-505 text-xs">
+                                        {t('common.no_results')}
                                     </li>
                                 ) : (
                                     filteredOptions.map((opt) => (
@@ -188,6 +190,7 @@ export default function ReportsIndex({
     categories,
     products,
 }: Props) {
+    const { t } = useTranslation();
     const [startDate, setStartDate] = useState(filters.start_date);
     const [endDate, setEndDate] = useState(filters.end_date);
     const [paymentMethod, setPaymentMethod] = useState(filters.payment_method ?? '');
@@ -247,7 +250,7 @@ export default function ReportsIndex({
 
     return (
         <>
-            <Head title="Reports" />
+            <Head title={t('reports.title')} />
 
             <style>{`
                 @media print {
@@ -290,7 +293,7 @@ export default function ReportsIndex({
             <div className="print-area">
                 {/* Print Header - only visible when printing */}
                 <div className="print-header hidden">
-                    <h1 style={{ fontSize: '24px', fontWeight: 'bold', margin: 0 }}>Sales Report</h1>
+                    <h1 style={{ fontSize: '24px', fontWeight: 'bold', margin: 0 }}>{t('reports.title', 'Sales Report')}</h1>
                 </div>
                 <div className="print-date hidden">
                     {new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
@@ -301,10 +304,10 @@ export default function ReportsIndex({
                     <div className="no-print flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                         <div>
                             <h1 className="text-3xl font-extrabold tracking-tight text-neutral-900 dark:text-neutral-50">
-                                Sales Reports
+                                {t('reports.title', 'Sales Reports')}
                             </h1>
                             <p className="mt-1 text-sm text-neutral-500 dark:text-neutral-400">
-                                Analyze sales performance across date ranges.
+                                {t('reports.subtitle', 'Analyze sales performance across date ranges.')}
                             </p>
                         </div>
                         <div className="flex flex-wrap gap-2">
@@ -313,21 +316,21 @@ export default function ReportsIndex({
                                 className="cursor-pointer gap-2 bg-neutral-200 text-neutral-700 shadow-md transition-all duration-200 hover:bg-neutral-300 dark:bg-neutral-800 dark:text-neutral-200 dark:hover:bg-neutral-700"
                             >
                                 <Printer className="size-4" />
-                                Print
+                                {t('reports.print', 'Print')}
                             </Button>
                             <Button
                                 onClick={handleExportPdf}
                                 className="cursor-pointer gap-2 bg-red-600 text-white shadow-md transition-all duration-200 hover:bg-red-700"
                             >
                                 <FileDown className="size-4" />
-                                PDF
+                                {t('reports.export_pdf', 'PDF')}
                             </Button>
                             <Button
                                 onClick={handleExport}
                                 className="cursor-pointer gap-2 bg-neutral-950 shadow-md transition-all duration-200 hover:bg-neutral-800 dark:bg-neutral-50 dark:text-neutral-950 dark:hover:bg-neutral-200"
                             >
                                 <Download className="size-4" />
-                                CSV
+                                {t('reports.export_excel', 'CSV')}
                             </Button>
                         </div>
                     </div>
@@ -336,7 +339,7 @@ export default function ReportsIndex({
                 <div className="no-print flex flex-wrap items-end gap-4 rounded-xl border border-neutral-200 bg-white p-4 shadow-xs dark:border-neutral-800 dark:bg-neutral-900/30">
                     <div className="flex flex-col gap-1.5">
                         <label className="text-xs font-semibold tracking-wider text-neutral-500 uppercase dark:text-neutral-400">
-                            Start Date
+                            {t('reports.start_date', 'Start Date')}
                         </label>
                         <input
                             type="date"
@@ -347,7 +350,7 @@ export default function ReportsIndex({
                     </div>
                     <div className="flex flex-col gap-1.5">
                         <label className="text-xs font-semibold tracking-wider text-neutral-500 uppercase dark:text-neutral-400">
-                            End Date
+                            {t('reports.end_date', 'End Date')}
                         </label>
                         <input
                             type="date"
@@ -358,17 +361,17 @@ export default function ReportsIndex({
                     </div>
                     <div className="flex flex-col gap-1.5">
                         <label className="text-xs font-semibold tracking-wider text-neutral-500 uppercase dark:text-neutral-400">
-                            Payment
+                            {t('reports.payment', 'Payment')}
                         </label>
                         <select
                             value={paymentMethod}
                             onChange={(e) => setPaymentMethod(e.target.value)}
                             className="rounded-lg border border-neutral-200 bg-white px-3 py-2 text-sm text-neutral-900 dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-50"
                         >
-                            <option value="">All methods</option>
+                            <option value="">{t('reports.all_methods', 'All methods')}</option>
                             {paymentMethods.map((method) => (
                                 <option key={method.value} value={method.value}>
-                                    {method.label}
+                                    {t(`dashboard.${method.value}`, method.label)}
                                 </option>
                             ))}
                         </select>
@@ -377,22 +380,22 @@ export default function ReportsIndex({
                         value={categoryId}
                         onChange={setCategoryId}
                         options={categories}
-                        placeholder="All categories"
-                        label="Category"
+                        placeholder={t('reports.all_categories', 'All categories')}
+                        label={t('common.category', 'Category')}
                     />
                     <SearchableSelect
                         value={productId}
                         onChange={setProductId}
                         options={products}
-                        placeholder="All products"
-                        label="Product"
+                        placeholder={t('reports.all_products', 'All products')}
+                        label={t('dashboard.product', 'Product')}
                     />
                     <div className="flex gap-2">
                         <Button
                             onClick={handleFilter}
                             className="cursor-pointer bg-neutral-900 text-white hover:bg-neutral-800 dark:bg-neutral-100 dark:text-neutral-900 dark:hover:bg-neutral-200"
                         >
-                            Apply Filter
+                            {t('reports.apply_filter', 'Apply Filter')}
                         </Button>
                         {(paymentMethod !== '' ||
                           categoryId !== '' ||
@@ -405,7 +408,7 @@ export default function ReportsIndex({
                                 onClick={handleClearFilters}
                                 className="cursor-pointer border border-neutral-200 bg-white hover:bg-neutral-50 dark:border-neutral-700 dark:bg-neutral-900 dark:hover:bg-neutral-800 text-neutral-700 dark:text-neutral-300"
                             >
-                                Clear Filters
+                                {t('reports.clear_filters', 'Clear Filters')}
                             </Button>
                         )}
                     </div>
@@ -416,7 +419,7 @@ export default function ReportsIndex({
                     <div className="rounded-xl border border-neutral-200 bg-white p-5 shadow-xs transition-all hover:shadow-md dark:border-neutral-800 dark:bg-neutral-900/30">
                         <div className="flex items-center justify-between">
                             <span className="text-xs font-semibold tracking-wider text-neutral-500 uppercase dark:text-neutral-400">
-                                Total Revenue
+                                {t('reports.total_revenue')}
                             </span>
                             <div className="rounded-lg bg-emerald-50 p-2 dark:bg-emerald-950/30">
                                 <DollarSign className="size-5 text-emerald-600 dark:text-emerald-400" />
@@ -427,7 +430,7 @@ export default function ReportsIndex({
                                 ${summary.total_revenue.toFixed(2)}
                             </span>
                             <p className="mt-1 text-xs text-neutral-500 dark:text-neutral-400">
-                                Within selected period
+                                {t('reports.within_selected_period', 'Within selected period')}
                             </p>
                         </div>
                     </div>
@@ -435,7 +438,7 @@ export default function ReportsIndex({
                     <div className="rounded-xl border border-neutral-200 bg-white p-5 shadow-xs transition-all hover:shadow-md dark:border-neutral-800 dark:bg-neutral-900/30">
                         <div className="flex items-center justify-between">
                             <span className="text-xs font-semibold tracking-wider text-neutral-500 uppercase dark:text-neutral-400">
-                                Total Sales
+                                {t('reports.total_sales')}
                             </span>
                             <div className="rounded-lg bg-purple-50 p-2 dark:bg-purple-950/30">
                                 <ShoppingCart className="size-5 text-purple-600 dark:text-purple-400" />
@@ -446,7 +449,7 @@ export default function ReportsIndex({
                                 {summary.total_sales}
                             </span>
                             <p className="mt-1 text-xs text-neutral-500 dark:text-neutral-400">
-                                Completed transactions
+                                {t('reports.completed_transactions', 'Completed transactions')}
                             </p>
                         </div>
                     </div>
@@ -454,7 +457,7 @@ export default function ReportsIndex({
                     <div className="rounded-xl border border-neutral-200 bg-white p-5 shadow-xs transition-all hover:shadow-md dark:border-neutral-800 dark:bg-neutral-900/30">
                         <div className="flex items-center justify-between">
                             <span className="text-xs font-semibold tracking-wider text-neutral-500 uppercase dark:text-neutral-400">
-                                Average Ticket
+                                {t('reports.avg_ticket', 'Average Ticket')}
                             </span>
                             <div className="rounded-lg bg-blue-50 p-2 dark:bg-blue-950/30">
                                 <TrendingUp className="size-5 text-blue-600 dark:text-blue-400" />
@@ -465,7 +468,7 @@ export default function ReportsIndex({
                                 ${summary.average_ticket.toFixed(2)}
                             </span>
                             <p className="mt-1 text-xs text-neutral-500 dark:text-neutral-400">
-                                Per transaction
+                                {t('reports.per_transaction', 'Per transaction')}
                             </p>
                         </div>
                     </div>
@@ -473,7 +476,7 @@ export default function ReportsIndex({
                     <div className="rounded-xl border border-neutral-200 bg-white p-5 shadow-xs transition-all hover:shadow-md dark:border-neutral-800 dark:bg-neutral-900/30">
                         <div className="flex items-center justify-between">
                             <span className="text-xs font-semibold tracking-wider text-neutral-500 uppercase dark:text-neutral-400">
-                                Total Discounts
+                                {t('reports.total_discounts', 'Total Discounts')}
                             </span>
                             <div className="rounded-lg bg-amber-50 p-2 dark:bg-amber-950/30">
                                 <Percent className="size-5 text-amber-600 dark:text-amber-400" />
@@ -484,7 +487,7 @@ export default function ReportsIndex({
                                 ${summary.total_discount.toFixed(2)}
                             </span>
                             <p className="mt-1 text-xs text-neutral-500 dark:text-neutral-400">
-                                Applied to orders
+                                {t('reports.applied_to_orders', 'Applied to orders')}
                             </p>
                         </div>
                     </div>
@@ -498,17 +501,17 @@ export default function ReportsIndex({
                         <div className="rounded-xl border border-neutral-200 bg-white p-5 shadow-xs dark:border-neutral-800 dark:bg-neutral-900/30">
                             <div className="mb-4 flex items-center justify-between">
                                 <h2 className="text-lg font-bold text-neutral-900 dark:text-neutral-50">
-                                    Daily Sales
+                                    {t('reports.daily_sales', 'Daily Sales')}
                                 </h2>
                                 {dailySales.length > 0 && (
                                     <span className="text-xs font-semibold text-neutral-400 dark:text-neutral-500">
-                                        Total: ${dailySales.reduce((a, d) => a + d.total, 0).toFixed(2)}
+                                        {t('dashboard.total')}: ${dailySales.reduce((a, d) => a + d.total, 0).toFixed(2)}
                                     </span>
                                 )}
                             </div>
                             {dailySales.length === 0 ? (
                                 <p className="py-8 text-center text-sm text-neutral-400">
-                                    No sales data for this period
+                                    {t('reports.no_sales_data', 'No sales data for this period')}
                                 </p>
                             ) : (
                                 <div className="flex gap-2">
@@ -548,10 +551,10 @@ export default function ReportsIndex({
                                                             className="group relative flex flex-1 items-end"
                                                         >
                                                             {/* Tooltip */}
-                                                            <div className="pointer-events-none absolute bottom-full left-1/2 z-10 mb-2 -translate-x-1/2 whitespace-nowrap rounded-lg bg-neutral-900 px-3 py-2 text-[10px] text-white opacity-0 shadow-lg transition-opacity group-hover:opacity-100 dark:bg-neutral-50 dark:text-neutral-900">
+                                                            <div className="pointer-events-none absolute bottom-full left-1/2 z-10 mb-2 -translate-x-1/2 whitespace-nowrap rounded-lg bg-neutral-900 px-3 py-2 text-[10px] text-white opacity-0 shadow-lg transition-opacity group-hover:opacity-100 dark:bg-neutral-900 dark:text-white">
                                                                 <div className="font-bold">{dayName}, {dayNum}</div>
                                                                 <div className="mt-0.5 font-mono">${day.total.toFixed(2)}</div>
-                                                                <div className="text-neutral-400 dark:text-neutral-500">{day.count} sale{day.count !== 1 ? 's' : ''}</div>
+                                                                <div className="text-neutral-400 dark:text-neutral-500">{day.count} {t('dashboard.sales_count_label', 'sales')}</div>
                                                                 {/* Arrow */}
                                                                 <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-neutral-900 dark:border-t-neutral-50" />
                                                             </div>
@@ -592,11 +595,11 @@ export default function ReportsIndex({
                         {/* Top Products */}
                         <div className="rounded-xl border border-neutral-200 bg-white p-5 shadow-xs dark:border-neutral-800 dark:bg-neutral-900/30">
                             <h2 className="mb-4 text-lg font-bold text-neutral-900 dark:text-neutral-50">
-                                Top Products
+                                {t('reports.top_products', 'Top Products')}
                             </h2>
                             {topProducts.length === 0 ? (
                                 <p className="py-8 text-center text-sm text-neutral-400">
-                                    No product data for this period
+                                    {t('reports.no_product_data', 'No product data for this period')}
                                 </p>
                             ) : (
                                 <div className="space-y-3">
@@ -624,7 +627,7 @@ export default function ReportsIndex({
                                                     </div>
                                                     <div className="flex items-center gap-3">
                                                         <span className="text-[10px] text-neutral-400 dark:text-neutral-500">
-                                                            {product.total_quantity} unit{product.total_quantity !== 1 ? 's' : ''}
+                                                            {product.total_quantity} {t('dashboard.units_sold', 'units sold')}
                                                         </span>
                                                         <span className="font-mono text-xs font-bold text-emerald-600 dark:text-emerald-400">
                                                             ${product.total_revenue.toFixed(2)}
@@ -649,11 +652,11 @@ export default function ReportsIndex({
                     <div className="flex flex-col gap-6">
                         <div className="rounded-xl border border-neutral-200 bg-white p-5 shadow-xs dark:border-neutral-800 dark:bg-neutral-900/30">
                             <h2 className="mb-4 text-lg font-bold text-neutral-900 dark:text-neutral-50">
-                                Payment Methods
+                                {t('dashboard.payment_methods')}
                             </h2>
                             {salesByPaymentMethod.length === 0 ? (
                                 <p className="py-4 text-center text-xs text-neutral-400">
-                                    No payment data for this period
+                                    {t('reports.no_payment_data', 'No payment data for this period')}
                                 </p>
                             ) : (
                                 <>
@@ -673,7 +676,7 @@ export default function ReportsIndex({
                                                               : 'bg-blue-500'
                                                     }`}
                                                     style={{ width: `${percent}%` }}
-                                                    title={`${item.label}: $${item.total.toFixed(2)} (${Math.round(percent)}%)`}
+                                                    title={`${t(`dashboard.${item.method}`, item.label)}: $${item.total.toFixed(2)} (${Math.round(percent)}%)`}
                                                 />
                                             );
                                         })}
@@ -698,10 +701,10 @@ export default function ReportsIndex({
                                                     <div className="flex flex-1 items-center justify-between">
                                                         <div className="flex items-center gap-1.5">
                                                             <span className="text-xs font-semibold text-neutral-700 dark:text-neutral-300">
-                                                                {item.label}
+                                                                {t(`dashboard.${item.method}`, item.label)}
                                                             </span>
                                                             <span className="text-[10px] text-neutral-400 dark:text-neutral-500">
-                                                                {item.count} sale{item.count !== 1 ? 's' : ''}
+                                                                {item.count} {t('dashboard.sales_count_label', 'sales')}
                                                             </span>
                                                         </div>
                                                         <div className="flex items-center gap-2">

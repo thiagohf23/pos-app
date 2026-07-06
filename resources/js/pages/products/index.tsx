@@ -1,6 +1,7 @@
 import { Head, router } from '@inertiajs/react';
 import { Plus, Search } from 'lucide-react';
 import { useState, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import { DeleteConfirmDialog } from '@/components/delete-confirm-dialog';
 import { Pagination } from '@/components/pagination';
@@ -18,6 +19,7 @@ interface Props {
 }
 
 export default function ProductsIndex({ products, categories, suppliers }: Props) {
+    const { t } = useTranslation();
     const [showForm, setShowForm] = useState(false);
     const [editing, setEditing] = useState<Product | null>(null);
     const [searchTerm, setSearchTerm] = useState('');
@@ -51,10 +53,10 @@ export default function ProductsIndex({ products, categories, suppliers }: Props
             },
             {
                 onSuccess: () => {
-                    toast.success(`Product "${product.name}" status updated!`);
+                    toast.success(t('products.status_updated_alert', { defaultValue: `Product "${product.name}" status updated!`, name: product.name }));
                 },
                 onError: () => {
-                    toast.error('Failed to update status.');
+                    toast.error(t('products.status_update_failed_alert', 'Failed to update status.'));
                 },
             },
         );
@@ -70,12 +72,12 @@ export default function ProductsIndex({ products, categories, suppliers }: Props
             onFinish: () => setIsDeleting(false),
             onSuccess: () => {
                 toast.success(
-                    `Product "${deletingProduct.name}" deleted successfully!`,
+                    t('products.deleted_alert', { defaultValue: `Product "${deletingProduct.name}" deleted successfully!`, name: deletingProduct.name })
                 );
                 setDeletingProduct(null);
             },
             onError: () => {
-                toast.error('Failed to delete the product.');
+                toast.error(t('products.delete_failed_alert', 'Failed to delete the product.'));
             },
         });
     }
@@ -93,18 +95,17 @@ export default function ProductsIndex({ products, categories, suppliers }: Props
 
     return (
         <>
-            <Head title="Products" />
+            <Head title={t('products.title')} />
 
             <div className="flex h-full flex-1 flex-col gap-6 p-6">
                 {/* Header */}
-                <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                 <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                     <div>
                         <h1 className="text-3xl font-extrabold tracking-tight text-neutral-900 dark:text-neutral-50">
-                            Products
+                            {t('products.title')}
                         </h1>
                         <p className="mt-1 text-sm text-neutral-500 dark:text-neutral-400">
-                            Manage your product catalog, stock levels, and
-                            pricing.
+                            {t('products.subtitle', 'Manage your product catalog, stock levels, and pricing.')}
                         </p>
                     </div>
                     <Button
@@ -115,7 +116,7 @@ export default function ProductsIndex({ products, categories, suppliers }: Props
                         className="w-full cursor-pointer gap-2 bg-neutral-950 shadow-md transition-all duration-200 hover:bg-neutral-800 sm:w-auto dark:bg-neutral-50 dark:text-neutral-950 dark:hover:bg-neutral-200"
                     >
                         <Plus className="size-4" />
-                        Add Product
+                        {t('products.create')}
                     </Button>
                 </div>
 
@@ -123,7 +124,7 @@ export default function ProductsIndex({ products, categories, suppliers }: Props
                 <div className="relative flex w-full max-w-md items-center gap-2">
                     <Search className="pointer-events-none absolute left-3 size-4 text-neutral-400" />
                     <Input
-                        placeholder="Search products or categories..."
+                        placeholder={t('products.search_placeholder', 'Search products or categories...')}
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                         className="bg-white pl-9 dark:bg-neutral-900/50"
@@ -167,8 +168,8 @@ export default function ProductsIndex({ products, categories, suppliers }: Props
                 open={deletingProduct !== null}
                 onClose={() => setDeletingProduct(null)}
                 onConfirm={confirmDelete}
-                title="Delete Product"
-                description={`Are you sure you want to delete "${deletingProduct?.name}"? This action cannot be undone.`}
+                title={t('products.delete_title', 'Delete Product')}
+                description={t('products.delete_description', { defaultValue: `Are you sure you want to delete "${deletingProduct?.name}"? This action cannot be undone.`, name: deletingProduct?.name })}
                 loading={isDeleting}
             />
         </>

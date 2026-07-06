@@ -34,8 +34,8 @@ export default function PermissionsIndex({ permissions }: Props) {
 
     function confirmDelete() {
         if (!deletingPermission) {
-return;
-}
+            return;
+        }
 
         router.delete(destroy.url(deletingPermission.id), {
             onStart: () => setIsDeleting(true),

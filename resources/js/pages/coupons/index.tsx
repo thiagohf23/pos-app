@@ -1,6 +1,7 @@
 import { Head, router } from '@inertiajs/react';
 import { Search, Ticket } from 'lucide-react';
 import { useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import { DeleteConfirmDialog } from '@/components/delete-confirm-dialog';
 import { Pagination } from '@/components/pagination';
@@ -18,6 +19,7 @@ interface Props {
 }
 
 export default function CouponsIndex({ coupons, categories, products }: Props) {
+    const { t } = useTranslation();
     const [showForm, setShowForm] = useState(false);
     const [editing, setEditing] = useState<Coupon | null>(null);
     const [searchTerm, setSearchTerm] = useState('');
@@ -45,7 +47,7 @@ export default function CouponsIndex({ coupons, categories, products }: Props) {
                 // Invalidate prefetched pages so the removed coupon disappears without a reload
                 router.flushAll();
                 toast.success(
-                    `Coupon "${deletingCoupon.code}" deleted successfully!`,
+                    t('coupons.deleted_alert', { defaultValue: `Coupon "${deletingCoupon.code}" deleted successfully!`, name: deletingCoupon.code })
                 );
                 setDeletingCoupon(null);
             },
@@ -53,7 +55,7 @@ export default function CouponsIndex({ coupons, categories, products }: Props) {
                 if (errors.delete) {
                     toast.error(errors.delete);
                 } else {
-                    toast.error('Failed to delete the coupon.');
+                    toast.error(t('coupons.delete_failed_alert', 'Failed to delete the coupon.'));
                 }
             },
         });
@@ -72,18 +74,17 @@ export default function CouponsIndex({ coupons, categories, products }: Props) {
 
     return (
         <>
-            <Head title="Coupons" />
+            <Head title={t('coupons.title')} />
 
             <div className="flex h-full flex-1 flex-col gap-6 p-6">
                 {/* Header */}
                 <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                     <div>
                         <h1 className="text-3xl font-extrabold tracking-tight text-neutral-900 dark:text-neutral-50">
-                            Coupons
+                            {t('coupons.title')}
                         </h1>
                         <p className="mt-1 text-sm text-neutral-500 dark:text-neutral-400">
-                            Create and manage discount coupons applied at
-                            checkout.
+                            {t('coupons.subtitle', 'Create and manage discount coupons applied at checkout.')}
                         </p>
                     </div>
                     <Button
@@ -94,7 +95,7 @@ export default function CouponsIndex({ coupons, categories, products }: Props) {
                         className="w-full cursor-pointer gap-2 bg-neutral-950 shadow-md transition-all duration-200 hover:bg-neutral-800 sm:w-auto dark:bg-neutral-50 dark:text-neutral-950 dark:hover:bg-neutral-200"
                     >
                         <Ticket className="size-4" />
-                        Add Coupon
+                        {t('coupons.create')}
                     </Button>
                 </div>
 
@@ -102,7 +103,7 @@ export default function CouponsIndex({ coupons, categories, products }: Props) {
                 <div className="relative flex w-full max-w-md items-center gap-2">
                     <Search className="pointer-events-none absolute left-3 size-4 text-neutral-400" />
                     <Input
-                        placeholder="Search coupons..."
+                        placeholder={t('coupons.search_placeholder', 'Search coupons...')}
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                         className="bg-white pl-9 dark:bg-neutral-900/50"
@@ -145,8 +146,8 @@ export default function CouponsIndex({ coupons, categories, products }: Props) {
                 open={deletingCoupon !== null}
                 onClose={() => setDeletingCoupon(null)}
                 onConfirm={confirmDelete}
-                title="Delete Coupon"
-                description={`Are you sure you want to delete coupon "${deletingCoupon?.code}"? This action cannot be undone.`}
+                title={t('coupons.delete_title', 'Delete Coupon')}
+                description={t('coupons.delete_description', { defaultValue: `Are you sure you want to delete coupon "${deletingCoupon?.code}"? This action cannot be undone.`, code: deletingCoupon?.code })}
                 loading={isDeleting}
             />
         </>

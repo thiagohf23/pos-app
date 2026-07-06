@@ -34,8 +34,8 @@ export default function RolesIndex({ roles, permissions = [] }: Props) {
 
     function confirmDelete() {
         if (!deletingRole) {
-return;
-}
+            return;
+        }
 
         router.delete(destroy.url(deletingRole.id), {
             onStart: () => setIsDeleting(true),

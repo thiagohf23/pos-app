@@ -9,6 +9,7 @@ import {
     Smartphone,
     Banknote,
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { dashboard } from '@/routes';
 
 type Period = 'today' | 'week' | 'month' | 'all';
@@ -53,6 +54,8 @@ const PERIOD_OPTIONS: { value: Period; label: string }[] = [
 ];
 
 export default function Dashboard({ metrics, period }: Props) {
+    const { t } = useTranslation();
+
     const formatDate = (date: string) => {
         return new Date(date).toLocaleDateString('en-US', {
             month: 'short',
@@ -101,18 +104,17 @@ export default function Dashboard({ metrics, period }: Props) {
 
     return (
         <>
-            <Head title="Dashboard" />
+            <Head title={t('dashboard.title')} />
 
             <div className="flex flex-col gap-6 p-6">
                 {/* Header */}
                 <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                     <div>
                         <h1 className="text-3xl font-extrabold tracking-tight text-neutral-900 dark:text-neutral-50">
-                            Dashboard
+                            {t('dashboard.title')}
                         </h1>
                         <p className="mt-1 text-sm text-neutral-500 dark:text-neutral-400">
-                            Real-time overview of your store's sales and inventory
-                            levels.
+                            {t('dashboard.subtitle', 'Real-time overview of your store\'s sales and inventory levels.')}
                         </p>
                     </div>
 
@@ -129,7 +131,7 @@ export default function Dashboard({ metrics, period }: Props) {
                                         : 'text-neutral-500 hover:text-neutral-800 dark:text-neutral-400 dark:hover:text-neutral-200'
                                 }`}
                             >
-                                {opt.label}
+                                {t(`reports.${opt.value}`, opt.label)}
                             </button>
                         ))}
                     </div>
@@ -141,7 +143,7 @@ export default function Dashboard({ metrics, period }: Props) {
                     <div className="rounded-xl border border-neutral-200 bg-white p-5 shadow-xs transition-all hover:shadow-md dark:border-neutral-800 dark:bg-neutral-900/30">
                         <div className="flex items-center justify-between">
                             <span className="text-xs font-semibold tracking-wider text-neutral-500 uppercase dark:text-neutral-400">
-                                Total Revenue
+                                {t('dashboard.revenue')}
                             </span>
                             <div className="rounded-lg bg-emerald-50 p-2 dark:bg-emerald-950/30">
                                 <DollarSign className="size-5 text-emerald-600 dark:text-emerald-400" />
@@ -152,7 +154,7 @@ export default function Dashboard({ metrics, period }: Props) {
                                 ${metrics.revenue.toFixed(2)}
                             </span>
                             <p className="mt-1 text-xs text-neutral-500 dark:text-neutral-400">
-                                {PERIOD_OPTIONS.find(o => o.value === period)?.label ?? 'All Time'} sales value
+                                {t(`reports.${period}`, PERIOD_OPTIONS.find(o => o.value === period)?.label ?? 'All Time')} {t('dashboard.sales_value', 'sales value')}
                             </p>
                         </div>
                     </div>
@@ -161,7 +163,7 @@ export default function Dashboard({ metrics, period }: Props) {
                     <div className="rounded-xl border border-neutral-200 bg-white p-5 shadow-xs transition-all hover:shadow-md dark:border-neutral-800 dark:bg-neutral-900/30">
                         <div className="flex items-center justify-between">
                             <span className="text-xs font-semibold tracking-wider text-neutral-500 uppercase dark:text-neutral-400">
-                                Average Ticket
+                                {t('dashboard.avg_ticket')}
                             </span>
                             <div className="rounded-lg bg-blue-50 p-2 dark:bg-blue-950/30">
                                 <TrendingUp className="size-5 text-blue-600 dark:text-blue-400" />
@@ -172,7 +174,7 @@ export default function Dashboard({ metrics, period }: Props) {
                                 ${metrics.avg_ticket.toFixed(2)}
                             </span>
                             <p className="mt-1 text-xs text-neutral-500 dark:text-neutral-400">
-                                Average order value
+                                {t('dashboard.avg_order_value', 'Average order value')}
                             </p>
                         </div>
                     </div>
@@ -181,7 +183,7 @@ export default function Dashboard({ metrics, period }: Props) {
                     <div className="rounded-xl border border-neutral-200 bg-white p-5 shadow-xs transition-all hover:shadow-md dark:border-neutral-800 dark:bg-neutral-900/30">
                         <div className="flex items-center justify-between">
                             <span className="text-xs font-semibold tracking-wider text-neutral-500 uppercase dark:text-neutral-400">
-                                Total Sales
+                                {t('dashboard.sales')}
                             </span>
                             <div className="rounded-lg bg-purple-50 p-2 dark:bg-purple-950/30">
                                 <ShoppingCart className="size-5 text-purple-600 dark:text-purple-400" />
@@ -192,7 +194,7 @@ export default function Dashboard({ metrics, period }: Props) {
                                 {metrics.sales_count}
                             </span>
                             <p className="mt-1 text-xs text-neutral-500 dark:text-neutral-400">
-                                Completed checkouts
+                                {t('dashboard.completed_checkouts', 'Completed checkouts')}
                             </p>
                         </div>
                     </div>
@@ -201,7 +203,7 @@ export default function Dashboard({ metrics, period }: Props) {
                     <div className="rounded-xl border border-neutral-200 bg-white p-5 shadow-xs transition-all hover:shadow-md dark:border-neutral-800 dark:bg-neutral-900/30">
                         <div className="flex items-center justify-between">
                             <span className="text-xs font-semibold tracking-wider text-neutral-500 uppercase dark:text-neutral-400">
-                                Inventory Health
+                                {t('dashboard.inventory_health', 'Inventory Health')}
                             </span>
                             <div className="rounded-lg bg-amber-50 p-2 dark:bg-amber-950/30">
                                 <AlertTriangle className="size-5 text-amber-600 dark:text-amber-400" />
@@ -213,8 +215,8 @@ export default function Dashboard({ metrics, period }: Props) {
                                     metrics.out_of_stock_count}
                             </span>
                             <p className="mt-1 text-xs text-neutral-500 dark:text-neutral-400">
-                                {metrics.out_of_stock_count} out &middot;{' '}
-                                {metrics.low_stock_count} low stock items
+                                {metrics.out_of_stock_count} {t('dashboard.out_of_stock').toLowerCase()} &middot;{' '}
+                                {metrics.low_stock_count} {t('dashboard.low_stock').toLowerCase()}
                             </p>
                         </div>
                     </div>
@@ -227,22 +229,22 @@ export default function Dashboard({ metrics, period }: Props) {
                         {/* Recent Transactions */}
                         <div className="rounded-xl border border-neutral-200 bg-white p-5 shadow-xs dark:border-neutral-800 dark:bg-neutral-900/30">
                             <h2 className="mb-4 text-lg font-bold text-neutral-900 dark:text-neutral-50">
-                                Recent Sales
+                                {t('dashboard.recent_sales')}
                             </h2>
                             <div className="overflow-x-auto">
                                 <table className="w-full text-left text-sm text-neutral-500 dark:text-neutral-400">
                                     <thead className="border-b border-neutral-100 text-xs font-bold tracking-wider text-neutral-400 uppercase dark:border-neutral-800">
                                         <tr>
-                                            <th className="px-1 py-3">ID</th>
+                                            <th className="px-1 py-3">{t('dashboard.id', 'ID')}</th>
                                             <th className="px-2 py-3">
-                                                Cashier
+                                                {t('dashboard.cashier', 'Cashier')}
                                             </th>
                                             <th className="px-2 py-3">
-                                                Payment
+                                                {t('dashboard.payment', 'Payment')}
                                             </th>
-                                            <th className="px-2 py-3">Date</th>
+                                            <th className="px-2 py-3">{t('dashboard.date', 'Date')}</th>
                                             <th className="px-2 py-3 text-right">
-                                                Total
+                                                {t('dashboard.total', 'Total')}
                                             </th>
                                         </tr>
                                     </thead>
@@ -253,7 +255,7 @@ export default function Dashboard({ metrics, period }: Props) {
                                                     colSpan={5}
                                                     className="py-6 text-center text-xs text-neutral-400"
                                                 >
-                                                    No transactions recorded for this period
+                                                    {t('dashboard.no_recent_sales', 'No transactions recorded for this period')}
                                                 </td>
                                             </tr>
                                         ) : (
@@ -267,7 +269,7 @@ export default function Dashboard({ metrics, period }: Props) {
                                                     </td>
                                                     <td className="px-2 py-3.5 font-sans text-neutral-700 dark:text-neutral-300">
                                                         {sale.user?.name ||
-                                                            'System'}
+                                                            t('dashboard.system', 'System')}
                                                     </td>
                                                     <td className="px-2 py-3.5">
                                                         <div className="flex items-center gap-1.5 font-sans">
@@ -275,9 +277,7 @@ export default function Dashboard({ metrics, period }: Props) {
                                                                 sale.payment_method,
                                                             )}
                                                             <span className="text-xs">
-                                                                {getPaymentLabel(
-                                                                    sale.payment_method,
-                                                                )}
+                                                                {t(`dashboard.${sale.payment_method}`, getPaymentLabel(sale.payment_method))}
                                                             </span>
                                                         </div>
                                                     </td>
@@ -303,7 +303,7 @@ export default function Dashboard({ metrics, period }: Props) {
                         {/* Payment Breakdown Progress Bars */}
                         <div className="rounded-xl border border-neutral-200 bg-white p-5 shadow-xs dark:border-neutral-800 dark:bg-neutral-900/30">
                             <h2 className="mb-4 text-lg font-bold text-neutral-900 dark:text-neutral-50">
-                                Payment Methods Share
+                                {t('dashboard.payment_methods')}
                             </h2>
                             <div className="space-y-4">
                                 {Object.entries(metrics.payment_methods).map(
@@ -321,11 +321,9 @@ export default function Dashboard({ metrics, period }: Props) {
                                                 <div className="flex items-center justify-between text-xs">
                                                     <div className="flex items-center gap-1.5 font-semibold text-neutral-700 dark:text-neutral-300">
                                                         {getPaymentIcon(method)}
-                                                        {getPaymentLabel(
-                                                            method,
-                                                        )}
+                                                        {t(`dashboard.${method}`, getPaymentLabel(method))}
                                                         <span className="font-normal text-neutral-400">
-                                                            ({data.count} sales)
+                                                            ({data.count} {t('dashboard.sales_count_label', 'sales')})
                                                         </span>
                                                     </div>
                                                     <span className="font-mono font-bold text-neutral-900 dark:text-neutral-100">
@@ -361,12 +359,12 @@ export default function Dashboard({ metrics, period }: Props) {
                         {/* Top Selling Products */}
                         <div className="rounded-xl border border-neutral-200 bg-white p-5 shadow-xs dark:border-neutral-800 dark:bg-neutral-900/30">
                             <h2 className="mb-4 text-lg font-bold text-neutral-900 dark:text-neutral-50">
-                                Top Selling
+                                {t('dashboard.top_selling')}
                             </h2>
                             <div className="space-y-4">
                                 {metrics.top_selling.length === 0 ? (
                                     <p className="py-4 text-center text-xs text-neutral-400">
-                                        No items sold in this period
+                                        {t('dashboard.no_items_sold', 'No items sold in this period')}
                                     </p>
                                 ) : (
                                     metrics.top_selling.map((item, index) => (
@@ -382,7 +380,7 @@ export default function Dashboard({ metrics, period }: Props) {
                                                     {item.product_name}
                                                 </p>
                                                 <p className="font-mono text-[10px] text-neutral-500">
-                                                    Qty: {item.quantity_sold}
+                                                    {t('dashboard.qty')}: {item.quantity_sold}
                                                 </p>
                                             </div>
                                             <span className="font-mono text-xs font-bold text-emerald-600">
@@ -398,14 +396,14 @@ export default function Dashboard({ metrics, period }: Props) {
                         <div className="rounded-xl border border-neutral-200 bg-white p-5 shadow-xs dark:border-neutral-800 dark:bg-neutral-900/30">
                             <div className="mb-4 flex items-center justify-between">
                                 <h2 className="text-lg font-bold text-neutral-900 dark:text-neutral-50">
-                                    Stock Warnings
+                                    {t('dashboard.stock_warnings', 'Stock Warnings')}
                                 </h2>
                                 <Package className="size-4 text-neutral-400" />
                             </div>
                             <div className="space-y-3.5">
                                 {metrics.low_stock_products.length === 0 ? (
                                     <p className="py-4 text-center text-xs text-neutral-400">
-                                        All products have good stock levels
+                                        {t('dashboard.good_stock_levels', 'All products have good stock levels')}
                                     </p>
                                 ) : (
                                     metrics.low_stock_products.map(
@@ -420,7 +418,7 @@ export default function Dashboard({ metrics, period }: Props) {
                                                     </p>
                                                     <p className="text-[10px] text-neutral-500 uppercase">
                                                         {product.category
-                                                            ?.name || 'General'}
+                                                            ?.name || t('dashboard.general', 'General')}
                                                     </p>
                                                 </div>
                                                 <span
@@ -431,8 +429,8 @@ export default function Dashboard({ metrics, period }: Props) {
                                                     }`}
                                                 >
                                                     {product.stock === 0
-                                                        ? 'Out of Stock'
-                                                        : `${product.stock} left`}
+                                                        ? t('dashboard.out_of_stock')
+                                                        : `${product.stock} ${t('dashboard.left', 'left')}`}
                                                 </span>
                                             </div>
                                         ),
