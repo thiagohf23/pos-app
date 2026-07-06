@@ -10,6 +10,7 @@ import {
     Ticket,
     Truck,
     Users,
+    ClipboardList,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import AppLogo from '@/components/app-logo';
@@ -28,13 +29,11 @@ import {
 } from '@/components/ui/sidebar';
 import { dashboard } from '@/routes';
 import { index as categoriesIndex } from '@/routes/categories';
-import { index as employeesIndex } from '@/routes/employees';
-import { index as suppliersIndex } from '@/routes/suppliers';
 import { index as couponsIndex } from '@/routes/coupons';
+import { index as employeesIndex } from '@/routes/employees';
+import { index as permissionsIndex } from '@/routes/permissions';
 import { index as posIndex } from '@/routes/pos';
 import { index as productsIndex } from '@/routes/products';
-import { index as rolesIndex } from '@/routes/roles';
-import { index as permissionsIndex } from '@/routes/permissions';
 import { index as reportsIndex } from '@/routes/reports';
 import { index as stockAdjustmentsIndex } from '@/routes/stock-adjustments';
 import type { NavItem } from '@/types';
@@ -100,6 +99,12 @@ const mainNavItems: NavItem[] = [
         title: 'nav.reports',
         href: reportsIndex().url,
         icon: BarChart3,
+        roles: ['Admin'],
+    },
+    {
+        title: 'Stock Adjustments',
+        href: stockAdjustmentsIndex().url,
+        icon: ClipboardList,
         roles: ['Admin'],
     },
 ];

@@ -21,7 +21,6 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
-import { AvatarCropper } from '../../settings/components/avatar-cropper';
 import { store, update } from '@/routes/products';
 import type { Category, Product, Supplier } from '@/types';
 
@@ -103,6 +102,7 @@ export function ProductDialog({ open, onClose, editing, categories, suppliers }:
 
         const dataTransfer = new DataTransfer();
         dataTransfer.items.add(croppedFile);
+
         if (fileInputRef.current) {
             fileInputRef.current.files = dataTransfer.files;
         }
@@ -111,7 +111,9 @@ export function ProductDialog({ open, onClose, editing, categories, suppliers }:
     }
 
     async function handleEditCurrentImage() {
-        if (!imagePreview) return;
+        if (!imagePreview) {
+return;
+}
 
         try {
             const response = await fetch(imagePreview);

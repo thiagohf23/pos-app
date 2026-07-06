@@ -12,6 +12,8 @@ use App\Http\Controllers\PosController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\RoleController;
+use App\Http\Controllers\SaleCancellationController;
+use App\Http\Controllers\StockAdjustmentController;
 use App\Http\Controllers\SupplierController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -45,6 +47,19 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('pos/checkout', [CheckoutController::class, 'store'])->name('pos.checkout');
     Route::post('pos/coupon', CouponValidationController::class)->name('pos.coupon');
     Route::get('pos/receipt/{sale}', [PosController::class, 'show'])->name('pos.receipt');
+
+    // Sale cancellation (Admin only)
+    Route::patch('sales/{sale}/cancel', SaleCancellationController::class)
+        ->name('sales.cancel')
+        ->middleware('role:Admin');
+
+    // Stock adjustments (Admin only)
+    Route::get('stock-adjustments', [StockAdjustmentController::class, 'index'])
+        ->name('stock-adjustments.index')
+        ->middleware('role:Admin');
+    Route::post('stock-adjustments', [StockAdjustmentController::class, 'store'])
+        ->name('stock-adjustments.store')
+        ->middleware('role:Admin');
 
     Route::get('reports', [ReportController::class, 'index'])->name('reports.index')->middleware('role:Admin');
     Route::get('reports/export', [ReportController::class, 'export'])->name('reports.export')->middleware('role:Admin');

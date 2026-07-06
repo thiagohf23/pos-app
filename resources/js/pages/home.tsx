@@ -1,6 +1,4 @@
 import { Head, Link, usePage } from '@inertiajs/react';
-import { login, register } from '@/routes';
-import { index as posIndex } from '@/routes/pos';
 import { LayoutGrid, ShoppingCart, ShieldCheck, ArrowRight, Printer, Sun, Moon } from 'lucide-react';
 import { useAppearance } from '@/hooks/use-appearance';
 import { useTranslation } from 'react-i18next';
