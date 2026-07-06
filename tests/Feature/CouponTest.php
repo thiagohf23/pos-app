@@ -103,7 +103,7 @@ test('user can delete a coupon', function () {
 
     $this->actingAs($user)->delete(route('coupons.destroy', $coupon));
 
-    $this->assertDatabaseMissing('coupons', ['id' => $coupon->id]);
+    $this->assertSoftDeleted('coupons', ['id' => $coupon->id]);
 });
 
 // ── Validation endpoint ───────────────────────────────────────────────────────

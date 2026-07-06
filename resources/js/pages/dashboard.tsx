@@ -1,4 +1,4 @@
-import { Head } from '@inertiajs/react';
+import { Head, router } from '@inertiajs/react';
 import {
     DollarSign,
     TrendingUp,
@@ -10,6 +10,8 @@ import {
     Banknote,
 } from 'lucide-react';
 import { dashboard } from '@/routes';
+
+type Period = 'today' | 'week' | 'month' | 'all';
 
 interface Props {
     metrics: {
@@ -29,6 +31,7 @@ interface Props {
             id: number;
             total: string;
             payment_method: string;
+            sold_at: string;
             created_at: string;
             user?: { name: string };
         }>;
@@ -39,9 +42,17 @@ interface Props {
             category?: { name: string };
         }>;
     };
+    period: Period;
 }
 
-export default function Dashboard({ metrics }: Props) {
+const PERIOD_OPTIONS: { value: Period; label: string }[] = [
+    { value: 'today', label: 'Today' },
+    { value: 'week', label: 'This Week' },
+    { value: 'month', label: 'This Month' },
+    { value: 'all', label: 'All Time' },
+];
+
+export default function Dashboard({ metrics, period }: Props) {
     const formatDate = (date: string) => {
         return new Date(date).toLocaleDateString('en-US', {
             month: 'short',
@@ -50,6 +61,10 @@ export default function Dashboard({ metrics }: Props) {
             minute: '2-digit',
         });
     };
+
+    function handlePeriodChange(newPeriod: Period) {
+        router.get(dashboard(), { period: newPeriod }, { preserveScroll: true });
+    }
 
     const getPaymentIcon = (method: string) => {
         switch (method) {
@@ -90,14 +105,34 @@ export default function Dashboard({ metrics }: Props) {
 
             <div className="flex flex-col gap-6 p-6">
                 {/* Header */}
-                <div>
-                    <h1 className="text-3xl font-extrabold tracking-tight text-neutral-900 dark:text-neutral-50">
-                        Dashboard
-                    </h1>
-                    <p className="mt-1 text-sm text-neutral-500 dark:text-neutral-400">
-                        Real-time overview of your store's sales and inventory
-                        levels.
-                    </p>
+                <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                    <div>
+                        <h1 className="text-3xl font-extrabold tracking-tight text-neutral-900 dark:text-neutral-50">
+                            Dashboard
+                        </h1>
+                        <p className="mt-1 text-sm text-neutral-500 dark:text-neutral-400">
+                            Real-time overview of your store's sales and inventory
+                            levels.
+                        </p>
+                    </div>
+
+                    {/* Period Filter */}
+                    <div className="flex items-center gap-1 rounded-lg border border-neutral-200 bg-white p-1 shadow-xs dark:border-neutral-800 dark:bg-neutral-900">
+                        {PERIOD_OPTIONS.map((opt) => (
+                            <button
+                                key={opt.value}
+                                id={`period-${opt.value}`}
+                                onClick={() => handlePeriodChange(opt.value)}
+                                className={`rounded-md px-3 py-1.5 text-xs font-semibold transition-all cursor-pointer ${
+                                    period === opt.value
+                                        ? 'bg-neutral-950 text-white shadow-sm dark:bg-neutral-50 dark:text-neutral-950'
+                                        : 'text-neutral-500 hover:text-neutral-800 dark:text-neutral-400 dark:hover:text-neutral-200'
+                                }`}
+                            >
+                                {opt.label}
+                            </button>
+                        ))}
+                    </div>
                 </div>
 
                 {/* 4 Stats Cards */}
@@ -117,7 +152,7 @@ export default function Dashboard({ metrics }: Props) {
                                 ${metrics.revenue.toFixed(2)}
                             </span>
                             <p className="mt-1 text-xs text-neutral-500 dark:text-neutral-400">
-                                All-time sales value
+                                {PERIOD_OPTIONS.find(o => o.value === period)?.label ?? 'All Time'} sales value
                             </p>
                         </div>
                     </div>
@@ -218,7 +253,7 @@ export default function Dashboard({ metrics }: Props) {
                                                     colSpan={5}
                                                     className="py-6 text-center text-xs text-neutral-400"
                                                 >
-                                                    No transactions recorded yet
+                                                    No transactions recorded for this period
                                                 </td>
                                             </tr>
                                         ) : (
@@ -248,7 +283,7 @@ export default function Dashboard({ metrics }: Props) {
                                                     </td>
                                                     <td className="px-2 py-3.5 text-xs">
                                                         {formatDate(
-                                                            sale.created_at,
+                                                            sale.sold_at ?? sale.created_at,
                                                         )}
                                                     </td>
                                                     <td className="px-2 py-3.5 text-right font-bold text-emerald-600">
@@ -331,7 +366,7 @@ export default function Dashboard({ metrics }: Props) {
                             <div className="space-y-4">
                                 {metrics.top_selling.length === 0 ? (
                                     <p className="py-4 text-center text-xs text-neutral-400">
-                                        No items sold yet
+                                        No items sold in this period
                                     </p>
                                 ) : (
                                     metrics.top_selling.map((item, index) => (

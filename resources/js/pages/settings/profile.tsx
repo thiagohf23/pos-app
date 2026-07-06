@@ -1,20 +1,20 @@
 import { Form, Head, usePage } from '@inertiajs/react';
 import { Link } from '@inertiajs/react';
-import { useState, useRef } from 'react';
 import { Camera, Crop } from 'lucide-react';
-import { AvatarCropper } from './components/avatar-cropper';
+import { useState, useRef } from 'react';
 import ProfileController from '@/actions/App/Http/Controllers/Settings/ProfileController';
 import DeleteUser from '@/components/delete-user';
 import Heading from '@/components/heading';
 import InputError from '@/components/input-error';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useInitials } from '@/hooks/use-initials';
 import { edit } from '@/routes/profile';
 import { send } from '@/routes/verification';
 import type { Auth } from '@/types';
+import { AvatarCropper } from './components/avatar-cropper';
 
 type PageProps = {
     auth: Auth;
@@ -36,6 +36,7 @@ export default function Profile({
 
     function handleAvatarChange(e: React.ChangeEvent<HTMLInputElement>) {
         const file = e.target.files?.[0];
+
         if (file) {
             setSelectedFile(file);
             setIsCropperOpen(true);
@@ -43,7 +44,9 @@ export default function Profile({
     }
 
     async function handleEditCurrentAvatar() {
-        if (!avatarPreview) return;
+        if (!avatarPreview) {
+return;
+}
 
         try {
             // Fetch current preview (data URL or server URL)
@@ -66,6 +69,7 @@ export default function Profile({
 
         const dataTransfer = new DataTransfer();
         dataTransfer.items.add(croppedFile);
+
         if (fileInputRef.current) {
             fileInputRef.current.files = dataTransfer.files;
         }

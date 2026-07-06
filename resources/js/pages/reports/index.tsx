@@ -203,9 +203,11 @@ export default function ReportsIndex({
         if (paymentMethod) {
             query.payment_method = paymentMethod;
         }
+
         if (categoryId) {
             query.category_id = categoryId;
         }
+
         if (productId) {
             query.product_id = productId;
         }
@@ -659,6 +661,7 @@ export default function ReportsIndex({
                                     <div className="mb-5 flex h-4 overflow-hidden rounded-full bg-neutral-100 dark:bg-neutral-800">
                                         {salesByPaymentMethod.map((item) => {
                                             const percent = (item.total / totalPaymentAmount) * 100;
+
                                             return (
                                                 <div
                                                     key={item.method}
