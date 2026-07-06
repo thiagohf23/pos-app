@@ -22,17 +22,17 @@ import {
     SelectValue,
 } from '@/components/ui/select';
 import { store, update } from '@/routes/products';
-import type { Category, Product } from '@/types';
-import { AvatarCropper } from '../../settings/components/avatar-cropper';
+import type { Category, Product, Supplier } from '@/types';
 
 interface Props {
     open: boolean;
     onClose: () => void;
     editing: Product | null;
     categories: Category[];
+    suppliers: Supplier[];
 }
 
-export function ProductDialog({ open, onClose, editing, categories }: Props) {
+export function ProductDialog({ open, onClose, editing, categories, suppliers }: Props) {
     const fileInputRef = useRef<HTMLInputElement>(null);
     // State is initialized from `editing` at mount; the parent remounts this dialog
     // via a `key` whenever it opens, so we never sync props to state inside an effect.
@@ -40,12 +40,14 @@ export function ProductDialog({ open, onClose, editing, categories }: Props) {
         editing?.image ? (editing.image.startsWith('http') ? editing.image : `/storage/${editing.image}`) : null,
     );
     const [categorySearchQuery, setCategorySearchQuery] = useState('');
+    const [supplierSearchQuery, setSupplierSearchQuery] = useState('');
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
     const [isCropperOpen, setIsCropperOpen] = useState(false);
 
     const { data, setData, post, processing, errors, reset, clearErrors } =
         useForm({
             category_id: editing ? String(editing.category_id) : '',
+            supplier_id: editing?.supplier_id ? String(editing.supplier_id) : '',
             name: editing?.name ?? '',
             sku: editing?.sku ?? '',
             barcode: editing?.barcode ?? '',
@@ -67,6 +69,18 @@ export function ProductDialog({ open, onClose, editing, categories }: Props) {
             category.name.toLowerCase().includes(query),
         );
     }, [categories, categorySearchQuery]);
+
+    const filteredSuppliers = useMemo(() => {
+        const query = supplierSearchQuery.toLowerCase().trim();
+
+        if (!query) {
+            return suppliers;
+        }
+
+        return suppliers.filter((supplier) =>
+            supplier.name.toLowerCase().includes(query),
+        );
+    }, [suppliers, supplierSearchQuery]);
 
     function handleImageChange(e: React.ChangeEvent<HTMLInputElement>) {
         const file = e.target.files?.[0];
@@ -118,6 +132,7 @@ return;
         clearErrors();
         setImagePreview(null);
         setCategorySearchQuery('');
+        setSupplierSearchQuery('');
 
         if (fileInputRef.current) {
             fileInputRef.current.value = '';
@@ -196,7 +211,7 @@ return;
                         )}
                     </div>
 
-                    {/* SKU & Barcode */}
+                    {/* SKU & Barcode Grid */}
                     <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-1.5">
                             <Label htmlFor="sku">SKU</Label>
@@ -204,27 +219,32 @@ return;
                                 id="sku"
                                 value={data.sku}
                                 onChange={(e) => setData('sku', e.target.value)}
-                                placeholder="e.g. WM-001"
+                                placeholder="e.g. MS-PRO-01"
                             />
                             {errors.sku && (
-                                <p className="text-xs text-destructive">{errors.sku}</p>
+                                <p className="text-xs text-destructive">
+                                    {errors.sku}
+                                </p>
                             )}
                         </div>
+
                         <div className="space-y-1.5">
                             <Label htmlFor="barcode">Barcode</Label>
                             <Input
                                 id="barcode"
                                 value={data.barcode}
                                 onChange={(e) => setData('barcode', e.target.value)}
-                                placeholder="e.g. 7891234567890"
+                                placeholder="Scan or type barcode"
                             />
                             {errors.barcode && (
-                                <p className="text-xs text-destructive">{errors.barcode}</p>
+                                <p className="text-xs text-destructive">
+                                    {errors.barcode}
+                                </p>
                             )}
                         </div>
                     </div>
 
-                    {/* Category & Price Grid */}
+                    {/* Category & Supplier Grid */}
                     <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-1.5">
                             <Label htmlFor="category">Category *</Label>
@@ -278,6 +298,60 @@ return;
                         </div>
 
                         <div className="space-y-1.5">
+                            <Label htmlFor="supplier">Supplier</Label>
+                            <Select
+                                value={data.supplier_id}
+                                onValueChange={(val) =>
+                                    setData('supplier_id', val)
+                                }
+                            >
+                                <SelectTrigger id="supplier" className="w-full">
+                                    <SelectValue placeholder="Select supplier..." />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <div className="border-b border-neutral-100 p-2 dark:border-neutral-800">
+                                        <Input
+                                            placeholder="Search supplier..."
+                                            value={supplierSearchQuery}
+                                            onChange={(e) =>
+                                                setSupplierSearchQuery(
+                                                    e.target.value,
+                                                )
+                                            }
+                                            onKeyDown={(e) =>
+                                                e.stopPropagation()
+                                            }
+                                            className="h-8 bg-neutral-50 text-xs dark:bg-neutral-900"
+                                        />
+                                    </div>
+                                    <SelectItem value="">No Supplier</SelectItem>
+                                    {filteredSuppliers.length === 0 ? (
+                                        <div className="p-2 text-center text-xs text-neutral-400">
+                                            No suppliers found
+                                        </div>
+                                    ) : (
+                                        filteredSuppliers.map((supplier) => (
+                                            <SelectItem
+                                                key={supplier.id}
+                                                value={String(supplier.id)}
+                                            >
+                                                {supplier.name}
+                                            </SelectItem>
+                                        ))
+                                    )}
+                                </SelectContent>
+                            </Select>
+                            {errors.supplier_id && (
+                                <p className="text-xs text-destructive">
+                                    {errors.supplier_id}
+                                </p>
+                            )}
+                        </div>
+                    </div>
+
+                    {/* Price & Stock Grid */}
+                    <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-1.5">
                             <Label htmlFor="price">Price ($) *</Label>
                             <Input
                                 id="price"
@@ -297,10 +371,7 @@ return;
                                 </p>
                             )}
                         </div>
-                    </div>
 
-                    {/* Stock & Active Grid */}
-                    <div className="grid grid-cols-2 items-center gap-4">
                         <div className="space-y-1.5">
                             <Label htmlFor="stock">Stock Quantity *</Label>
                             <Input
@@ -320,8 +391,11 @@ return;
                                 </p>
                             )}
                         </div>
+                    </div>
 
-                        <div className="mt-5 flex items-center gap-2">
+                    {/* Active */}
+                    <div className="grid grid-cols-1 items-center gap-4">
+                        <div className="mt-2 flex items-center gap-2">
                             <Checkbox
                                 id="is_active"
                                 checked={data.is_active}

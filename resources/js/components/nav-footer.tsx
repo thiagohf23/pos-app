@@ -1,4 +1,5 @@
 import type { ComponentPropsWithoutRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
     SidebarGroup,
     SidebarGroupContent,
@@ -16,6 +17,8 @@ export function NavFooter({
 }: ComponentPropsWithoutRef<typeof SidebarGroup> & {
     items: NavItem[];
 }) {
+    const { t } = useTranslation();
+
     return (
         <SidebarGroup
             {...props}
@@ -37,7 +40,7 @@ export function NavFooter({
                                     {item.icon && (
                                         <item.icon className="h-5 w-5" />
                                     )}
-                                    <span>{item.title}</span>
+                                    <span>{t(item.title)}</span>
                                 </a>
                             </SidebarMenuButton>
                         </SidebarMenuItem>

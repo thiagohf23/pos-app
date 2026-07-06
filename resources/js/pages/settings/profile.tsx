@@ -239,7 +239,7 @@ return;
 Profile.layout = {
     breadcrumbs: [
         {
-            title: 'Profile settings',
+            title: 'settings.profile',
             href: edit(),
         },
     ],

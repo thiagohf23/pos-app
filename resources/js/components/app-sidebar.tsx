@@ -12,7 +12,9 @@ import {
     Users,
     ClipboardList,
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import AppLogo from '@/components/app-logo';
+import { LanguageSwitcher } from '@/components/language-switcher';
 import { NavFooter } from '@/components/nav-footer';
 import { NavMain } from '@/components/nav-main';
 import { NavUser } from '@/components/nav-user';
@@ -33,64 +35,68 @@ import { index as permissionsIndex } from '@/routes/permissions';
 import { index as posIndex } from '@/routes/pos';
 import { index as productsIndex } from '@/routes/products';
 import { index as reportsIndex } from '@/routes/reports';
-import { index as rolesIndex } from '@/routes/roles';
 import { index as stockAdjustmentsIndex } from '@/routes/stock-adjustments';
-import { index as suppliersIndex } from '@/routes/suppliers';
 import type { NavItem } from '@/types';
 
 const mainNavItems: NavItem[] = [
     {
-        title: 'Dashboard',
+        title: 'nav.dashboard',
         href: dashboard(),
         icon: LayoutGrid,
     },
     {
-        title: 'POS Terminal',
+        title: 'nav.pos',
         href: posIndex().url,
         icon: ShoppingCart,
     },
     {
-        title: 'Products',
+        title: 'nav.products',
         href: productsIndex().url,
         icon: Package,
     },
     {
-        title: 'Categories',
+        title: 'nav.categories',
         href: categoriesIndex().url,
         icon: Folder,
     },
     {
-        title: 'Coupons',
+        title: 'nav.coupons',
         href: couponsIndex().url,
         icon: Ticket,
         roles: ['Admin'],
     },
     {
-        title: 'Employees',
+        title: 'nav.employees',
         href: employeesIndex().url,
         icon: Users,
         roles: ['Admin'],
     },
     {
-        title: 'Suppliers',
+        title: 'nav.suppliers',
         href: suppliersIndex().url,
         icon: Truck,
         roles: ['Admin'],
     },
     {
-        title: 'Roles',
+        title: 'nav.roles',
         href: rolesIndex().url,
         icon: Users,
         roles: ['Admin'],
     },
     {
-        title: 'Permissions',
+        title: 'nav.permissions',
         href: permissionsIndex().url,
         icon: Users,
         roles: ['Admin'],
     },
     {
-        title: 'Reports',
+        title: 'nav.stock_adjustments',
+        href: stockAdjustmentsIndex().url,
+        icon: Package,
+        roles: ['Admin'],
+    },
+    {
+        title: 'nav.reports',
         href: reportsIndex().url,
         icon: BarChart3,
         roles: ['Admin'],
@@ -105,12 +111,12 @@ const mainNavItems: NavItem[] = [
 
 const footerNavItems: NavItem[] = [
     {
-        title: 'Repository',
+        title: 'sidebar.repository',
         href: 'https://github.com/laravel/react-starter-kit',
         icon: FolderGit2,
     },
     {
-        title: 'Documentation',
+        title: 'sidebar.documentation',
         href: 'https://laravel.com/docs/starter-kits#react',
         icon: BookOpen,
     },
@@ -118,6 +124,7 @@ const footerNavItems: NavItem[] = [
 
 export function AppSidebar() {
     const { auth } = usePage().props;
+    const { t } = useTranslation();
 
     const visibleNavItems = mainNavItems.filter(
         (item) => !item.roles || item.roles.some((role) => auth.roles.includes(role)),
@@ -144,6 +151,7 @@ export function AppSidebar() {
             <SidebarFooter>
                 <NavFooter items={footerNavItems} className="mt-auto" />
                 <NavUser />
+                <LanguageSwitcher variant="mobile" />
             </SidebarFooter>
         </Sidebar>
     );

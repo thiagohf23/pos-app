@@ -38,11 +38,33 @@ class HandleInertiaRequests extends Middleware
         return [
             ...parent::share($request),
             'name' => config('app.name'),
+            'locale' => app()->getLocale(),
+            'translations' => $this->getTranslations(app()->getLocale()),
             'auth' => [
                 'user' => $request->user(),
                 'roles' => $request->user()?->getRoleNames() ?? [],
             ],
             'sidebarOpen' => $request->hasCookie('sidebar_state') && $request->cookie('sidebar_state') === 'true',
         ];
+    }
+
+    /**
+     * Load all PHP translation files for the given locale.
+     *
+     * @return array<string, mixed>
+     */
+    private function getTranslations(string $locale): array
+    {
+        $translations = [];
+        $path = lang_path($locale);
+
+        if (is_dir($path)) {
+            foreach (glob($path.'/*.php') as $file) {
+                $key = pathinfo($file, PATHINFO_FILENAME);
+                $translations[$key] = require $file;
+            }
+        }
+
+        return $translations;
     }
 }

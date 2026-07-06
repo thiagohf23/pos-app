@@ -139,7 +139,7 @@ return;
 PermissionsIndex.layout = {
     breadcrumbs: [
         {
-            title: 'Permissions',
+            title: 'nav.permissions',
             href: '/permissions',
         },
     ],

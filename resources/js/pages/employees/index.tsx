@@ -191,7 +191,7 @@ export default function EmployeesIndex({ employees, roles }: Props) {
 EmployeesIndex.layout = {
     breadcrumbs: [
         {
-            title: 'Employees',
+            title: 'nav.employees',
             href: '/employees',
         },
     ],

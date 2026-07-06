@@ -138,7 +138,7 @@ return;
 RolesIndex.layout = {
     breadcrumbs: [
         {
-            title: 'Roles',
+            title: 'nav.roles',
             href: '/roles',
         },
     ],

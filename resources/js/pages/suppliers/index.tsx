@@ -168,7 +168,7 @@ export default function SuppliersIndex({ suppliers }: Props) {
 SuppliersIndex.layout = {
     breadcrumbs: [
         {
-            title: 'Suppliers',
+            title: 'nav.suppliers',
             href: '/suppliers',
         },
     ],

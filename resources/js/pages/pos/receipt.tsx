@@ -1,7 +1,10 @@
-import { Head } from '@inertiajs/react';
-import { Printer, X } from 'lucide-react';
-import { useEffect } from 'react';
+import { Head, router } from '@inertiajs/react';
+import { Printer, TriangleAlert, X } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { toast } from 'sonner';
+import { DeleteConfirmDialog } from '@/components/delete-confirm-dialog';
 import { Button } from '@/components/ui/button';
+import { cancel } from '@/routes/sales';
 import type { Sale } from '@/types';
 
 interface Props {
@@ -19,6 +22,9 @@ interface Props {
 }
 
 export default function ReceiptPage({ sale }: Props) {
+    const [showCancelDialog, setShowCancelDialog] = useState(false);
+    const [isCancelling, setIsCancelling] = useState(false);
+
     useEffect(() => {
         // Automatically open the print dialog when the page mounts
         const timer = setTimeout(() => {
@@ -27,6 +33,8 @@ export default function ReceiptPage({ sale }: Props) {
 
         return () => clearTimeout(timer);
     }, []);
+
+    const isCancelled = sale.status === 'cancelled';
 
     const formatDate = (date: string) => {
         return new Date(date).toLocaleString('en-US', {
@@ -42,6 +50,20 @@ export default function ReceiptPage({ sale }: Props) {
     const handleClose = () => {
         window.close();
     };
+
+    function handleCancelSale() {
+        router.patch(cancel({ sale: sale.id }).url, {}, {
+            onStart: () => setIsCancelling(true),
+            onFinish: () => setIsCancelling(false),
+            onSuccess: () => {
+                toast.success('Sale cancelled and stock returned.');
+                setShowCancelDialog(false);
+            },
+            onError: () => {
+                toast.error('Failed to cancel sale.');
+            },
+        });
+    }
 
     return (
         <>
@@ -70,6 +92,16 @@ export default function ReceiptPage({ sale }: Props) {
                     Receipt Print Preview
                 </span>
                 <div className="flex gap-2">
+                    {!isCancelled && (
+                        <Button
+                            onClick={() => setShowCancelDialog(true)}
+                            variant="outline"
+                            className="hover:bg-neutral-750 h-9 gap-1.5 border-red-700 bg-red-800 text-white hover:bg-red-700"
+                        >
+                            <TriangleAlert className="size-4" />
+                            Cancel Sale
+                        </Button>
+                    )}
                     <Button
                         onClick={handlePrint}
                         variant="outline"
@@ -225,7 +257,7 @@ export default function ReceiptPage({ sale }: Props) {
                             Thank you for your purchase!
                         </p>
                         <p className="mt-1 text-[10px] text-neutral-500 dark:text-neutral-400 print:text-neutral-600">
-                            Status: PAID
+                            Status: {isCancelled ? 'CANCELLED' : 'PAID'}
                         </p>
                         {sale.user && (
                             <p className="font-mono text-[10px] text-neutral-500 dark:text-neutral-400 print:text-neutral-600">
@@ -235,6 +267,15 @@ export default function ReceiptPage({ sale }: Props) {
                     </div>
                 </div>
             </div>
+
+            <DeleteConfirmDialog
+                open={showCancelDialog}
+                onClose={() => setShowCancelDialog(false)}
+                onConfirm={handleCancelSale}
+                title="Cancel Sale"
+                description="This will void the sale and return all items to stock. Are you sure?"
+                loading={isCancelling}
+            />
         </>
     );
 }
