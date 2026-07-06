@@ -1,10 +1,16 @@
 'use client';
 
 import { Head } from '@inertiajs/react';
-import { Search } from 'lucide-react';
-import { useState, useMemo } from 'react';
+import { Maximize2, Minimize2, Search } from 'lucide-react';
+import { useEffect, useState, useMemo } from 'react';
 import { toast } from 'sonner';
+import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipTrigger,
+} from '@/components/ui/tooltip';
 import type { Category, Product } from '@/types';
 import { Cart } from './components/cart';
 import { CheckoutDialog } from './components/checkout-dialog';
@@ -69,6 +75,31 @@ export default function PosIndex({ products = [], categories = [] }: Props) {
         null,
     );
     const [showPaymentDialog, setShowPaymentDialog] = useState(false);
+    const [isFullscreen, setIsFullscreen] = useState(false);
+
+    // Hide/show header when fullscreen toggles
+    useEffect(() => {
+        const header = document.querySelector<HTMLElement>(
+            'header, [class*="border-b"][class*="border-sidebar-border"]',
+        );
+
+        if (header) {
+            header.style.display = isFullscreen ? 'none' : '';
+        }
+    }, [isFullscreen]);
+
+    // Restore header when leaving the page
+    useEffect(() => {
+        return () => {
+            const header = document.querySelector<HTMLElement>(
+                'header, [class*="border-b"][class*="border-sidebar-border"]',
+            );
+
+            if (header) {
+                header.style.display = '';
+            }
+        };
+    }, []);
 
     // Client-side filtering of products
     const filteredProducts = useMemo(() => {
@@ -101,13 +132,34 @@ export default function PosIndex({ products = [], categories = [] }: Props) {
         <>
             <Head title="Point of Sale (POS)" />
 
-            <div className="flex h-[calc(100vh-4rem)] flex-col overflow-hidden bg-neutral-50 lg:flex-row dark:bg-neutral-950/40">
+            <div className={`flex flex-col overflow-hidden bg-neutral-50 lg:flex-row dark:bg-neutral-950/40 ${isFullscreen ? 'h-screen' : 'h-[calc(100vh-4rem)]'}`}>
                 {/* Product Catalog Area (Left) */}
                 <div className="flex flex-1 flex-col gap-6 overflow-y-auto border-r border-neutral-200 p-6 dark:border-neutral-800">
                     <div className="flex flex-col gap-2">
-                        <h1 className="text-3xl font-extrabold tracking-tight text-neutral-900 dark:text-neutral-50">
-                            POS Terminal
-                        </h1>
+                        <div className="flex items-center gap-3">
+                            <h1 className="text-3xl font-extrabold tracking-tight text-neutral-900 dark:text-neutral-50">
+                                POS Terminal
+                            </h1>
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <Button
+                                        variant="ghost"
+                                        size="icon"
+                                        onClick={() => setIsFullscreen(!isFullscreen)}
+                                        className="h-8 w-8"
+                                    >
+                                        {isFullscreen ? (
+                                            <Minimize2 className="h-4 w-4" />
+                                        ) : (
+                                            <Maximize2 className="h-4 w-4" />
+                                        )}
+                                    </Button>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                    {isFullscreen ? 'Exit fullscreen' : 'Fullscreen mode'}
+                                </TooltipContent>
+                            </Tooltip>
+                        </div>
                         <p className="text-sm text-neutral-500 dark:text-neutral-400">
                             Search and select items to add to the checkout
                             order.

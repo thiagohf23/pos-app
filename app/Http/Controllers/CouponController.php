@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\CouponScope;
 use App\Http\Requests\StoreCouponRequest;
 use App\Http\Requests\UpdateCouponRequest;
 use App\Models\Category;
@@ -14,9 +15,6 @@ use Inertia\Response as InertiaResponse;
 
 class CouponController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index(): InertiaResponse
     {
         $coupons = Coupon::with(['categories:id,name', 'products:id,name'])->latest()->paginate(10);
@@ -30,9 +28,6 @@ class CouponController extends Controller
         ]);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(StoreCouponRequest $request): RedirectResponse
     {
         $data = $request->validated();
@@ -43,17 +38,14 @@ class CouponController extends Controller
         $coupon = Coupon::create($data);
 
         match ($coupon->scope) {
-            'category' => [$coupon->categories()->sync($categoryIds ?? []), $coupon->products()->detach()],
-            'product' => [$coupon->products()->sync($productIds ?? []), $coupon->categories()->detach()],
+            CouponScope::Category => [$coupon->categories()->sync($categoryIds ?? []), $coupon->products()->detach()],
+            CouponScope::Product => [$coupon->products()->sync($productIds ?? []), $coupon->categories()->detach()],
             default => [$coupon->categories()->detach(), $coupon->products()->detach()],
         };
 
         return redirect()->route('coupons.index');
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(UpdateCouponRequest $request, Coupon $coupon): RedirectResponse
     {
         $data = $request->validated();
@@ -64,17 +56,14 @@ class CouponController extends Controller
         $coupon->update($data);
 
         match ($coupon->scope) {
-            'category' => [$coupon->categories()->sync($categoryIds ?? []), $coupon->products()->detach()],
-            'product' => [$coupon->products()->sync($productIds ?? []), $coupon->categories()->detach()],
+            CouponScope::Category => [$coupon->categories()->sync($categoryIds ?? []), $coupon->products()->detach()],
+            CouponScope::Product => [$coupon->products()->sync($productIds ?? []), $coupon->categories()->detach()],
             default => [$coupon->categories()->detach(), $coupon->products()->detach()],
         };
 
         return redirect()->route('coupons.index');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(Coupon $coupon): RedirectResponse
     {
         $coupon->delete();

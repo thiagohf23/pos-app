@@ -3,6 +3,7 @@
 use App\Models\Employee;
 use App\Models\User;
 use Database\Seeders\RolesAndPermissionsSeeder;
+use Illuminate\Support\Facades\Hash;
 
 beforeEach(function () {
     $this->seed(RolesAndPermissionsSeeder::class);
@@ -48,6 +49,27 @@ test('authenticated user can update an employee', function () {
     $employee->load('user');
 
     expect($employee->salary)->toBe('5000.00');
+});
+
+test('employee password is hashed when updated', function () {
+    $admin = User::factory()->create()->assignRole('Admin');
+    $employee = Employee::factory()->create();
+
+    $this->actingAs($admin)->put(route('employees.update', $employee), [
+        'name' => $employee->user->name,
+        'email' => $employee->user->email,
+        'password' => 'new-secret-password',
+        'salary' => $employee->salary,
+        'is_active' => $employee->is_active,
+    ]);
+
+    $employee->user->refresh();
+
+    // Password must NOT be stored as plain text
+    expect($employee->user->password)->not->toBe('new-secret-password');
+
+    // Must be a valid bcrypt hash
+    expect(Hash::check('new-secret-password', $employee->user->password))->toBeTrue();
 });
 
 test('employee email must be unique', function () {

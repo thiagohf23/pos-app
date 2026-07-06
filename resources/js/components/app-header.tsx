@@ -1,5 +1,6 @@
 import { Link, usePage } from '@inertiajs/react';
-import { BookOpen, Folder, LayoutGrid, Menu, Search, Package, ShoppingCart, Ticket, Sparkles, Truck, FileText } from 'lucide-react';
+import { BookOpen, Folder, LayoutGrid, Menu, Search, Package, ShoppingCart, Ticket, Sparkles, Truck, FileText, ClipboardList } from 'lucide-react';
+import { Users } from 'lucide-react';
 import AppLogo from '@/components/app-logo';
 import AppLogoIcon from '@/components/app-logo-icon';
 import { Breadcrumbs } from '@/components/breadcrumbs';
@@ -35,14 +36,14 @@ import { cn, toUrl } from '@/lib/utils';
 import { dashboard, home } from '@/routes';
 import { index as categoriesIndex } from '@/routes/categories';
 import { index as couponsIndex } from '@/routes/coupons';
+import { index as employeesIndex } from '@/routes/employees';
+import { index as stockAdjustmentsIndex } from '@/routes/stock-adjustments';
+import { index as permissionsIndex } from '@/routes/permissions';
 import { index as posIndex } from '@/routes/pos';
 import { index as productsIndex } from '@/routes/products';
-import { index as employeesIndex } from '@/routes/employees';
-import { index as suppliersIndex } from '@/routes/suppliers';
-import { index as rolesIndex } from '@/routes/roles';
-import { index as permissionsIndex } from '@/routes/permissions';
 import { index as reportsIndex } from '@/routes/reports';
-import { Users } from 'lucide-react';
+import { index as rolesIndex } from '@/routes/roles';
+import { index as suppliersIndex } from '@/routes/suppliers';
 import type { BreadcrumbItem, NavItem } from '@/types';
 import AppearanceToggleTab from './appearance-tabs';
 
@@ -87,6 +88,12 @@ const mainNavItems: NavItem[] = [
         title: 'Suppliers',
         href: suppliersIndex().url,
         icon: Truck,
+        roles: ['Admin'],
+    },
+    {
+        title: 'Stock Adjustments',
+        href: stockAdjustmentsIndex().url,
+        icon: ClipboardList,
         roles: ['Admin'],
     },
     {

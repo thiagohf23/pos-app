@@ -2,28 +2,41 @@
 
 namespace App\Models;
 
+use App\Enums\CouponScope;
+use Carbon\Carbon;
 use Database\Factories\CouponFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
+/**
+ * @property int $id
+ * @property string $code
+ * @property string|null $description
+ * @property float $discount_percent
+ * @property CouponScope $scope
+ * @property int|null $max_uses
+ * @property int $used_count
+ * @property Carbon $starts_at
+ * @property Carbon $expires_at
+ * @property bool $is_active
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
+ * @property Carbon|null $deleted_at
+ */
 #[Fillable(['code', 'description', 'discount_percent', 'scope', 'max_uses', 'used_count', 'starts_at', 'expires_at', 'is_active'])]
 class Coupon extends Model
 {
     /** @use HasFactory<CouponFactory> */
-    use HasFactory;
+    use HasFactory, SoftDeletes;
 
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
     protected function casts(): array
     {
         return [
             'discount_percent' => 'decimal:2',
+            'scope' => CouponScope::class,
             'starts_at' => 'datetime',
             'expires_at' => 'datetime',
             'is_active' => 'boolean',
@@ -42,13 +55,6 @@ class Coupon extends Model
         return $this->belongsToMany(Product::class);
     }
 
-    public function scopeActive(Builder $query): void
-    {
-        $query->where('is_active', true)
-            ->where('starts_at', '<=', now())
-            ->where('expires_at', '>=', now());
-    }
-
     public function isValid(): bool
     {
         return $this->is_active
@@ -64,10 +70,10 @@ class Coupon extends Model
         $categoryIds = null;
         $productIds = null;
 
-        if ($this->scope === 'category') {
+        if ($this->scope === CouponScope::Category) {
             $this->loadMissing('categories');
             $categoryIds = $this->categories->pluck('id');
-        } elseif ($this->scope === 'product') {
+        } elseif ($this->scope === CouponScope::Product) {
             $this->loadMissing('products');
             $productIds = $this->products->pluck('id');
         }
@@ -79,8 +85,8 @@ class Coupon extends Model
             $quantity = $item['quantity'];
 
             $matches = match ($this->scope) {
-                'category' => (bool) $categoryIds?->contains($product->category_id),
-                'product' => (bool) $productIds?->contains($product->id),
+                CouponScope::Category => (bool) $categoryIds?->contains($product->category_id),
+                CouponScope::Product => (bool) $productIds?->contains($product->id),
                 default => true,
             };
 

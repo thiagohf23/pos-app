@@ -21,9 +21,9 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
-import { AvatarCropper } from '../../settings/components/avatar-cropper';
 import { store, update } from '@/routes/products';
 import type { Category, Product } from '@/types';
+import { AvatarCropper } from '../../settings/components/avatar-cropper';
 
 interface Props {
     open: boolean;
@@ -47,6 +47,8 @@ export function ProductDialog({ open, onClose, editing, categories }: Props) {
         useForm({
             category_id: editing ? String(editing.category_id) : '',
             name: editing?.name ?? '',
+            sku: editing?.sku ?? '',
+            barcode: editing?.barcode ?? '',
             description: editing?.description ?? '',
             price: editing?.price ?? '',
             stock: editing ? String(editing.stock) : '0',
@@ -86,6 +88,7 @@ export function ProductDialog({ open, onClose, editing, categories }: Props) {
 
         const dataTransfer = new DataTransfer();
         dataTransfer.items.add(croppedFile);
+
         if (fileInputRef.current) {
             fileInputRef.current.files = dataTransfer.files;
         }
@@ -94,7 +97,9 @@ export function ProductDialog({ open, onClose, editing, categories }: Props) {
     }
 
     async function handleEditCurrentImage() {
-        if (!imagePreview) return;
+        if (!imagePreview) {
+return;
+}
 
         try {
             const response = await fetch(imagePreview);
@@ -189,6 +194,34 @@ export function ProductDialog({ open, onClose, editing, categories }: Props) {
                                 {errors.name}
                             </p>
                         )}
+                    </div>
+
+                    {/* SKU & Barcode */}
+                    <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-1.5">
+                            <Label htmlFor="sku">SKU</Label>
+                            <Input
+                                id="sku"
+                                value={data.sku}
+                                onChange={(e) => setData('sku', e.target.value)}
+                                placeholder="e.g. WM-001"
+                            />
+                            {errors.sku && (
+                                <p className="text-xs text-destructive">{errors.sku}</p>
+                            )}
+                        </div>
+                        <div className="space-y-1.5">
+                            <Label htmlFor="barcode">Barcode</Label>
+                            <Input
+                                id="barcode"
+                                value={data.barcode}
+                                onChange={(e) => setData('barcode', e.target.value)}
+                                placeholder="e.g. 7891234567890"
+                            />
+                            {errors.barcode && (
+                                <p className="text-xs text-destructive">{errors.barcode}</p>
+                            )}
+                        </div>
                     </div>
 
                     {/* Category & Price Grid */}

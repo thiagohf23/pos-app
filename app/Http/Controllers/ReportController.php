@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\PaymentMethod;
 use App\Models\Category;
 use App\Models\Product;
 use App\Models\Sale;
@@ -38,8 +39,8 @@ class ReportController extends Controller
             ->groupBy('payment_method')
             ->get()
             ->map(fn ($item) => [
-                'method' => $item->payment_method,
-                'label' => $this->paymentMethodLabel($item->payment_method),
+                'method' => $item->payment_method->value,
+                'label' => $item->payment_method->label(),
                 'count' => (int) $item->count,
                 'total' => (float) $item->total,
             ]);
@@ -82,7 +83,7 @@ class ReportController extends Controller
             ],
             'paymentMethods' => collect($this->paymentMethods)->map(fn ($method) => [
                 'value' => $method,
-                'label' => $this->paymentMethodLabel($method),
+                'label' => PaymentMethod::from($method)->label(),
             ]),
             'categories' => Category::orderBy('name')->get(['id', 'name']),
             'products' => Product::orderBy('name')->get(['id', 'name']),
@@ -126,7 +127,7 @@ class ReportController extends Controller
                     $sale->id,
                     $sale->sold_at->format('d/m/Y H:i'),
                     $sale->user->name,
-                    $this->paymentMethodLabel($sale->payment_method),
+                    $sale->payment_method->label(),
                     number_format($sale->subtotal, 2, '.', ''),
                     number_format($sale->discount, 2, '.', ''),
                     number_format($sale->total, 2, '.', ''),
@@ -258,7 +259,7 @@ class ReportController extends Controller
         $labels = [];
 
         if ($filters['payment_method']) {
-            $labels[] = 'Payment: '.$this->paymentMethodLabel($filters['payment_method']);
+            $labels[] = 'Payment: '.PaymentMethod::from($filters['payment_method'])->label();
         }
 
         if ($filters['category_id']) {
@@ -270,16 +271,5 @@ class ReportController extends Controller
         }
 
         return $labels;
-    }
-
-    private function paymentMethodLabel(string $method): string
-    {
-        return match ($method) {
-            'cash' => 'Cash',
-            'credit_card' => 'Credit Card',
-            'debit_card' => 'Debit Card',
-            'pix' => 'PIX',
-            default => $method,
-        };
     }
 }

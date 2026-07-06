@@ -73,7 +73,10 @@ export interface Category {
 export interface Product {
     id: number;
     category_id: number;
+    supplier_id: number | null;
     name: string;
+    sku: string | null;
+    barcode: string | null;
     description: string | null;
     price: string;
     stock: number;

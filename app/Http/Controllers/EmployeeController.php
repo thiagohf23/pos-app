@@ -8,6 +8,7 @@ use App\Models\Employee;
 use App\Models\User;
 use App\Notifications\EmployeeInvitation;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
@@ -63,7 +64,7 @@ class EmployeeController extends Controller
             ]);
 
             if ($request->filled('password')) {
-                $user->update(['password' => $request->input('password')]);
+                $user->update(['password' => Hash::make($request->input('password'))]);
             }
 
             if ($request->has('role_id')) {

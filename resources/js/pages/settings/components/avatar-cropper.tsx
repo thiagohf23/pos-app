@@ -1,4 +1,5 @@
 import { useRef, useState, useEffect } from 'react';
+import { Button } from '@/components/ui/button';
 import {
     Dialog,
     DialogContent,
@@ -6,7 +7,6 @@ import {
     DialogHeader,
     DialogTitle,
 } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
 interface AvatarCropperProps {
@@ -31,6 +31,7 @@ export function AvatarCropper({ imageFile, open, onClose, onCrop, shape = 'circl
     useEffect(() => {
         if (!imageFile) {
             setImageSrc(null);
+
             return;
         }
 
@@ -51,7 +52,9 @@ export function AvatarCropper({ imageFile, open, onClose, onCrop, shape = 'circl
 
     // Handle mouse/touch move
     const handleMove = (clientX: number, clientY: number) => {
-        if (!isDragging) return;
+        if (!isDragging) {
+return;
+}
         
         // Calculate new position
         const newX = clientX - dragStart.x;
@@ -65,7 +68,9 @@ export function AvatarCropper({ imageFile, open, onClose, onCrop, shape = 'circl
     };
 
     const handleSave = () => {
-        if (!imageRef.current || !imageSrc) return;
+        if (!imageRef.current || !imageSrc) {
+return;
+}
 
         const img = new Image();
         img.src = imageSrc;
@@ -75,7 +80,10 @@ export function AvatarCropper({ imageFile, open, onClose, onCrop, shape = 'circl
             canvas.width = 300;
             canvas.height = 300;
             const ctx = canvas.getContext('2d');
-            if (!ctx) return;
+
+            if (!ctx) {
+return;
+}
 
             // Dimensions of the display cutout container (e.g., 256px)
             const viewSize = 256;
