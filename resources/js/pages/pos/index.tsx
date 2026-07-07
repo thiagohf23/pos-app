@@ -2,7 +2,7 @@
 
 import { Head } from '@inertiajs/react';
 import { Maximize2, Minimize2, Search } from 'lucide-react';
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState, useMemo, useRef } from 'react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -72,12 +72,19 @@ export default function PosIndex({ products = [], categories = [] }: Props) {
         total,
     } = useCart();
     const [search, setSearch] = useState('');
+    const [selectedProductIndex, setSelectedProductIndex] = useState(0);
     const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(
         null,
     );
     const [showPaymentDialog, setShowPaymentDialog] = useState(false);
     const [isFullscreen, setIsFullscreen] = useState(false);
     const { setOpen } = useSidebar();
+    const searchRef = useRef<HTMLInputElement>(null);
+
+    // Reset selected product index when filters change
+    useEffect(() => {
+        setSelectedProductIndex(0);
+    }, [search, selectedCategoryId]);
 
     // Hide/show header and toggle sidebar when fullscreen toggles
     useEffect(() => {
@@ -132,6 +139,71 @@ export default function PosIndex({ products = [], categories = [] }: Props) {
         setShowPaymentDialog(true);
     }
 
+    // Keyboard shortcuts listener
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            const activeElement = document.activeElement;
+            const isTyping =
+                activeElement instanceof HTMLInputElement ||
+                activeElement instanceof HTMLTextAreaElement;
+
+            if (e.key === 'F2' || e.key === '/') {
+                if (e.key === 'F2' || !isTyping) {
+                    e.preventDefault();
+                    searchRef.current?.focus();
+                    searchRef.current?.select();
+                }
+            } else if (e.key === 'F8') {
+                e.preventDefault();
+                if (cart.length > 0) {
+                    setShowPaymentDialog(true);
+                } else {
+                    toast.error('Cart is empty!');
+                }
+            } else if (e.key === 'Escape') {
+                if (activeElement === searchRef.current) {
+                    setSearch('');
+                    searchRef.current.blur();
+                }
+            } else if (e.altKey && e.key.toLowerCase() === 'n') {
+                e.preventDefault();
+                clearCart();
+                toast.success('Cart cleared!');
+            } else if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+                if (activeElement === searchRef.current || !isTyping) {
+                    e.preventDefault();
+                    setSelectedProductIndex((prev) =>
+                        filteredProducts.length > 0
+                            ? (prev + 1) % filteredProducts.length
+                            : -1
+                    );
+                }
+            } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+                if (activeElement === searchRef.current || !isTyping) {
+                    e.preventDefault();
+                    setSelectedProductIndex((prev) =>
+                        filteredProducts.length > 0
+                            ? (prev - 1 + filteredProducts.length) % filteredProducts.length
+                            : -1
+                    );
+                }
+            } else if (e.key === 'Enter') {
+                if (!isTyping && selectedProductIndex >= 0 && selectedProductIndex < filteredProducts.length) {
+                    e.preventDefault();
+                    const product = filteredProducts[selectedProductIndex];
+                    if (product.stock > 0) {
+                        addToCart(product);
+                    } else {
+                        toast.error(`${product.name} is out of stock!`);
+                    }
+                }
+            }
+        };
+
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, [cart, clearCart, filteredProducts, selectedProductIndex]);
+
     return (
         <>
             <Head title="Point of Sale (POS)" />
@@ -175,11 +247,15 @@ export default function PosIndex({ products = [], categories = [] }: Props) {
                         <div className="relative w-full sm:max-w-xs">
                             <Search className="pointer-events-none absolute top-3 left-3 size-4 text-neutral-400" />
                             <Input
+                                ref={searchRef}
                                 placeholder="Search by name, description..."
                                 value={search}
                                 onChange={(e) => setSearch(e.target.value)}
-                                className="h-11 bg-white pl-9 dark:bg-neutral-900/50"
+                                className="h-11 bg-white pl-9 pr-10 dark:bg-neutral-900/50"
                             />
+                            <div className="absolute right-3 top-3 text-[10px] bg-neutral-100 dark:bg-neutral-800 text-neutral-400 dark:text-neutral-500 font-mono px-1.5 py-0.5 rounded border pointer-events-none select-none">
+                                F2
+                            </div>
                         </div>
 
                         <div className="scrollbar-none overflow-x-auto py-1">
@@ -215,6 +291,7 @@ export default function PosIndex({ products = [], categories = [] }: Props) {
                         products={filteredProducts}
                         cart={cart}
                         onAddToCart={addToCart}
+                        selectedProductIndex={selectedProductIndex}
                     />
                 </div>
 

@@ -13,6 +13,7 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\SaleCancellationController;
+use App\Http\Controllers\SaleController;
 use App\Http\Controllers\StockAdjustmentController;
 use App\Http\Controllers\SupplierController;
 use Illuminate\Support\Facades\Route;
@@ -47,6 +48,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('pos/checkout', [CheckoutController::class, 'store'])->name('pos.checkout');
     Route::post('pos/coupon', CouponValidationController::class)->name('pos.coupon');
     Route::get('pos/receipt/{sale}', [PosController::class, 'show'])->name('pos.receipt');
+
+    Route::resource('sales', SaleController::class)->only(['index']);
 
     // Sale cancellation (Admin only)
     Route::patch('sales/{sale}/cancel', SaleCancellationController::class)

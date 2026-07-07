@@ -29,12 +29,14 @@ createInertiaApp({
         const locale = (props.initialPage.props as any)?.locale;
         initializeI18n(locale);
         
-        createRoot(el!).render(
-            <TooltipProvider delayDuration={0}>
-                <App {...props} />
-                <Toaster />
-            </TooltipProvider>
-        );
+        if (el) {
+            createRoot(el).render(
+                <TooltipProvider delayDuration={0}>
+                    <App {...props} />
+                    <Toaster />
+                </TooltipProvider>
+            );
+        }
     },
     progress: {
         color: '#4B5563',

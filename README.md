@@ -39,6 +39,7 @@
 - **Coupon System** — Apply percentage-based coupons with flexible scoping (global, per-category, or per-product)
 - **Digital Receipt** — Auto-generated receipt with sale details, payment info, and change calculation
 - **Stock Validation** — Real-time stock checks during checkout with pessimistic locking to prevent overselling
+- **Keyboard Shortcuts** — Comprehensive keyboard navigation: `F2` search, arrow keys navigate products, `Enter` add to cart, `F8` checkout, `Alt+N` clear cart, `F3` coupon, number keys for payment methods, `Esc` cancel
 
 ### 📊 Dashboard & Analytics
 - **Revenue Metrics** — Total revenue, sales count, and average ticket at a glance
@@ -75,6 +76,7 @@
 - **Profile Settings** — Edit personal info and avatar
 - **Security Settings** — Manage password and 2FA
 - **Appearance** — Light/dark mode theme toggle
+- **Multi-Language Support** — Full i18n integration (Portuguese, English, Spanish) with persistent language switcher in navbar
 
 ---
 

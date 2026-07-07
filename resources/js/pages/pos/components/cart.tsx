@@ -149,7 +149,10 @@ export function Cart({
                 >
                     <CreditCard className="size-4" />
                     Checkout Order
-                    <ArrowRight className="ml-1 size-4" />
+                    <span className="ml-1 text-[10px] bg-emerald-700/60 text-emerald-100 font-mono px-1.5 py-0.5 rounded border border-emerald-500/40 select-none">
+                        F8
+                    </span>
+                    <ArrowRight className="ml-auto size-4" />
                 </Button>
             </div>
         </div>

@@ -11,6 +11,7 @@ import {
     Truck,
     Users,
     ClipboardList,
+    History,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import AppLogo from '@/components/app-logo';
@@ -36,6 +37,7 @@ import { index as posIndex } from '@/routes/pos';
 import { index as productsIndex } from '@/routes/products';
 import { index as reportsIndex } from '@/routes/reports';
 import { index as rolesIndex } from '@/routes/roles';
+import { index as salesIndex } from '@/routes/sales';
 import { index as stockAdjustmentsIndex } from '@/routes/stock-adjustments';
 import { index as suppliersIndex } from '@/routes/suppliers';
 import type { NavItem } from '@/types';
@@ -50,6 +52,11 @@ const mainNavItems: NavItem[] = [
         title: 'nav.pos',
         href: posIndex().url,
         icon: ShoppingCart,
+    },
+    {
+        title: 'nav.sales',
+        href: salesIndex().url,
+        icon: History,
     },
     {
         title: 'nav.products',
