@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="./public/storage/logos/logo.png" alt="POS App Logo" width="150" height="auto"/>
+  <img src="./public/images/logos/logo.png" alt="POS App Logo" width="150" height="auto"/>
 </p>
 
   <p align="center">
