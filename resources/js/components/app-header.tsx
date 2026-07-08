@@ -1,10 +1,9 @@
 import { Link, usePage } from '@inertiajs/react';
-import { BookOpen, Folder, LayoutGrid, Menu, Search, Package, ShoppingCart, Ticket, Sparkles, Truck, FileText, Users } from 'lucide-react';
+import { BookOpen, Folder, LayoutGrid, Menu, Search, Package, ShoppingCart, Ticket, Sparkles, Truck, FileText, Users, Sun, Moon } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import AppLogo from '@/components/app-logo';
 import AppLogoIcon from '@/components/app-logo-icon';
 import { Breadcrumbs } from '@/components/breadcrumbs';
-import { LanguageSwitcher } from '@/components/language-switcher';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import {
@@ -31,6 +30,7 @@ import {
     TooltipTrigger,
 } from '@/components/ui/tooltip';
 import { UserMenuContent } from '@/components/user-menu-content';
+import { useAppearance } from '@/hooks/use-appearance';
 import { useCurrentUrl } from '@/hooks/use-current-url';
 import { useInitials } from '@/hooks/use-initials';
 import { cn, toUrl } from '@/lib/utils';
@@ -38,15 +38,15 @@ import { dashboard, home } from '@/routes';
 import { index as categoriesIndex } from '@/routes/categories';
 import { index as couponsIndex } from '@/routes/coupons';
 import { index as employeesIndex } from '@/routes/employees';
-import { index as stockAdjustmentsIndex } from '@/routes/stock-adjustments';
 import { index as permissionsIndex } from '@/routes/permissions';
 import { index as posIndex } from '@/routes/pos';
 import { index as productsIndex } from '@/routes/products';
 import { index as reportsIndex } from '@/routes/reports';
 import { index as rolesIndex } from '@/routes/roles';
+import { index as stockAdjustmentsIndex } from '@/routes/stock-adjustments';
 import { index as suppliersIndex } from '@/routes/suppliers';
 import type { BreadcrumbItem, NavItem } from '@/types';
-import AppearanceToggleTab from './appearance-tabs';
+import LanguageSwitcher from './language-switcher';
 
 type Props = {
     breadcrumbs?: BreadcrumbItem[];
@@ -128,6 +128,8 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
     const getInitials = useInitials();
     const { isCurrentUrl, whenCurrentUrl } = useCurrentUrl();
     const { t } = useTranslation();
+    const { resolvedAppearance, updateAppearance } = useAppearance();
+    const toggleAppearance = () => updateAppearance(resolvedAppearance === 'dark' ? 'light' : 'dark');
 
     const visibleNavItems = mainNavItems.filter(
         (item) => !item.roles || item.roles.some((role) => auth.roles.includes(role)),
@@ -203,7 +205,7 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
                         prefetch
                         className="flex items-center space-x-2"
                     >
-                        <AppLogo />
+                        <AppLogoIcon className='27' />
                     </Link>
 
                     {/* Desktop Navigation */}
@@ -255,8 +257,20 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
                                     <p>{t('nav.home')}</p>
                                 </TooltipContent>
                             </Tooltip>
-                            <AppearanceToggleTab className="max-lg:hidden" />
                             <LanguageSwitcher />
+                            <button
+                                onClick={toggleAppearance}
+                                className="rounded-full p-2 text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100 dark:text-neutral-400 dark:hover:text-neutral-100 dark:hover:bg-neutral-800 transition-colors cursor-pointer"
+                                aria-label="Toggle theme"
+                                title={`Switch to ${resolvedAppearance === 'dark' ? 'light' : 'dark'} mode`}
+                            >
+                                {resolvedAppearance === 'dark' ? (
+                                    <Sun className="size-5" />
+                                ) : (
+                                    <Moon className="size-5" />
+                                )}
+                            </button>
+
                             <div className="ml-1 hidden gap-1 lg:flex">
                                 {rightNavItems.map((item) => (
                                     <Tooltip key={item.title}>

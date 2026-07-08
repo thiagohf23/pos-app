@@ -6,9 +6,10 @@ interface Props {
     products: Product[];
     cart: CartItem[];
     onAddToCart: (product: Product) => void;
+    selectedProductIndex: number;
 }
 
-export function ProductGrid({ products, cart, onAddToCart }: Props) {
+export function ProductGrid({ products, cart, onAddToCart, selectedProductIndex }: Props) {
     if (products.length === 0) {
         return (
             <div className="flex flex-1 flex-col items-center justify-center py-12 text-center">
@@ -24,8 +25,22 @@ export function ProductGrid({ products, cart, onAddToCart }: Props) {
     }
 
     return (
-        <div className="grid grid-cols-3 gap-3 pb-6 sm:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
-            {products.map((product) => {
+        <div className="flex flex-col gap-3">
+            {/* Keyboard Navigation Hints */}
+            <div className="flex gap-1.5 flex-wrap items-center text-[9px] text-neutral-500 dark:text-neutral-400">
+                <span className="font-semibold">Navigate:</span>
+                <span className="bg-neutral-100 dark:bg-neutral-800 text-neutral-400 dark:text-neutral-500 font-mono px-1.5 py-0.5 rounded border border-neutral-200/50 dark:border-neutral-800/80 select-none">
+                    ↑↓←→
+                </span>
+                <span>/</span>
+                <span className="bg-neutral-100 dark:bg-neutral-800 text-neutral-400 dark:text-neutral-500 font-mono px-1.5 py-0.5 rounded border border-neutral-200/50 dark:border-neutral-800/80 select-none">
+                    Alt+N
+                </span>
+                <span className="text-neutral-400">to clear</span>
+            </div>
+
+            <div className="grid grid-cols-3 gap-3 pb-6 sm:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
+                {products.map((product, index) => {
                 const cartQty =
                     cart.find((i) => i.product.id === product.id)?.quantity ??
                     0;
@@ -36,9 +51,11 @@ export function ProductGrid({ products, cart, onAddToCart }: Props) {
                         product={product}
                         cartQty={cartQty}
                         onAdd={onAddToCart}
+                        isSelected={index === selectedProductIndex}
                     />
                 );
             })}
+            </div>
         </div>
     );
 }

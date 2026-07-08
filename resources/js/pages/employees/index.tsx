@@ -1,6 +1,7 @@
 import { Head, router } from '@inertiajs/react';
 import { Search, UserPlus } from 'lucide-react';
 import { useState, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import { DeleteConfirmDialog } from '@/components/delete-confirm-dialog';
 import { Pagination } from '@/components/pagination';
@@ -17,6 +18,7 @@ interface Props {
 }
 
 export default function EmployeesIndex({ employees, roles }: Props) {
+    const { t } = useTranslation();
     const [showForm, setShowForm] = useState(false);
     const [editing, setEditing] = useState<Employee | null>(null);
     const [searchTerm, setSearchTerm] = useState('');
@@ -49,11 +51,11 @@ export default function EmployeesIndex({ employees, roles }: Props) {
             {
                 onSuccess: () => {
                     toast.success(
-                        `Employee "${employee.user?.name}" status updated!`,
+                        t('employees.status_updated_alert', { defaultValue: `Employee "${employee.user?.name}" status updated!`, name: employee.user?.name })
                     );
                 },
                 onError: () => {
-                    toast.error('Failed to update status.');
+                    toast.error(t('employees.status_update_failed_alert', 'Failed to update status.'));
                 },
             },
         );
@@ -70,27 +72,27 @@ export default function EmployeesIndex({ employees, roles }: Props) {
             onSuccess: () => {
                 router.flushAll();
                 toast.success(
-                    `Employee "${deletingEmployee.user?.name}" deleted successfully!`,
+                    t('employees.deleted_alert', { defaultValue: `Employee "${deletingEmployee.user?.name}" deleted successfully!`, name: deletingEmployee.user?.name })
                 );
                 setDeletingEmployee(null);
             },
             onError: () => {
-                toast.error('Failed to delete the employee.');
+                toast.error(t('employees.delete_failed_alert', 'Failed to delete the employee.'));
             },
         });
     }
 
     function handleResendInvitation(employee: Employee) {
         router.post(resendInvitation.url(employee.id), {}, {
-            onSuccess: () => toast.success('Convite reenviado!'),
-            onError: () => toast.error('Falha ao reenviar convite.'),
+            onSuccess: () => toast.success(t('employees.invitation_resent_alert', 'Invitation resent!')),
+            onError: () => toast.error(t('employees.resend_failed_alert', 'Failed to resend invitation.')),
         });
     }
 
     function handleResetPassword(employee: Employee) {
         router.post(resetPassword.url(employee.id), {}, {
-            onSuccess: () => toast.success('Link de redefinição enviado!'),
-            onError: () => toast.error('Falha ao enviar link.'),
+            onSuccess: () => toast.success(t('employees.reset_link_sent_alert', 'Reset link sent!')),
+            onError: () => toast.error(t('employees.send_reset_failed_alert', 'Failed to send link.')),
         });
     }
 
@@ -107,17 +109,17 @@ export default function EmployeesIndex({ employees, roles }: Props) {
 
     return (
         <>
-            <Head title="Employees" />
+            <Head title={t('employees.title')} />
 
             <div className="flex h-full flex-1 flex-col gap-6 p-6">
                 {/* Header */}
                 <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                     <div>
                         <h1 className="text-3xl font-extrabold tracking-tight text-neutral-900 dark:text-neutral-50">
-                            Employees
+                            {t('employees.title')}
                         </h1>
                         <p className="mt-1 text-sm text-neutral-500 dark:text-neutral-400">
-                            Manage your team members and their roles.
+                            {t('employees.subtitle', 'Manage your team members and their roles.')}
                         </p>
                     </div>
                     <Button
@@ -128,7 +130,7 @@ export default function EmployeesIndex({ employees, roles }: Props) {
                         className="w-full cursor-pointer gap-2 bg-neutral-950 shadow-md transition-all duration-200 hover:bg-neutral-800 sm:w-auto dark:bg-neutral-50 dark:text-neutral-950 dark:hover:bg-neutral-200"
                     >
                         <UserPlus className="size-4" />
-                        Add Employee
+                        {t('employees.create')}
                     </Button>
                 </div>
 
@@ -136,7 +138,7 @@ export default function EmployeesIndex({ employees, roles }: Props) {
                 <div className="relative flex w-full max-w-md items-center gap-2">
                     <Search className="pointer-events-none absolute left-3 size-4 text-neutral-400" />
                     <Input
-                        placeholder="Search employees..."
+                        placeholder={t('employees.search_placeholder', 'Search employees...')}
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                         className="bg-white pl-9 dark:bg-neutral-900/50"
@@ -180,8 +182,8 @@ export default function EmployeesIndex({ employees, roles }: Props) {
                 open={deletingEmployee !== null}
                 onClose={() => setDeletingEmployee(null)}
                 onConfirm={confirmDelete}
-                title="Delete Employee"
-                description={`Are you sure you want to delete "${deletingEmployee?.user?.name}"? This action cannot be undone.`}
+                title={t('employees.delete_title', 'Delete Employee')}
+                description={t('employees.delete_description', { defaultValue: `Are you sure you want to delete "${deletingEmployee?.user?.name}"? This action cannot be undone.`, name: deletingEmployee?.user?.name })}
                 loading={isDeleting}
             />
         </>

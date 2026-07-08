@@ -1,3 +1,4 @@
+import { router } from '@inertiajs/react';
 import {
     Check,
     CreditCard,
@@ -7,7 +8,7 @@ import {
     Landmark,
     Coins,
 } from 'lucide-react';
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import {
@@ -222,11 +223,116 @@ export function CheckoutDialog({
         }
     }
 
+    // Keep refs to latest state values to avoid stale closures in keyboard listener
+    const latestStateRef = useRef({
+        paymentMethod,
+        parsedAmountPaid,
+        finalTotal,
+        amountPaid,
+        notes,
+    });
+
+    // Sync refs on every render so handleKeyDown always sees current values
+    latestStateRef.current = {
+        paymentMethod,
+        parsedAmountPaid,
+        finalTotal,
+        amountPaid,
+        notes,
+    };
+
+    const handleCheckoutRef = useRef(handleCheckout);
+    handleCheckoutRef.current = handleCheckout;
+
+    // Keyboard shortcuts for Checkout Modal
+    useEffect(() => {
+        if (!open || showCheckoutSuccess) {
+return;
+}
+
+        const handleKeyDown = (e: KeyboardEvent) => {
+            const activeElement = document.activeElement;
+            const isTyping =
+                activeElement instanceof HTMLInputElement ||
+                activeElement instanceof HTMLTextAreaElement;
+
+            if (!isTyping) {
+                if (e.key === '1') {
+                    e.preventDefault();
+                    setPaymentMethod('cash');
+                } else if (e.key === '2') {
+                    e.preventDefault();
+                    setPaymentMethod('credit_card');
+                } else if (e.key === '3') {
+                    e.preventDefault();
+                    setPaymentMethod('debit_card');
+                } else if (e.key === '4') {
+                    e.preventDefault();
+                    setPaymentMethod('pix');
+                } else if (e.key === 'F3') {
+                    e.preventDefault();
+                    document.getElementById('coupon-input')?.focus();
+                }
+            }
+
+            if (e.key === 'Escape') {
+                e.preventDefault();
+                handleOpenChange(false);
+            } else if (e.key === 'Enter') {
+                if (activeElement instanceof HTMLInputElement && activeElement.id === 'coupon-input') {
+                    return;
+                }
+
+                if (activeElement instanceof HTMLTextAreaElement) {
+                    return;
+                }
+
+                const { paymentMethod: pm, parsedAmountPaid: pap, finalTotal: ft, amountPaid: ap } = latestStateRef.current;
+                const isCashValid =
+                    pm !== 'cash' ||
+                    (pap >= ft && ap.trim() !== '');
+
+                if (isCashValid) {
+                    e.preventDefault();
+                    handleCheckoutRef.current();
+                }
+            }
+        };
+
+        window.addEventListener('keydown', handleKeyDown);
+
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, [open, showCheckoutSuccess]);
+
+    // Keyboard shortcuts for Success Modal
+    useEffect(() => {
+        if (!showCheckoutSuccess) {
+return;
+}
+
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                setShowCheckoutSuccess(false);
+                clearCart();
+                setSaleId(null);
+                router.reload();
+            } else if (e.key === 'F1') {
+                e.preventDefault();
+                printReceipt();
+            }
+        };
+
+        window.addEventListener('keydown', handleKeyDown);
+
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, [showCheckoutSuccess, saleId, clearCart]);
+
     return (
         <>
             {/* Payment Method Dialog */}
             <Dialog open={open} onOpenChange={handleOpenChange}>
-                <DialogContent className="sm:max-w-[420px]">
+                <DialogContent onOpenAutoFocus={(e) => e.preventDefault()} className="sm:max-w-[420px]">
                     <DialogHeader>
                         <DialogTitle className="text-xl font-bold text-neutral-900 dark:text-neutral-50">
                             Select Payment Method
@@ -241,9 +347,14 @@ export function CheckoutDialog({
 
                     {/* Coupon Code */}
                     <div className="flex flex-col gap-1.5 pb-2">
-                        <label className="text-xs font-semibold text-neutral-600 dark:text-neutral-400">
-                            Coupon code
-                        </label>
+                        <div className="flex items-center gap-2">
+                            <label className="text-xs font-semibold text-neutral-600 dark:text-neutral-400">
+                                Coupon code
+                            </label>
+                            <span className="text-[9px] bg-neutral-100 dark:bg-neutral-800 text-neutral-400 dark:text-neutral-500 font-mono px-1.5 py-0.5 rounded border border-neutral-200/50 dark:border-neutral-800/80 pointer-events-none select-none">
+                                F3
+                            </span>
+                        </div>
                         {appliedCoupon ? (
                             <div className="flex items-center justify-between rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 dark:border-emerald-900 dark:bg-emerald-950/20">
                                 <span className="text-sm font-semibold text-emerald-700 dark:text-emerald-400">
@@ -264,12 +375,19 @@ export function CheckoutDialog({
                         ) : (
                             <div className="flex gap-2">
                                 <Input
+                                    id="coupon-input"
                                     type="text"
                                     placeholder="Enter coupon code"
                                     value={couponCode}
                                     onChange={(e) =>
                                         setCouponCode(e.target.value)
                                     }
+                                    onKeyDown={(e) => {
+                                        if (e.key === 'Enter') {
+                                            e.preventDefault();
+                                            applyCoupon();
+                                        }
+                                    }}
                                     className="flex-1"
                                 />
                                 <Button
@@ -295,6 +413,14 @@ export function CheckoutDialog({
                         {PAYMENT_METHODS.map((method) => {
                             const Icon = method.icon;
                             const isSelected = paymentMethod === method.value;
+                            const hotkey =
+                                method.value === 'cash'
+                                    ? '1'
+                                    : method.value === 'credit_card'
+                                      ? '2'
+                                      : method.value === 'debit_card'
+                                        ? '3'
+                                        : '4';
 
                             return (
                                 <button
@@ -302,11 +428,15 @@ export function CheckoutDialog({
                                     onClick={() =>
                                         setPaymentMethod(method.value)
                                     }
-                                    className={`flex cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border-2 p-4 transition-all ${isSelected
+                                    className={`relative flex cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border-4 p-4 transition-all ${
+                                        isSelected
                                             ? 'border-emerald-500 bg-emerald-50 text-emerald-700 dark:bg-emerald-950/20 dark:text-emerald-400'
                                             : 'border-neutral-200 bg-white text-neutral-600 hover:border-neutral-400 dark:border-neutral-800 dark:bg-neutral-900/50 dark:text-neutral-400 dark:hover:border-neutral-600'
-                                        }`}
+                                    }`}
                                 >
+                                    <div className="absolute top-2 right-2 text-[9px] bg-neutral-100 dark:bg-neutral-800 text-neutral-400 dark:text-neutral-500 font-mono px-1.5 py-0.5 rounded border border-neutral-200/50 dark:border-neutral-800/80 pointer-events-none select-none">
+                                        {hotkey}
+                                    </div>
                                     <Icon
                                         className={`size-8 ${isSelected ? 'text-emerald-600' : ''}`}
                                     />
@@ -389,9 +519,12 @@ export function CheckoutDialog({
                         <Button
                             variant="outline"
                             onClick={() => handleOpenChange(false)}
-                            className="flex-1 cursor-pointer font-semibold"
+                            className="flex-1 cursor-pointer font-semibold gap-1.5"
                         >
                             Cancel
+                            <span className="text-[9px] bg-neutral-100 dark:bg-neutral-800 text-neutral-400 dark:text-neutral-500 font-mono px-1 rounded border border-neutral-200/50 dark:border-neutral-700/50 select-none">
+                                Esc
+                            </span>
                         </Button>
                         <Button
                             onClick={handleCheckout}
@@ -404,6 +537,9 @@ export function CheckoutDialog({
                         >
                             <Banknote className="size-4" />
                             Pay ${finalTotal.toFixed(2)}
+                            <span className="ml-auto text-[9px] bg-emerald-700/60 text-emerald-100 font-mono px-1.5 py-0.5 rounded border border-emerald-500/40 select-none">
+                                Enter
+                            </span>
                         </Button>
                     </DialogFooter>
                 </DialogContent>
@@ -493,20 +629,27 @@ export function CheckoutDialog({
                             onClick={printReceipt}
                             disabled={!saleId}
                             variant="outline"
-                            className="flex-1 cursor-pointer font-semibold"
+                            className="flex-1 cursor-pointer font-semibold gap-1.5"
                         >
                             <Printer className="mr-1 size-4" />
                             Print Receipt
+                            <span className="text-[9px] bg-neutral-100 dark:bg-neutral-800 text-neutral-400 dark:text-neutral-500 font-mono px-1 rounded border border-neutral-200/50 dark:border-neutral-700/50 select-none">
+                                F1
+                            </span>
                         </Button>
                         <Button
                             onClick={() => {
                                 setShowCheckoutSuccess(false);
                                 clearCart();
                                 setSaleId(null);
+                                router.reload();
                             }}
-                            className="flex-1 cursor-pointer bg-neutral-950 font-semibold hover:bg-neutral-800 dark:bg-neutral-50 dark:text-neutral-950 dark:hover:bg-neutral-200"
+                            className="flex-1 cursor-pointer gap-2 bg-emerald-600 font-semibold text-white hover:bg-emerald-500"
                         >
                             New Sale
+                            <span className="text-[9px] bg-emerald-700/60 text-emerald-100 font-mono px-1.5 py-0.5 rounded border border-emerald-500/40 select-none">
+                                Enter
+                            </span>
                         </Button>
                     </DialogFooter>
                 </DialogContent>

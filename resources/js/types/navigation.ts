@@ -12,4 +12,10 @@ export type NavItem = {
     icon?: LucideIcon | null;
     isActive?: boolean;
     roles?: string[];
+} | {
+    title: string;
+    icon?: LucideIcon | null;
+    isActive?: boolean;
+    roles?: string[];
+    items: NavItem[];
 };

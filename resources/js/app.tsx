@@ -1,5 +1,5 @@
-import { createRoot } from 'react-dom/client';
 import { createInertiaApp } from '@inertiajs/react';
+import { createRoot } from 'react-dom/client';
 import { Toaster } from '@/components/ui/sonner';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { initializeTheme } from '@/hooks/use-appearance';
@@ -29,12 +29,14 @@ createInertiaApp({
         const locale = (props.initialPage.props as any)?.locale;
         initializeI18n(locale);
         
-        createRoot(el!).render(
-            <TooltipProvider delayDuration={0}>
-                <App {...props} />
-                <Toaster />
-            </TooltipProvider>
-        );
+        if (el) {
+            createRoot(el).render(
+                <TooltipProvider delayDuration={0}>
+                    <App {...props} />
+                    <Toaster />
+                </TooltipProvider>
+            );
+        }
     },
     progress: {
         color: '#4B5563',

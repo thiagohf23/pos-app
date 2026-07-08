@@ -1,4 +1,5 @@
 import { Edit, Image as ImageIcon, Package, Plus, Trash2 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
@@ -21,6 +22,8 @@ export function ProductTable({
     onToggleActive,
     onAddClick,
 }: Props) {
+    const { t } = useTranslation();
+
     if (products.length === 0) {
         return (
             <div className="flex h-96 flex-col items-center justify-center p-12 text-center">
@@ -28,12 +31,12 @@ export function ProductTable({
                     <Package className="size-8 animate-pulse" />
                 </div>
                 <h3 className="text-lg font-semibold text-neutral-900 dark:text-neutral-100">
-                    No products found
+                    {t('common.no_results')}
                 </h3>
                 <p className="mt-1 max-w-sm text-sm text-neutral-500 dark:text-neutral-400">
                     {searchTerm
-                        ? 'Try adjusting your search terms or filter criteria.'
-                        : 'Get started by adding your first product to the catalog.'}
+                        ? t('products.no_results_search_hint', 'Try adjusting your search terms or filter criteria.')
+                        : t('products.no_results_empty_hint', 'Get started by adding your first product to the catalog.')}
                 </p>
                 {!searchTerm && (
                     <Button
@@ -42,7 +45,7 @@ export function ProductTable({
                         className="mt-4 cursor-pointer gap-2"
                     >
                         <Plus className="size-4" />
-                        Add Product
+                        {t('products.create')}
                     </Button>
                 )}
             </div>
@@ -54,13 +57,13 @@ export function ProductTable({
             <table className="w-full border-collapse text-left">
                 <thead>
                     <tr className="border-b border-neutral-200 bg-neutral-50/50 text-xs font-semibold tracking-wider text-neutral-500 uppercase dark:border-neutral-800 dark:bg-neutral-900/50 dark:text-neutral-400">
-                        <th className="px-6 py-4">Product</th>
-                        <th className="px-6 py-4">SKU / Barcode</th>
-                        <th className="px-6 py-4">Category</th>
-                        <th className="px-6 py-4">Price</th>
-                        <th className="px-6 py-4 text-center">Stock</th>
-                        <th className="px-6 py-4 text-center">Status</th>
-                        <th className="px-6 py-4 text-right">Actions</th>
+                        <th className="px-6 py-4">{t('dashboard.product')}</th>
+                        <th className="px-6 py-4">{t('products.sku_barcode', 'SKU / Barcode')}</th>
+                        <th className="px-6 py-4">{t('common.category')}</th>
+                        <th className="px-6 py-4">{t('common.price')}</th>
+                        <th className="px-6 py-4 text-center">{t('dashboard.stock')}</th>
+                        <th className="px-6 py-4 text-center">{t('common.status')}</th>
+                        <th className="px-6 py-4 text-right">{t('common.actions')}</th>
                     </tr>
                 </thead>
                 <tbody className="divide-y divide-neutral-200 dark:divide-neutral-800">
@@ -88,7 +91,7 @@ export function ProductTable({
                                         </div>
                                         <div className="max-w-xs truncate text-xs text-neutral-500 dark:text-neutral-400">
                                             {product.description ||
-                                                'No description'}
+                                                t('products.no_description', 'No description')}
                                         </div>
                                     </div>
                                 </div>
@@ -109,7 +112,7 @@ export function ProductTable({
                                         variant="secondary"
                                         className="bg-neutral-100 text-neutral-800 dark:bg-neutral-800 dark:text-neutral-300"
                                     >
-                                        {product.category?.name || 'Uncategorized'}
+                                        {product.category?.name || t('products.uncategorized', 'Uncategorized')}
                                     </Badge>
                                     {product.supplier && (
                                         <Badge

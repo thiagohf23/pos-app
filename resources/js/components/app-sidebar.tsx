@@ -1,9 +1,8 @@
 import { Link, usePage } from '@inertiajs/react';
 import {
     BarChart3,
-    BookOpen,
     Folder,
-    FolderGit2,
+    Zap,
     LayoutGrid,
     Package,
     ShoppingCart,
@@ -11,12 +10,14 @@ import {
     Truck,
     Users,
     ClipboardList,
+    History,
+    Lock,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import AppLogo from '@/components/app-logo';
-import { LanguageSwitcher } from '@/components/language-switcher';
+import AppLogoIcon from '@/components/app-logo-icon';
+
 import { NavFooter } from '@/components/nav-footer';
-import { NavMain } from '@/components/nav-main';
+import { NavMain, type NavGroup } from '@/components/nav-main';
 import { NavUser } from '@/components/nav-user';
 import {
     Sidebar,
@@ -36,91 +37,107 @@ import { index as posIndex } from '@/routes/pos';
 import { index as productsIndex } from '@/routes/products';
 import { index as reportsIndex } from '@/routes/reports';
 import { index as rolesIndex } from '@/routes/roles';
+import { index as salesIndex } from '@/routes/sales';
 import { index as stockAdjustmentsIndex } from '@/routes/stock-adjustments';
 import { index as suppliersIndex } from '@/routes/suppliers';
 import type { NavItem } from '@/types';
 
-const mainNavItems: NavItem[] = [
+const navGroups: NavGroup[] = [
     {
-        title: 'nav.dashboard',
-        href: dashboard(),
-        icon: LayoutGrid,
+        label: 'nav.group_sales',
+        items: [
+            {
+                title: 'nav.dashboard',
+                href: dashboard(),
+                icon: LayoutGrid,
+            },
+            {
+                title: 'nav.pos',
+                href: posIndex().url,
+                icon: ShoppingCart,
+            },
+            {
+                title: 'nav.sales',
+                href: salesIndex().url,
+                icon: History,
+            },
+        ],
     },
     {
-        title: 'nav.pos',
-        href: posIndex().url,
-        icon: ShoppingCart,
+        label: 'nav.group_catalog',
+        items: [
+            {
+                title: 'nav.products',
+                href: productsIndex().url,
+                icon: Package,
+            },
+            {
+                title: 'nav.categories',
+                href: categoriesIndex().url,
+                icon: Folder,
+            },
+            {
+                title: 'nav.suppliers',
+                href: suppliersIndex().url,
+                icon: Truck,
+                roles: ['Admin'],
+            },
+            {
+                title: 'nav.stock_adjustments',
+                href: stockAdjustmentsIndex().url,
+                icon: ClipboardList,
+                roles: ['Admin'],
+            },
+        ],
     },
     {
-        title: 'nav.products',
-        href: productsIndex().url,
-        icon: Package,
+        label: 'nav.group_marketing',
+        items: [
+            {
+                title: 'nav.coupons',
+                href: couponsIndex().url,
+                icon: Ticket,
+                roles: ['Admin'],
+            },
+        ],
     },
     {
-        title: 'nav.categories',
-        href: categoriesIndex().url,
-        icon: Folder,
-    },
-    {
-        title: 'nav.coupons',
-        href: couponsIndex().url,
-        icon: Ticket,
-        roles: ['Admin'],
-    },
-    {
-        title: 'nav.employees',
-        href: employeesIndex().url,
-        icon: Users,
-        roles: ['Admin'],
-    },
-    {
-        title: 'nav.suppliers',
-        href: suppliersIndex().url,
-        icon: Truck,
-        roles: ['Admin'],
-    },
-    {
-        title: 'nav.roles',
-        href: rolesIndex().url,
-        icon: Users,
-        roles: ['Admin'],
-    },
-    {
-        title: 'nav.permissions',
-        href: permissionsIndex().url,
-        icon: Users,
-        roles: ['Admin'],
-    },
-    {
-        title: 'nav.stock_adjustments',
-        href: stockAdjustmentsIndex().url,
-        icon: Package,
-        roles: ['Admin'],
-    },
-    {
-        title: 'nav.reports',
-        href: reportsIndex().url,
-        icon: BarChart3,
-        roles: ['Admin'],
-    },
-    {
-        title: 'Stock Adjustments',
-        href: stockAdjustmentsIndex().url,
-        icon: ClipboardList,
-        roles: ['Admin'],
+        label: 'nav.group_admin',
+        items: [
+            {
+                title: 'nav.reports',
+                href: reportsIndex().url,
+                icon: BarChart3,
+                roles: ['Admin'],
+            },
+            {
+                title: 'nav.access_control',
+                icon: Lock,
+                roles: ['Admin'],
+                items: [
+                    {
+                        title: 'nav.employees',
+                        href: employeesIndex().url,
+                    },
+                    {
+                        title: 'nav.roles',
+                        href: rolesIndex().url,
+                    },
+                    {
+                        title: 'nav.permissions',
+                        href: permissionsIndex().url,
+                    },
+                ],
+            },
+        ],
     },
 ];
 
 const footerNavItems: NavItem[] = [
     {
-        title: 'sidebar.repository',
-        href: 'https://github.com/laravel/react-starter-kit',
-        icon: FolderGit2,
-    },
-    {
-        title: 'sidebar.documentation',
-        href: 'https://laravel.com/docs/starter-kits#react',
-        icon: BookOpen,
+        title: 'nav.Home_Page',
+        href: '/',
+        icon: Zap,
     },
 ];
 
@@ -128,9 +145,16 @@ export function AppSidebar() {
     const { auth } = usePage().props;
     const { t } = useTranslation();
 
-    const visibleNavItems = mainNavItems.filter(
-        (item) => !item.roles || item.roles.some((role) => auth.roles.includes(role)),
-    );
+    const filterItemByRole = (item: NavItem): boolean => {
+        return !item.roles || item.roles.some((role) => auth.roles.includes(role));
+    };
+
+    const visibleGroups = navGroups
+        .map((group) => ({
+            ...group,
+            items: group.items.filter(filterItemByRole),
+        }))
+        .filter((group) => group.items.length > 0);
 
     return (
         <Sidebar collapsible="offcanvas" variant="inset">
@@ -139,7 +163,7 @@ export function AppSidebar() {
                     <SidebarMenuItem>
                         <SidebarMenuButton size="lg" asChild>
                             <Link href={posIndex().url} prefetch>
-                                <AppLogo />
+                                <AppLogoIcon className="size-27" />
                             </Link>
                         </SidebarMenuButton>
                     </SidebarMenuItem>
@@ -147,13 +171,12 @@ export function AppSidebar() {
             </SidebarHeader>
 
             <SidebarContent>
-                <NavMain items={visibleNavItems} />
+                <NavMain groups={visibleGroups} />
             </SidebarContent>
 
             <SidebarFooter>
                 <NavFooter items={footerNavItems} className="mt-auto" />
                 <NavUser />
-                <LanguageSwitcher variant="mobile" />
             </SidebarFooter>
         </Sidebar>
     );

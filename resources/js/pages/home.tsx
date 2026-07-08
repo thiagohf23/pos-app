@@ -1,14 +1,45 @@
 import { Head, Link, usePage } from '@inertiajs/react';
-import { LayoutGrid, ShoppingCart, ShieldCheck, ArrowRight, Printer, Sun, Moon } from 'lucide-react';
-import { useAppearance } from '@/hooks/use-appearance';
+import {
+    ShoppingCart,
+    Package,
+    Boxes,
+    History,
+    Ticket,
+    Truck,
+    BarChart3,
+    ShieldCheck,
+    ArrowRight,
+    Sun,
+    Moon,
+    type LucideIcon,
+} from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import AppLogoIcon from '@/components/app-logo-icon';
 import { LanguageSwitcher } from '@/components/language-switcher';
+import { useAppearance } from '@/hooks/use-appearance';
 import { login, register } from '@/routes';
 import { index as posIndex } from '@/routes/pos';
 
+type FeatureModule = {
+    icon: LucideIcon;
+    titleKey: string;
+    descKey: string;
+};
+
+const featureModules: FeatureModule[] = [
+    { icon: ShoppingCart, titleKey: 'home.mod_pos_title', descKey: 'home.mod_pos_desc' },
+    { icon: Package, titleKey: 'home.mod_catalog_title', descKey: 'home.mod_catalog_desc' },
+    { icon: Boxes, titleKey: 'home.mod_stock_title', descKey: 'home.mod_stock_desc' },
+    { icon: History, titleKey: 'home.mod_sales_title', descKey: 'home.mod_sales_desc' },
+    { icon: Ticket, titleKey: 'home.mod_coupons_title', descKey: 'home.mod_coupons_desc' },
+    { icon: Truck, titleKey: 'home.mod_suppliers_title', descKey: 'home.mod_suppliers_desc' },
+    { icon: BarChart3, titleKey: 'home.mod_reports_title', descKey: 'home.mod_reports_desc' },
+    { icon: ShieldCheck, titleKey: 'home.mod_access_title', descKey: 'home.mod_access_desc' },
+];
+
 export default function Home() {
     const { auth } = usePage().props as any;
-    const { appearance, resolvedAppearance, updateAppearance } = useAppearance();
+    const { resolvedAppearance, updateAppearance } = useAppearance();
     const { t } = useTranslation();
 
     const toggleAppearance = () => {
@@ -18,16 +49,13 @@ export default function Home() {
     return (
         <>
             <Head title={t('home.title')} />
-            
+
             <div className="min-h-screen bg-neutral-50 dark:bg-neutral-950 text-neutral-900 dark:text-neutral-100 flex flex-col font-sans">
                 {/* Header */}
                 <header className="border-b border-neutral-200 dark:border-neutral-800 bg-white/80 dark:bg-neutral-900/80 backdrop-blur-xs sticky top-0 z-50">
                     <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
                         <div className="flex items-center gap-2">
-                            <div className="bg-neutral-950 dark:bg-white text-white dark:text-neutral-950 p-2 rounded-lg">
-                                <ShoppingCart className="size-5" />
-                            </div>
-                            <span className="font-bold text-lg tracking-tight">POS Terminal</span>
+                            <AppLogoIcon className='size-24' />
                         </div>
 
                         <nav className="flex items-center gap-2">
@@ -113,46 +141,25 @@ export default function Home() {
                         )}
                     </div>
 
-                    {/* Features Grid */}
-                    <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8 w-full text-left border-t border-neutral-200 dark:border-neutral-800 pt-16 mt-8">
-                        <div className="flex flex-col gap-3">
-                            <div className="size-10 rounded-lg bg-neutral-100 dark:bg-neutral-900 flex items-center justify-center border border-neutral-200 dark:border-neutral-850 text-neutral-900 dark:text-neutral-100">
-                                <ShoppingCart className="size-5" />
-                            </div>
-                            <h3 className="font-semibold text-lg">{t('home.feature_checkout_title')}</h3>
-                            <p className="text-sm text-neutral-500 dark:text-neutral-400">
-                                {t('home.feature_checkout_desc')}
-                            </p>
-                        </div>
+                    {/* Features Section */}
+                    <div className="w-full border-t border-neutral-200 dark:border-neutral-800 pt-16 mt-8">
+                        <h2 className="text-3xl font-bold tracking-tight mb-3">{t('home.features_heading')}</h2>
+                        <p className="text-base text-neutral-500 dark:text-neutral-400 max-w-2xl mx-auto mb-12">
+                            {t('home.features_subheading')}
+                        </p>
 
-                        <div className="flex flex-col gap-3">
-                            <div className="size-10 rounded-lg bg-neutral-100 dark:bg-neutral-900 flex items-center justify-center border border-neutral-200 dark:border-neutral-850 text-neutral-900 dark:text-neutral-100">
-                                <LayoutGrid className="size-5" />
-                            </div>
-                            <h3 className="font-semibold text-lg">{t('home.feature_inventory_title')}</h3>
-                            <p className="text-sm text-neutral-500 dark:text-neutral-400">
-                                {t('home.feature_inventory_desc')}
-                            </p>
-                        </div>
-
-                        <div className="flex flex-col gap-3">
-                            <div className="size-10 rounded-lg bg-neutral-100 dark:bg-neutral-900 flex items-center justify-center border border-neutral-200 dark:border-neutral-850 text-neutral-900 dark:text-neutral-100">
-                                <Printer className="size-5" />
-                            </div>
-                            <h3 className="font-semibold text-lg">{t('home.feature_receipt_title')}</h3>
-                            <p className="text-sm text-neutral-500 dark:text-neutral-400">
-                                {t('home.feature_receipt_desc')}
-                            </p>
-                        </div>
-
-                        <div className="flex flex-col gap-3">
-                            <div className="size-10 rounded-lg bg-neutral-100 dark:bg-neutral-900 flex items-center justify-center border border-neutral-200 dark:border-neutral-850 text-neutral-900 dark:text-neutral-100">
-                                <ShieldCheck className="size-5" />
-                            </div>
-                            <h3 className="font-semibold text-lg">{t('home.feature_security_title')}</h3>
-                            <p className="text-sm text-neutral-500 dark:text-neutral-400">
-                                {t('home.feature_security_title_desc')}
-                            </p>
+                        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8 w-full text-left">
+                            {featureModules.map(({ icon: Icon, titleKey, descKey }) => (
+                                <div key={titleKey} className="flex flex-col gap-3">
+                                    <div className="size-10 rounded-lg bg-neutral-100 dark:bg-neutral-900 flex items-center justify-center border border-neutral-200 dark:border-neutral-850 text-neutral-900 dark:text-neutral-100">
+                                        <Icon className="size-5" />
+                                    </div>
+                                    <h3 className="font-semibold text-lg">{t(titleKey)}</h3>
+                                    <p className="text-sm text-neutral-500 dark:text-neutral-400">
+                                        {t(descKey)}
+                                    </p>
+                                </div>
+                            ))}
                         </div>
                     </div>
 

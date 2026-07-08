@@ -1,6 +1,7 @@
 import { router, useForm } from '@inertiajs/react';
 import { Loader2 } from 'lucide-react';
 import { useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -24,6 +25,7 @@ interface Props {
 }
 
 export function CategoryDialog({ open, onClose, editing }: Props) {
+    const { t } = useTranslation();
     const { data, setData, post, put, processing, errors, reset, clearErrors } =
         useForm({
             name: '',
@@ -61,13 +63,13 @@ export function CategoryDialog({ open, onClose, editing }: Props) {
                     // Invalidate prefetched pages (e.g. products) so updated categories show without a reload
                     router.flushAll();
                     toast.success(
-                        `Category "${data.name}" updated successfully!`,
+                        t('categories.updated_success_alert', { defaultValue: `Category "${data.name}" updated successfully!`, name: data.name })
                     );
                     handleClose();
                 },
                 onError: () => {
                     toast.error(
-                        'Failed to update the category. Please check the form.',
+                        t('categories.update_failed_form_alert', 'Failed to update the category. Please check the form.')
                     );
                 },
             });
@@ -77,13 +79,13 @@ export function CategoryDialog({ open, onClose, editing }: Props) {
                     // Invalidate prefetched pages (e.g. products) so the new category shows without a reload
                     router.flushAll();
                     toast.success(
-                        `Category "${data.name}" created successfully!`,
+                        t('categories.created_success_alert', { defaultValue: `Category "${data.name}" created successfully!`, name: data.name })
                     );
                     handleClose();
                 },
                 onError: () => {
                     toast.error(
-                        'Failed to create the category. Please check the form.',
+                        t('categories.create_failed_form_alert', 'Failed to create the category. Please check the form.')
                     );
                 },
             });
@@ -98,26 +100,24 @@ export function CategoryDialog({ open, onClose, editing }: Props) {
             <DialogContent className="sm:max-w-[480px]">
                 <DialogHeader>
                     <DialogTitle>
-                        {editing ? 'Edit Category' : 'Add Category'}
+                        {editing ? t('categories.edit') : t('categories.create')}
                     </DialogTitle>
                     <DialogDescription>
-                        Fill in the details below to{' '}
                         {editing
-                            ? 'update the category'
-                            : 'add a new category for products'}
-                        .
+                            ? t('categories.edit_description', 'Fill in the details below to update the category.')
+                            : t('categories.create_description', 'Fill in the details below to add a new category for products.')}
                     </DialogDescription>
                 </DialogHeader>
 
                 <form onSubmit={handleSubmit} className="space-y-4 py-2">
                     {/* Name */}
                     <div className="space-y-1.5">
-                        <Label htmlFor="name">Category Name *</Label>
+                        <Label htmlFor="name">{t('categories.category_name_label', 'Category Name *')}</Label>
                         <Input
                             id="name"
                             value={data.name}
                             onChange={(e) => setData('name', e.target.value)}
-                            placeholder="e.g. Electronics, Books"
+                            placeholder={t('categories.category_name_placeholder', 'e.g. Electronics, Books')}
                             required
                         />
                         {errors.name && (
@@ -140,20 +140,20 @@ export function CategoryDialog({ open, onClose, editing }: Props) {
                             htmlFor="is_active"
                             className="cursor-pointer text-sm font-medium select-none"
                         >
-                            Active on store
+                            {t('products.active_on_store', 'Active on store')}
                         </Label>
                     </div>
 
                     {/* Description */}
                     <div className="space-y-1.5">
-                        <Label htmlFor="description">Description</Label>
+                        <Label htmlFor="description">{t('products.description', 'Description')}</Label>
                         <textarea
                             id="description"
                             value={data.description}
                             onChange={(e) =>
                                 setData('description', e.target.value)
                             }
-                            placeholder="Describe the category..."
+                            placeholder={t('categories.description_placeholder', 'Describe the category...')}
                             className="max-h-[160px] min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-hidden disabled:cursor-not-allowed disabled:opacity-50"
                         />
                         {errors.description && (
@@ -171,7 +171,7 @@ export function CategoryDialog({ open, onClose, editing }: Props) {
                             disabled={processing}
                             className="cursor-pointer"
                         >
-                            Cancel
+                            {t('common.cancel')}
                         </Button>
                         <Button
                             type="submit"
@@ -181,7 +181,7 @@ export function CategoryDialog({ open, onClose, editing }: Props) {
                             {processing && (
                                 <Loader2 className="size-4 animate-spin" />
                             )}
-                            {editing ? 'Save Changes' : 'Create Category'}
+                            {editing ? t('common.save_changes') : t('categories.create')}
                         </Button>
                     </DialogFooter>
                 </form>

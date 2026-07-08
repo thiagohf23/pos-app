@@ -142,13 +142,12 @@ export default function StockAdjustmentsIndex({ products, movements }: Props) {
                                                 {movement.product?.name ?? `#${movement.product_id}`}
                                             </td>
                                             <td className="px-4 py-3.5">
-                                                <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-semibold ${
-                                                    movement.reason === 'sale'
+                                                <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-semibold ${movement.reason === 'sale'
                                                         ? 'bg-blue-50 text-blue-700 dark:bg-blue-950/20 dark:text-blue-400'
                                                         : movement.reason === 'sale_cancellation'
-                                                          ? 'bg-amber-50 text-amber-700 dark:bg-amber-950/20 dark:text-amber-400'
-                                                          : 'bg-violet-50 text-violet-700 dark:bg-violet-950/20 dark:text-violet-400'
-                                                }`}>
+                                                            ? 'bg-amber-50 text-amber-700 dark:bg-amber-950/20 dark:text-amber-400'
+                                                            : 'bg-violet-50 text-violet-700 dark:bg-violet-950/20 dark:text-violet-400'
+                                                    }`}>
                                                     {REASON_LABELS[movement.reason] ?? movement.reason}
                                                 </span>
                                             </td>
@@ -159,11 +158,10 @@ export default function StockAdjustmentsIndex({ products, movements }: Props) {
                                                 {movement.notes ?? '—'}
                                             </td>
                                             <td className="px-4 py-3.5 text-right">
-                                                <span className={`inline-flex items-center gap-1 font-mono text-xs font-bold ${
-                                                    movement.quantity_change > 0
+                                                <span className={`inline-flex items-center gap-1 font-mono text-xs font-bold ${movement.quantity_change > 0
                                                         ? 'text-emerald-600'
                                                         : 'text-red-600'
-                                                }`}>
+                                                    }`}>
                                                     {movement.quantity_change > 0 ? (
                                                         <ArrowUp className="size-3" />
                                                     ) : (
@@ -259,7 +257,9 @@ export default function StockAdjustmentsIndex({ products, movements }: Props) {
                             <Button
                                 type="button"
                                 variant="outline"
-                                onClick={() => { setShowForm(false); reset(); }}
+                                onClick={() => {
+ setShowForm(false); reset(); 
+}}
                                 disabled={processing}
                                 className="cursor-pointer"
                             >

@@ -2,7 +2,7 @@
 {{-- Header --}}
 <x-slot:header>
 <x-mail::header :url="config('app.url')">
-<img src="{{ asset('images/logo.svg') }}" alt="POS Terminal" width="80" height="80" style="border-radius: 16px;">
+<img src="{{ asset('images/logos/logo.svg') }}" alt="POS Terminal" width="80" height="80" style="border-radius: 16px;">
 </x-mail::header>
 </x-slot:header>
 

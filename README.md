@@ -1,10 +1,11 @@
 <p align="center">
-  <h1 align="center">🛒 POS App</h1>
+  <img src="./public/storage/logos/logo.png" alt="POS App Logo" width="150" height="auto"/>
+</p>
+
   <p align="center">
     A modern, high-performance Point of Sale system built with<br/>
     <strong>Laravel 13</strong> · <strong>Inertia.js v3</strong> · <strong>React 19</strong> · <strong>Tailwind CSS v4</strong>
   </p>
-</p>
 
 <p align="center">
   <img src="https://img.shields.io/badge/PHP-8.4-777BB4?logo=php&logoColor=white" alt="PHP 8.4"/>
@@ -39,6 +40,7 @@
 - **Coupon System** — Apply percentage-based coupons with flexible scoping (global, per-category, or per-product)
 - **Digital Receipt** — Auto-generated receipt with sale details, payment info, and change calculation
 - **Stock Validation** — Real-time stock checks during checkout with pessimistic locking to prevent overselling
+- **Keyboard Shortcuts** — Comprehensive keyboard navigation: `F2` search, arrow keys navigate products, `Enter` add to cart, `F8` checkout, `Alt+N` clear cart, `F3` coupon, number keys for payment methods, `Esc` cancel
 
 ### 📊 Dashboard & Analytics
 - **Revenue Metrics** — Total revenue, sales count, and average ticket at a glance
@@ -75,6 +77,7 @@
 - **Profile Settings** — Edit personal info and avatar
 - **Security Settings** — Manage password and 2FA
 - **Appearance** — Light/dark mode theme toggle
+- **Multi-Language Support** — Full i18n integration (Portuguese, English, Spanish) with persistent language switcher in navbar
 
 ---
 
