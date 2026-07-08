@@ -1,5 +1,5 @@
-import { createRoot } from 'react-dom/client';
 import { createInertiaApp } from '@inertiajs/react';
+import { createRoot } from 'react-dom/client';
 import { Toaster } from '@/components/ui/sonner';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { initializeTheme } from '@/hooks/use-appearance';

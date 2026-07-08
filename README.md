@@ -1,10 +1,11 @@
 <p align="center">
-  <h1 align="center">🛒 POS App</h1>
+  <img src="./public/storage/logos/logo.png" alt="POS App Logo" width="150" height="auto"/>
+</p>
+
   <p align="center">
     A modern, high-performance Point of Sale system built with<br/>
     <strong>Laravel 13</strong> · <strong>Inertia.js v3</strong> · <strong>React 19</strong> · <strong>Tailwind CSS v4</strong>
   </p>
-</p>
 
 <p align="center">
   <img src="https://img.shields.io/badge/PHP-8.4-777BB4?logo=php&logoColor=white" alt="PHP 8.4"/>

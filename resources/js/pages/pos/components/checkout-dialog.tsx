@@ -1,3 +1,4 @@
+import { router } from '@inertiajs/react';
 import {
     Check,
     CreditCard,
@@ -20,7 +21,6 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { checkout, coupon as couponRoute, receipt } from '@/routes/pos';
-import { router } from '@inertiajs/react';
 import type { CartItem } from '@/types';
 
 interface Props {
@@ -246,7 +246,9 @@ export function CheckoutDialog({
 
     // Keyboard shortcuts for Checkout Modal
     useEffect(() => {
-        if (!open || showCheckoutSuccess) return;
+        if (!open || showCheckoutSuccess) {
+return;
+}
 
         const handleKeyDown = (e: KeyboardEvent) => {
             const activeElement = document.activeElement;
@@ -280,9 +282,11 @@ export function CheckoutDialog({
                 if (activeElement instanceof HTMLInputElement && activeElement.id === 'coupon-input') {
                     return;
                 }
+
                 if (activeElement instanceof HTMLTextAreaElement) {
                     return;
                 }
+
                 const { paymentMethod: pm, parsedAmountPaid: pap, finalTotal: ft, amountPaid: ap } = latestStateRef.current;
                 const isCashValid =
                     pm !== 'cash' ||
@@ -296,12 +300,15 @@ export function CheckoutDialog({
         };
 
         window.addEventListener('keydown', handleKeyDown);
+
         return () => window.removeEventListener('keydown', handleKeyDown);
     }, [open, showCheckoutSuccess]);
 
     // Keyboard shortcuts for Success Modal
     useEffect(() => {
-        if (!showCheckoutSuccess) return;
+        if (!showCheckoutSuccess) {
+return;
+}
 
         const handleKeyDown = (e: KeyboardEvent) => {
             if (e.key === 'Enter') {
@@ -317,6 +324,7 @@ export function CheckoutDialog({
         };
 
         window.addEventListener('keydown', handleKeyDown);
+
         return () => window.removeEventListener('keydown', handleKeyDown);
     }, [showCheckoutSuccess, saleId, clearCart]);
 

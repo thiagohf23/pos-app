@@ -257,7 +257,9 @@ export default function StockAdjustmentsIndex({ products, movements }: Props) {
                             <Button
                                 type="button"
                                 variant="outline"
-                                onClick={() => { setShowForm(false); reset(); }}
+                                onClick={() => {
+ setShowForm(false); reset(); 
+}}
                                 disabled={processing}
                                 className="cursor-pointer"
                             >

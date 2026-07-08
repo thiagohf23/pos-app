@@ -30,20 +30,20 @@ import {
     TooltipTrigger,
 } from '@/components/ui/tooltip';
 import { UserMenuContent } from '@/components/user-menu-content';
+import { useAppearance } from '@/hooks/use-appearance';
 import { useCurrentUrl } from '@/hooks/use-current-url';
 import { useInitials } from '@/hooks/use-initials';
-import { useAppearance } from '@/hooks/use-appearance';
 import { cn, toUrl } from '@/lib/utils';
 import { dashboard, home } from '@/routes';
 import { index as categoriesIndex } from '@/routes/categories';
 import { index as couponsIndex } from '@/routes/coupons';
 import { index as employeesIndex } from '@/routes/employees';
-import { index as stockAdjustmentsIndex } from '@/routes/stock-adjustments';
 import { index as permissionsIndex } from '@/routes/permissions';
 import { index as posIndex } from '@/routes/pos';
 import { index as productsIndex } from '@/routes/products';
 import { index as reportsIndex } from '@/routes/reports';
 import { index as rolesIndex } from '@/routes/roles';
+import { index as stockAdjustmentsIndex } from '@/routes/stock-adjustments';
 import { index as suppliersIndex } from '@/routes/suppliers';
 import type { BreadcrumbItem, NavItem } from '@/types';
 import LanguageSwitcher from './language-switcher';
@@ -205,7 +205,7 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
                         prefetch
                         className="flex items-center space-x-2"
                     >
-                        <AppLogo />
+                        <AppLogoIcon className='27' />
                     </Link>
 
                     {/* Desktop Navigation */}

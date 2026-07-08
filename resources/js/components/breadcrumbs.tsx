@@ -17,6 +17,7 @@ export function Breadcrumbs({
     breadcrumbs: BreadcrumbItemType[];
 }) {
     const { t } = useTranslation();
+
     return (
         <>
             {breadcrumbs.length > 0 && (

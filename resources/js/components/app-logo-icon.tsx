@@ -1,7 +1,7 @@
 export default function AppLogoIcon({ className }: { className?: string }) {
     return (
         <img
-            src="/carrinho-de-compras.png"
+            src="/images/logos/logo.png"
             alt="POS"
             className={`${className} object-contain`}
         />

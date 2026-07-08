@@ -30,8 +30,8 @@
             }
         </style>
 
-        <link rel="icon" href="/carrinho-de-compras.png" type="image/png">
-        <link rel="apple-touch-icon" href="/carrinho-de-compras.png">
+        <link rel="icon" href="/images/favicons/shopping-cart.png" type="image/png">
+        <link rel="apple-touch-icon" href="/images/favicons/apple-touch-icon.png">
 
         @fonts
 

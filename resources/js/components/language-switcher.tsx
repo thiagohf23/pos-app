@@ -1,7 +1,6 @@
 import { router } from '@inertiajs/react';
 import { Globe } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { locales, type Locale } from '@/i18n';
 import { Button } from '@/components/ui/button';
 import {
     DropdownMenu,
@@ -14,6 +13,8 @@ import {
     TooltipContent,
     TooltipTrigger,
 } from '@/components/ui/tooltip';
+import { locales  } from '@/i18n';
+import type {Locale} from '@/i18n';
 
 type Props = {
     variant?: 'desktop' | 'mobile';
@@ -24,7 +25,10 @@ export function LanguageSwitcher({ variant = 'desktop' }: Props) {
     const current = i18n.language as Locale;
 
     const handleSwitch = (locale: Locale) => {
-        if (locale === current) return;
+        if (locale === current) {
+return;
+}
+
         document.cookie = `locale=${locale};path=/;max-age=${60 * 24 * 365};SameSite=Strict`;
         i18n.changeLanguage(locale);
         router.reload({ only: [] });

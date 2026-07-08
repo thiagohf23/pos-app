@@ -2,15 +2,10 @@ import { LayoutGrid, Sun, Moon } from 'lucide-react';
 import { Breadcrumbs } from '@/components/breadcrumbs';
 import { Button } from '@/components/ui/button';
 import { useSidebar } from '@/components/ui/sidebar';
-import type { BreadcrumbItem as BreadcrumbItemType } from '@/types';
-import { LanguageSwitcher } from './language-switcher';
 import { useAppearance } from '@/hooks/use-appearance';
+import { LanguageSwitcher } from './language-switcher';
 
-export function AppSidebarHeader({
-    breadcrumbs = [],
-}: {
-    breadcrumbs?: BreadcrumbItemType[];
-}) {
+export function AppSidebarHeader() {
     const { toggleSidebar } = useSidebar();
     const { resolvedAppearance, updateAppearance } = useAppearance();
     const toggleAppearance = () => updateAppearance(resolvedAppearance === 'dark' ? 'light' : 'dark');
@@ -27,7 +22,6 @@ export function AppSidebarHeader({
                 >
                     <LayoutGrid className="size-5" />
                 </Button>
-                <Breadcrumbs breadcrumbs={breadcrumbs} />
             </div>
             <div className="flex items-center space-x-2">
                 <LanguageSwitcher />
