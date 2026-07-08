@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="./public/images/logos/logo.png" alt="POS App Logo" width="150" height="auto"/>
+  <img src="./public/images/logos/logo.png" alt="POS App Logo" width="300" height="auto"/>
 </p>
 
   <p align="center">
@@ -15,6 +15,17 @@
   <img src="https://img.shields.io/badge/TypeScript-5-3178C6?logo=typescript&logoColor=white" alt="TypeScript"/>
   <img src="https://img.shields.io/badge/Pest-4-F28D1A?logo=php&logoColor=white" alt="Pest 4"/>
   <img src="https://img.shields.io/badge/License-MIT-green" alt="MIT License"/>
+</p>
+
+<p align="center">
+  <strong>Supported Languages:</strong>
+  <img src="https://img.shields.io/badge/Português-🇧🇷-34D399" alt="Português"/>
+  <img src="https://img.shields.io/badge/English-🇺🇸-60A5FA" alt="English"/>
+  <img src="https://img.shields.io/badge/Español-🇪🇸-F87171" alt="Español"/>
+</p>
+
+<p align="center">
+  Translations: <strong>English 🇺🇸</strong> | <a href="README.pt.md">Português 🇧🇷</a> | <a href="README.es.md">Español 🇪🇸</a>
 </p>
 
 ---
@@ -163,3 +174,9 @@ composer run ci:check   # Lint + format + types + tests
 ## 📄 License
 
 The POS App is open-sourced software licensed under the [MIT license](LICENSE).
+
+---
+
+<p align="center">
+  Made with ❤️, lots of ☕, and the help of AI assistants.
+</p>
