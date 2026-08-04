@@ -4,12 +4,10 @@ namespace App\Services;
 
 use App\Enums\PaymentMethod;
 use App\Enums\SaleStatus;
-use App\Enums\StockMovementReason;
 use App\Models\Coupon;
 use App\Models\Product;
 use App\Models\Sale;
 use App\Models\SaleItem;
-use App\Models\StockMovement;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
@@ -112,14 +110,9 @@ class CheckoutService
                     'total' => $product->price * $item['quantity'],
                 ]);
 
-                $product->decrement('stock', $item['quantity']);
-
-                StockMovement::create([
-                    'product_id' => $product->id,
+                app(StockLedger::class)->recordSale($product, $item['quantity'], [
                     'user_id' => Auth::id(),
                     'sale_id' => $sale->id,
-                    'quantity_change' => -$item['quantity'],
-                    'reason' => StockMovementReason::Sale,
                     'notes' => "Sale #{$sale->id}",
                 ]);
             }

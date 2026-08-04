@@ -3,9 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Enums\SaleStatus;
-use App\Enums\StockMovementReason;
 use App\Models\Sale;
-use App\Models\StockMovement;
+use App\Services\StockLedger;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -20,19 +19,15 @@ class SaleCancellationController extends Controller
 
         DB::transaction(function () use ($sale) {
             $sale->load('items');
+            $ledger = app(StockLedger::class);
 
             foreach ($sale->items as $saleItem) {
-                $product = $saleItem->product()->lockForUpdate()->first();
+                $product = $saleItem->product;
 
                 if ($product) {
-                    $product->increment('stock', $saleItem->quantity);
-
-                    StockMovement::create([
-                        'product_id' => $product->id,
+                    $ledger->recordCancellation($product, $saleItem->quantity, [
                         'user_id' => Auth::id(),
                         'sale_id' => $sale->id,
-                        'quantity_change' => $saleItem->quantity,
-                        'reason' => StockMovementReason::SaleCancellation,
                         'notes' => "Cancellation of Sale #{$sale->id}",
                     ]);
                 }

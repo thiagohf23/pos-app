@@ -2,13 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\Enums\StockMovementReason;
 use App\Http\Requests\StoreStockAdjustmentRequest;
 use App\Models\Product;
 use App\Models\StockMovement;
+use App\Services\StockLedger;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -33,24 +32,12 @@ class StockAdjustmentController extends Controller
         $product = Product::findOrFail($request->product_id);
 
         try {
-            DB::transaction(function () use ($request, $product) {
-                $quantityChange = $request->integer('quantity_change');
+            $quantityChange = $request->integer('quantity_change');
 
-                if ($quantityChange < 0 && $product->stock + $quantityChange < 0) {
-                    throw new \Exception("Cannot reduce stock below zero. Current stock: {$product->stock}.");
-                }
-
-                $product->increment('stock', $quantityChange);
-
-                StockMovement::create([
-                    'product_id' => $product->id,
-                    'user_id' => Auth::id(),
-                    'sale_id' => null,
-                    'quantity_change' => $quantityChange,
-                    'reason' => StockMovementReason::ManualAdjustment,
-                    'notes' => $request->notes,
-                ]);
-            });
+            app(StockLedger::class)->adjustManually($product, $quantityChange, [
+                'user_id' => Auth::id(),
+                'notes' => $request->notes,
+            ]);
         } catch (\Exception $e) {
             return back()->with('error', $e->getMessage());
         }
