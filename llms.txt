@@ -1,0 +1,32 @@
+# POS App
+> A modern, high-performance Point of Sale system.
+
+## Tech Stack
+- PHP 8.4 + Laravel 13
+- React 19 + TypeScript 5
+- Inertia.js v3
+- Tailwind CSS v4
+- Pest 4 (Testing)
+
+## Core Directories & Files
+- [app/]: Laravel backend core (Controllers, Models, Actions, Policies).
+- [routes/]: Application routing (web, api).
+- [resources/js/]: Frontend React application (Inertia setup).
+- [resources/js/pages/]: React page components (mapped to routes).
+- [resources/js/components/]: Reusable UI components (shadcn/ui based).
+- [resources/js/types/]: TypeScript definitions and strict frontend contracts.
+- [docs/]: General documentation and Architecture Decision Records (ADRs).
+
+## Key Concepts
+- **Inertia.js Routing**: The frontend is a React monolith acting as a SPA, but routing is driven by Laravel. Use `router.visit()` or `<Link>` from `@inertiajs/react`.
+- **POS Architecture**: The core checkout loop relies on React local state for cart management and communicates with Laravel for final transaction processing.
+- **Strict Typing**: The project enforces strict TypeScript guidelines on the frontend and strong PHP typing (Larastan) on the backend.
+- **Tailwind v4**: Styling is utility-first, using the latest Tailwind CSS version. Custom components often wrap `lucide-react` for iconography.
+- **Permissions**: Spatie Laravel Permission is used on the backend and injected into the frontend `auth.roles` props to conditionally render UI elements.
+
+## AI Assistant Guidelines
+- Before generating code, check the `resources/js/types` for existing interfaces.
+- Use `isNavLeaf(item)` type guard when handling navigation items.
+- Avoid introducing inline `setState` in `useEffect` synchronously; derive state or use `useLayoutEffect` where appropriate to prevent cascading renders.
+- Run `npm run lint` and `npm run types:check` to ensure frontend quality after major edits.
+- Exclude `.agents/`, `.claude/`, and `.opencode/` scripts when analyzing project source code for linting or refactoring.
