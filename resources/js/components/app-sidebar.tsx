@@ -8,16 +8,16 @@ import {
     ShoppingCart,
     Ticket,
     Truck,
-    Users,
     ClipboardList,
     History,
     Lock,
 } from 'lucide-react';
-import { useTranslation } from 'react-i18next';
+
 import AppLogoIcon from '@/components/app-logo-icon';
 
 import { NavFooter } from '@/components/nav-footer';
-import { NavMain, type NavGroup } from '@/components/nav-main';
+import { NavMain  } from '@/components/nav-main';
+import type {NavGroup} from '@/components/nav-main';
 import { NavUser } from '@/components/nav-user';
 import {
     Sidebar,
@@ -143,7 +143,6 @@ const footerNavItems: NavItem[] = [
 
 export function AppSidebar() {
     const { auth } = usePage().props;
-    const { t } = useTranslation();
 
     const filterItemByRole = (item: NavItem): boolean => {
         return !item.roles || item.roles.some((role) => auth.roles.includes(role));

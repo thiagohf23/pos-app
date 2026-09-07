@@ -1,6 +1,6 @@
 import { Link } from '@inertiajs/react';
-import { useTranslation } from 'react-i18next';
 import { ChevronRight } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import {
     Collapsible,
     CollapsibleContent,

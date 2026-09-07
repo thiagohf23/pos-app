@@ -3,9 +3,15 @@ import { Breadcrumbs } from '@/components/breadcrumbs';
 import { Button } from '@/components/ui/button';
 import { useSidebar } from '@/components/ui/sidebar';
 import { useAppearance } from '@/hooks/use-appearance';
+import type { BreadcrumbItem } from '@/types';
 import { LanguageSwitcher } from './language-switcher';
 
-export function AppSidebarHeader() {
+
+interface AppSidebarHeaderProps {
+    breadcrumbs?: BreadcrumbItem[];
+}
+
+export function AppSidebarHeader({ breadcrumbs = [] }: AppSidebarHeaderProps) {
     const { toggleSidebar } = useSidebar();
     const { resolvedAppearance, updateAppearance } = useAppearance();
     const toggleAppearance = () => updateAppearance(resolvedAppearance === 'dark' ? 'light' : 'dark');
@@ -22,6 +28,11 @@ export function AppSidebarHeader() {
                 >
                     <LayoutGrid className="size-5" />
                 </Button>
+                {breadcrumbs.length > 0 && (
+                    <div className="ml-4">
+                        <Breadcrumbs breadcrumbs={breadcrumbs} />
+                    </div>
+                )}
             </div>
             <div className="flex items-center space-x-2">
                 <LanguageSwitcher />

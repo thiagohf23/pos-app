@@ -8,7 +8,7 @@ import {
     Landmark,
     Coins,
 } from 'lucide-react';
-import React, { useState, useMemo, useEffect, useRef } from 'react';
+import React, { useState, useMemo, useEffect, useRef, useLayoutEffect } from 'react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import {
@@ -232,17 +232,19 @@ export function CheckoutDialog({
         notes,
     });
 
-    // Sync refs on every render so handleKeyDown always sees current values
-    latestStateRef.current = {
-        paymentMethod,
-        parsedAmountPaid,
-        finalTotal,
-        amountPaid,
-        notes,
-    };
-
     const handleCheckoutRef = useRef(handleCheckout);
-    handleCheckoutRef.current = handleCheckout;
+
+    // Sync refs so handleKeyDown always sees current values
+    useLayoutEffect(() => {
+        latestStateRef.current = {
+            paymentMethod,
+            parsedAmountPaid,
+            finalTotal,
+            amountPaid,
+            notes,
+        };
+        handleCheckoutRef.current = handleCheckout;
+    });
 
     // Keyboard shortcuts for Checkout Modal
     useEffect(() => {
@@ -302,6 +304,7 @@ return;
         window.addEventListener('keydown', handleKeyDown);
 
         return () => window.removeEventListener('keydown', handleKeyDown);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [open, showCheckoutSuccess]);
 
     // Keyboard shortcuts for Success Modal
@@ -326,6 +329,7 @@ return;
         window.addEventListener('keydown', handleKeyDown);
 
         return () => window.removeEventListener('keydown', handleKeyDown);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [showCheckoutSuccess, saleId, clearCart]);
 
     return (

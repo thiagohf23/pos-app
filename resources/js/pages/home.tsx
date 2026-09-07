@@ -10,9 +10,10 @@ import {
     ShieldCheck,
     ArrowRight,
     Sun,
-    Moon,
-    type LucideIcon,
+    Moon
+    
 } from 'lucide-react';
+import type {LucideIcon} from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import AppLogoIcon from '@/components/app-logo-icon';
 import { LanguageSwitcher } from '@/components/language-switcher';
