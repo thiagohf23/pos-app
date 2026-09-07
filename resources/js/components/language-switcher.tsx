@@ -29,6 +29,7 @@ export function LanguageSwitcher({ variant = 'desktop' }: Props) {
 return;
 }
 
+        // eslint-disable-next-line react-hooks/immutability
         document.cookie = `locale=${locale};path=/;max-age=${60 * 24 * 365};SameSite=Strict`;
         i18n.changeLanguage(locale);
         router.reload({ only: [] });

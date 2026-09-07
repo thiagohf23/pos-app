@@ -130,6 +130,7 @@ export interface Sale {
     created_at: string;
     updated_at: string;
     items?: SaleItem[];
+    user?: { id: number; name: string } | null;
 }
 
 export type StockMovementReason = 'sale' | 'sale_cancellation' | 'manual_adjustment';

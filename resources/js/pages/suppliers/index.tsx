@@ -50,7 +50,7 @@ export default function SuppliersIndex({ suppliers }: Props) {
                         `Supplier "${supplier.name}" status updated!`,
                     );
                 },
-                onError: (errors) => {
+                onError: () => {
                     toast.error('Failed to update status.');
                 },
             },

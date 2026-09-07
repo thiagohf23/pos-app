@@ -1,5 +1,5 @@
 import { Head, router } from '@inertiajs/react';
-import { Plus, Search, Shield } from 'lucide-react';
+import { Plus, Search } from 'lucide-react';
 import { useState, useMemo } from 'react';
 import { toast } from 'sonner';
 import { DeleteConfirmDialog } from '@/components/delete-confirm-dialog';

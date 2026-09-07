@@ -46,7 +46,7 @@ export function CategoryDialog({ open, onClose, editing }: Props) {
                 clearErrors();
             }
         }
-    }, [open, editing]);
+    }, [open, editing, clearErrors, reset, setData]);
 
     function handleClose() {
         onClose();

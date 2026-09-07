@@ -6,16 +6,24 @@ export type BreadcrumbItem = {
     href: NonNullable<InertiaLinkProps['href']>;
 };
 
-export type NavItem = {
+export type NavLeafItem = {
     title: string;
     href: NonNullable<InertiaLinkProps['href']>;
     icon?: LucideIcon | null;
     isActive?: boolean;
     roles?: string[];
-} | {
+};
+
+export type NavGroupItem = {
     title: string;
     icon?: LucideIcon | null;
     isActive?: boolean;
     roles?: string[];
     items: NavItem[];
 };
+
+export type NavItem = NavLeafItem | NavGroupItem;
+
+export function isNavLeaf(item: NavItem): item is NavLeafItem {
+    return 'href' in item;
+}

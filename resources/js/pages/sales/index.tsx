@@ -85,7 +85,7 @@ queryParams.end_date = endVal;
         }, 500);
 
         return () => clearTimeout(delayDebounceFn);
-    }, [searchTerm]);
+    }, [searchTerm, filters.search, statusFilter, startDate, endDate]);
 
     // Handle filter changes instantly for non-search inputs
     const handleStatusChange = (val: string) => {

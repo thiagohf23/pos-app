@@ -30,6 +30,7 @@ export function AvatarCropper({ imageFile, open, onClose, onCrop, shape = 'circl
     // Load image file into a Data URL
     useEffect(() => {
         if (!imageFile) {
+            // eslint-disable-next-line react-hooks/set-state-in-effect
             setImageSrc(null);
 
             return;

@@ -23,42 +23,6 @@ interface Props {
     categories?: Category[];
 }
 
-function CatalogSkeleton() {
-    return (
-        <div className="flex animate-pulse flex-col gap-6">
-            {/* Category Badges Skeleton */}
-            <div className="flex scrollbar-none gap-2 overflow-x-auto pb-2">
-                <div className="h-8 w-24 shrink-0 rounded-full bg-neutral-200 dark:bg-neutral-800" />
-                <div className="h-8 w-28 shrink-0 rounded-full bg-neutral-200 dark:bg-neutral-800" />
-                <div className="h-8 w-20 shrink-0 rounded-full bg-neutral-200 dark:bg-neutral-800" />
-                <div className="h-8 w-32 shrink-0 rounded-full bg-neutral-200 dark:bg-neutral-800" />
-                <div className="h-8 w-24 shrink-0 rounded-full bg-neutral-200 dark:bg-neutral-800" />
-            </div>
-
-            {/* Products Grid Skeleton */}
-            <div className="grid grid-cols-3 gap-3 pb-6 sm:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
-                {Array.from({ length: 12 }).map((_, i) => (
-                    <div
-                        key={i}
-                        className="dark:border-neutral-850 flex flex-col overflow-hidden rounded-lg border border-neutral-200 bg-white shadow-xs dark:bg-neutral-900/30"
-                    >
-                        {/* Image Skeleton */}
-                        <div className="dark:border-neutral-850 aspect-square w-full border-b border-neutral-100/50 bg-neutral-100 dark:bg-neutral-900" />
-                        {/* Info Skeleton */}
-                        <div className="flex flex-col gap-1.5 p-2">
-                            <div className="h-2.5 w-12 rounded bg-neutral-200 dark:bg-neutral-800" />
-                            <div className="h-3 w-3/4 rounded bg-neutral-200 dark:bg-neutral-800" />
-                            <div className="mt-1 flex items-center justify-between">
-                                <div className="h-3 w-10 rounded bg-neutral-200 dark:bg-neutral-800" />
-                                <div className="h-2.5 w-6 rounded bg-neutral-200 dark:bg-neutral-800" />
-                            </div>
-                        </div>
-                    </div>
-                ))}
-            </div>
-        </div>
-    );
-}
 
 export default function PosIndex({ products = [], categories = [] }: Props) {
     const {
@@ -83,6 +47,7 @@ export default function PosIndex({ products = [], categories = [] }: Props) {
 
     // Reset selected product index when filters change
     useEffect(() => {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setSelectedProductIndex(0);
     }, [search, selectedCategoryId]);
 
@@ -155,6 +120,7 @@ export default function PosIndex({ products = [], categories = [] }: Props) {
                 }
             } else if (e.key === 'F8') {
                 e.preventDefault();
+
                 if (cart.length > 0) {
                     setShowPaymentDialog(true);
                 } else {
@@ -163,7 +129,7 @@ export default function PosIndex({ products = [], categories = [] }: Props) {
             } else if (e.key === 'Escape') {
                 if (activeElement === searchRef.current) {
                     setSearch('');
-                    searchRef.current.blur();
+                    searchRef.current?.blur();
                 }
             } else if (e.altKey && e.key.toLowerCase() === 'n') {
                 e.preventDefault();
@@ -191,6 +157,7 @@ export default function PosIndex({ products = [], categories = [] }: Props) {
                 if (!isTyping && selectedProductIndex >= 0 && selectedProductIndex < filteredProducts.length) {
                     e.preventDefault();
                     const product = filteredProducts[selectedProductIndex];
+
                     if (product.stock > 0) {
                         addToCart(product);
                     } else {
@@ -201,8 +168,9 @@ export default function PosIndex({ products = [], categories = [] }: Props) {
         };
 
         window.addEventListener('keydown', handleKeyDown);
+
         return () => window.removeEventListener('keydown', handleKeyDown);
-    }, [cart, clearCart, filteredProducts, selectedProductIndex]);
+    }, [cart, clearCart, filteredProducts, selectedProductIndex, addToCart]);
 
     return (
         <>
