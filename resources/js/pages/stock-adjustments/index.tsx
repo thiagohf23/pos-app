@@ -1,6 +1,7 @@
 import { Head, useForm } from '@inertiajs/react';
 import { ArrowDown, ArrowUp, Loader2, Plus } from 'lucide-react';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import { Pagination } from '@/components/pagination';
 import { Button } from '@/components/ui/button';
@@ -53,6 +54,8 @@ const REASON_LABELS: Record<string, string> = {
 };
 
 export default function StockAdjustmentsIndex({ products, movements }: Props) {
+    const { t } = useTranslation();
+
     const [showForm, setShowForm] = useState(false);
 
     const { data, setData, post, processing, errors, reset } = useForm({
@@ -108,12 +111,12 @@ export default function StockAdjustmentsIndex({ products, movements }: Props) {
                         <table className="w-full text-left text-sm text-neutral-500 dark:text-neutral-400">
                             <thead className="border-b border-neutral-100 text-xs font-bold tracking-wider text-neutral-400 uppercase dark:border-neutral-800 dark:text-neutral-500">
                                 <tr>
-                                    <th className="px-4 py-3">Date</th>
-                                    <th className="px-4 py-3">Product</th>
-                                    <th className="px-4 py-3">Reason</th>
+                                    <th className="px-4 py-3">{t('date')}</th>
+                                    <th className="px-4 py-3">{t('product')}</th>
+                                    <th className="px-4 py-3">{t('reason')}</th>
                                     <th className="px-4 py-3">By</th>
-                                    <th className="px-4 py-3">Notes</th>
-                                    <th className="px-4 py-3 text-right">Change</th>
+                                    <th className="px-4 py-3">{t('notes')}</th>
+                                    <th className="px-4 py-3 text-right">{t('change')}</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-neutral-100 dark:divide-neutral-800">
@@ -186,7 +189,7 @@ export default function StockAdjustmentsIndex({ products, movements }: Props) {
             <Dialog open={showForm} onOpenChange={(open) => !open && setShowForm(false)}>
                 <DialogContent className="sm:max-w-[420px]">
                     <DialogHeader>
-                        <DialogTitle>Manual Stock Adjustment</DialogTitle>
+                        <DialogTitle>{t('manual_stock_adjustment')}</DialogTitle>
                         <DialogDescription>
                             Adjust stock up (positive) or down (negative). All changes are logged.
                         </DialogDescription>
@@ -242,7 +245,7 @@ export default function StockAdjustmentsIndex({ products, movements }: Props) {
                         </div>
 
                         <div className="space-y-1.5">
-                            <Label htmlFor="adjustment-notes">Notes</Label>
+                            <Label htmlFor="adjustment-notes">{t('notes')}</Label>
                             <textarea
                                 id="adjustment-notes"
                                 value={data.notes}

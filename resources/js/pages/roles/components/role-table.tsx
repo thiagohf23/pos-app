@@ -1,4 +1,5 @@
 import { Edit, Plus, Shield, Trash2 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import type { Role } from '@/types';
@@ -18,6 +19,8 @@ export function RoleTable({
     onDelete,
     onAddClick,
 }: Props) {
+    const { t } = useTranslation();
+
     if (roles.length === 0) {
         return (
             <div className="flex h-96 flex-col items-center justify-center p-12 text-center">
@@ -51,10 +54,10 @@ export function RoleTable({
             <table className="w-full border-collapse text-left">
                 <thead>
                     <tr className="border-b border-neutral-200 bg-neutral-50/50 text-xs font-semibold tracking-wider text-neutral-500 uppercase dark:border-neutral-800 dark:bg-neutral-900/50 dark:text-neutral-400">
-                        <th className="px-6 py-4">Role</th>
-                        <th className="px-6 py-4">Guard</th>
-                        <th className="px-6 py-4">Permissions</th>
-                        <th className="px-6 py-4 text-right">Actions</th>
+                        <th className="px-6 py-4">{t('role')}</th>
+                        <th className="px-6 py-4">{t('guard')}</th>
+                        <th className="px-6 py-4">{t('permissions')}</th>
+                        <th className="px-6 py-4 text-right">{t('actions')}</th>
                     </tr>
                 </thead>
                 <tbody className="divide-y divide-neutral-200 dark:divide-neutral-800">

@@ -9,6 +9,7 @@ import {
     Coins,
 } from 'lucide-react';
 import React, { useState, useMemo, useEffect, useRef, useLayoutEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import {
@@ -53,6 +54,8 @@ export function CheckoutDialog({
     subtotal,
     clearCart,
 }: Props) {
+    const { t } = useTranslation();
+
     const [paymentMethod, setPaymentMethod] =
         useState<PaymentMethod>('credit_card');
     const [amountPaid, setAmountPaid] = useState('');
@@ -569,13 +572,13 @@ return;
                         {/* Transaction Receipt Details */}
                         <div className="mt-5 w-full space-y-2.5 rounded-lg border border-neutral-100 bg-neutral-50/50 p-4 text-xs text-neutral-600 dark:border-neutral-800 dark:bg-neutral-900/30 dark:text-neutral-400">
                             <div className="flex justify-between">
-                                <span>Status</span>
+                                <span>{t('status')}</span>
                                 <span className="font-bold text-emerald-600">
                                     PAID
                                 </span>
                             </div>
                             <div className="flex justify-between">
-                                <span>Payment</span>
+                                <span>{t('payment')}</span>
                                 <span className="font-semibold text-neutral-800 capitalize dark:text-neutral-200">
                                     {checkoutDetails.paymentMethod ===
                                         'credit_card'
@@ -590,21 +593,21 @@ return;
                                 </span>
                             </div>
                             <div className="flex justify-between">
-                                <span>Subtotal</span>
+                                <span>{t('subtotal')}</span>
                                 <span>
                                     ${checkoutDetails.subtotal.toFixed(2)}
                                 </span>
                             </div>
                             {checkoutDetails.discount > 0 && (
                                 <div className="flex justify-between">
-                                    <span>Discount</span>
+                                    <span>{t('discount')}</span>
                                     <span>
                                         -${checkoutDetails.discount.toFixed(2)}
                                     </span>
                                 </div>
                             )}
                             <div className="flex justify-between">
-                                <span>Amount Paid</span>
+                                <span>{t('amount_paid')}</span>
                                 <span className="font-semibold text-neutral-800 dark:text-neutral-200">
                                     ${checkoutDetails.amountPaid.toFixed(2)}
                                 </span>
@@ -612,7 +615,7 @@ return;
                             {checkoutDetails.paymentMethod === 'cash' &&
                                 checkoutDetails.change > 0 && (
                                     <div className="flex justify-between font-medium text-emerald-600">
-                                        <span>Change</span>
+                                        <span>{t('change_money')}</span>
                                         <span>
                                             -$
                                             {checkoutDetails.change.toFixed(2)}
@@ -620,7 +623,7 @@ return;
                                     </div>
                                 )}
                             <div className="flex justify-between border-t border-neutral-200/50 pt-2.5 text-sm font-bold text-neutral-900 dark:border-neutral-800 dark:text-neutral-100">
-                                <span>Total Paid</span>
+                                <span>{t('total_paid')}</span>
                                 <span className="text-emerald-600">
                                     ${checkoutDetails.total.toFixed(2)}
                                 </span>
