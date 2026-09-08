@@ -7,6 +7,7 @@ import {
     ShoppingCart,
     Trash2,
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import type { CartItem } from '@/types';
@@ -29,6 +30,8 @@ export function Cart({
     removeFromCart,
     onCheckout,
 }: Props) {
+    const { t } = useTranslation();
+
     return (
         <div className="flex h-full w-full flex-col border-t border-neutral-200 bg-white shadow-lg lg:w-96 lg:border-t-0 lg:border-l dark:border-neutral-800 dark:bg-neutral-900/50">
             {/* Cart Header */}
@@ -36,11 +39,11 @@ export function Cart({
                 <div className="flex items-center gap-2">
                     <ShoppingCart className="size-5 text-neutral-700 dark:text-neutral-300" />
                     <h3 className="font-bold text-neutral-900 dark:text-neutral-50">
-                        Current Cart
+                        {t('current_cart')}
                     </h3>
                 </div>
                 <Badge variant="secondary" className="font-bold">
-                    {cart.reduce((a, b) => a + b.quantity, 0)} Items
+                    {cart.reduce((a, b) => a + b.quantity, 0)} {t('items')}
                 </Badge>
             </div>
 

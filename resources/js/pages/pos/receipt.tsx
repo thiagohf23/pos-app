@@ -1,6 +1,7 @@
 import { Head, router } from '@inertiajs/react';
 import { Printer, TriangleAlert, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import { DeleteConfirmDialog } from '@/components/delete-confirm-dialog';
 import { Button } from '@/components/ui/button';
@@ -22,6 +23,8 @@ interface Props {
 }
 
 export default function ReceiptPage({ sale }: Props) {
+    const { t } = useTranslation();
+
     const [showCancelDialog, setShowCancelDialog] = useState(false);
     const [isCancelling, setIsCancelling] = useState(false);
 
@@ -138,8 +141,8 @@ export default function ReceiptPage({ sale }: Props) {
                     {/* Items List */}
                     <div className="space-y-3">
                         <div className="flex justify-between border-b border-neutral-100 pb-1.5 text-xs font-bold tracking-wider uppercase dark:border-neutral-800 print:border-neutral-200">
-                            <span>Item Description</span>
-                            <span>Total</span>
+                            <span>{t('item_description')}</span>
+                            <span>{t('total')}</span>
                         </div>
                         {sale.items.map((item, index) => (
                             <div
@@ -190,7 +193,7 @@ export default function ReceiptPage({ sale }: Props) {
                             </div>
                         )}
                         <div className="flex justify-between border-t border-dotted border-neutral-200 pt-1.5 text-sm font-bold text-neutral-900 dark:border-neutral-800 dark:text-neutral-100 print:border-neutral-200 print:text-black">
-                            <span>Total</span>
+                            <span>{t('total')}</span>
                             <span className="text-emerald-600 print:text-black">
                                 ${parseFloat(sale.total).toFixed(2)}
                             </span>
@@ -199,7 +202,7 @@ export default function ReceiptPage({ sale }: Props) {
                         {/* Payment details */}
                         <div className="border-t border-dotted border-neutral-200 pt-1.5 text-[11px] text-neutral-500 dark:border-neutral-800 dark:text-neutral-400 print:border-neutral-200 print:text-neutral-600">
                             <div className="flex justify-between">
-                                <span>Payment Method</span>
+                                <span>{t('payment_method')}</span>
                                 <span className="capitalize">
                                     {sale.payment_method === 'credit_card'
                                         ? 'Credit Card'
@@ -214,7 +217,7 @@ export default function ReceiptPage({ sale }: Props) {
                                 sale.cash_tendered && (
                                     <>
                                         <div className="mt-0.5 flex justify-between">
-                                            <span>Cash Tendered</span>
+                                            <span>{t('cash_tendered')}</span>
                                             <span>
                                                 $
                                                 {parseFloat(
