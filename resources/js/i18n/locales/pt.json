@@ -457,5 +457,11 @@
     "cash_tendered": "Dinheiro Recebido",
     "welcome_page": "Página de Boas-vindas",
     "date": "Data",
-    "product": "Produto"
+    "product": "Produto",
+    "checkout_order": "Finalizar Pedido",
+    "status": "Status",
+    "payment": "Pagamento",
+    "amount_paid": "Valor Pago",
+    "change_money": "Troco",
+    "total_paid": "Total Pago"
 }

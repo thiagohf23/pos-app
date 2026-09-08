@@ -457,5 +457,11 @@
     "cash_tendered": "Efectivo Recibido",
     "welcome_page": "Página de Bienvenida",
     "date": "Fecha",
-    "product": "Producto"
+    "product": "Producto",
+    "checkout_order": "Finalizar Pedido",
+    "status": "Estado",
+    "payment": "Pago",
+    "amount_paid": "Monto Pagado",
+    "change_money": "Cambio",
+    "total_paid": "Total Pagado"
 }

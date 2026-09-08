@@ -457,5 +457,11 @@
     "cash_tendered": "Cash Tendered",
     "welcome_page": "Welcome Page",
     "date": "Date",
-    "product": "Product"
+    "product": "Product",
+    "checkout_order": "Checkout Order",
+    "status": "Status",
+    "payment": "Payment",
+    "amount_paid": "Amount Paid",
+    "change_money": "Change",
+    "total_paid": "Total Paid"
 }
