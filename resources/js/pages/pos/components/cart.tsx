@@ -7,6 +7,7 @@ import {
     ShoppingCart,
     Trash2,
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import type { CartItem } from '@/types';
@@ -29,6 +30,8 @@ export function Cart({
     removeFromCart,
     onCheckout,
 }: Props) {
+    const { t } = useTranslation();
+
     return (
         <div className="flex h-full w-full flex-col border-t border-neutral-200 bg-white shadow-lg lg:w-96 lg:border-t-0 lg:border-l dark:border-neutral-800 dark:bg-neutral-900/50">
             {/* Cart Header */}
@@ -36,11 +39,11 @@ export function Cart({
                 <div className="flex items-center gap-2">
                     <ShoppingCart className="size-5 text-neutral-700 dark:text-neutral-300" />
                     <h3 className="font-bold text-neutral-900 dark:text-neutral-50">
-                        Current Cart
+                        {t('current_cart')}
                     </h3>
                 </div>
                 <Badge variant="secondary" className="font-bold">
-                    {cart.reduce((a, b) => a + b.quantity, 0)} Items
+                    {cart.reduce((a, b) => a + b.quantity, 0)} {t('items')}
                 </Badge>
             </div>
 
@@ -50,11 +53,10 @@ export function Cart({
                     <div className="flex h-full flex-col items-center justify-center py-12 text-center text-neutral-400">
                         <ShoppingCart className="mb-2 size-10 animate-bounce stroke-[1.5px]" />
                         <p className="text-sm font-medium">
-                            Your cart is empty.
+                            {t('empty_cart')}
                         </p>
                         <p className="mt-1 max-w-[200px] text-xs text-neutral-500">
-                            Click on catalog products to start a sale terminal
-                            order.
+                            {t('add_products_hint')}
                         </p>
                     </div>
                 ) : (
@@ -127,14 +129,14 @@ export function Cart({
             {/* Order Summary calculations */}
             <div className="flex flex-col gap-3 border-t border-neutral-200 bg-neutral-50/50 p-4 dark:border-neutral-800 dark:bg-neutral-900/20">
                 <div className="flex justify-between text-xs text-neutral-500 dark:text-neutral-400">
-                    <span>Subtotal</span>
+                    <span>{t('subtotal')}</span>
                     <span className="font-semibold text-neutral-800 dark:text-neutral-200">
                         ${subtotal.toFixed(2)}
                     </span>
                 </div>
                 <div className="flex items-baseline justify-between border-t border-neutral-200 pt-3 dark:border-neutral-800">
                     <span className="text-sm font-bold text-neutral-900 dark:text-neutral-100">
-                        Total
+                        {t("total")}
                     </span>
                     <span className="dark:text-emerald-450 text-xl font-extrabold text-emerald-600">
                         ${total.toFixed(2)}
@@ -148,7 +150,7 @@ export function Cart({
                     className="mt-2 flex h-12 w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-emerald-600 font-bold text-white shadow-lg transition-all hover:bg-emerald-500"
                 >
                     <CreditCard className="size-4" />
-                    Checkout Order
+                    {t('checkout_order')}
                     <span className="ml-1 text-[10px] bg-emerald-700/60 text-emerald-100 font-mono px-1.5 py-0.5 rounded border border-emerald-500/40 select-none">
                         F8
                     </span>

@@ -1,0 +1,85 @@
+- generic [ref=e1]:
+  - main [ref=e4]:
+    - generic [ref=e6]:
+      - generic [ref=e7]:
+        - generic [ref=e13]:
+          - generic [ref=e14]:
+            - text: Conferência
+            - generic [ref=e15]: OS
+          - generic [ref=e16]: Participante
+        - heading "Faça login" [level=1] [ref=e19]
+        - paragraph [ref=e20]:
+          - text: ou
+          - link "crie uma conta" [ref=e21] [cursor=pointer]:
+            - /url: http://localhost:8000/app/register
+      - generic [ref=e23]:
+        - generic [ref=e26]:
+          - generic [ref=e30]:
+            - generic [ref=e33]:
+              - generic [ref=e37]:
+                - text: E-mail
+                - superscript [ref=e38]: "*"
+              - textbox "E-mail*" [active] [ref=e42]
+            - generic [ref=e45]:
+              - generic [ref=e47]:
+                - generic [ref=e49]:
+                  - text: Senha
+                  - superscript [ref=e50]: "*"
+                - link "Esqueceu sua senha?" [ref=e55] [cursor=pointer]:
+                  - /url: http://localhost:8000/app/password-reset/request
+              - generic [ref=e58]:
+                - textbox "Senha*" [ref=e60]
+                - button "Mostrar senha" [ref=e63] [cursor=pointer]
+            - generic [ref=e72]:
+              - checkbox "Lembre de mim" [ref=e73]
+              - generic [ref=e74]: Lembre de mim
+          - button "Login" [ref=e80] [cursor=pointer]
+        - generic [ref=e84]:
+          - generic [ref=e85]:
+            - generic [ref=e86]: Acesso Rápido para Testes
+            - paragraph [ref=e89]: Clique no perfil desejado para entrar automaticamente
+          - generic [ref=e90]:
+            - button "👑 Super Admin admin@conferenciaos.test →" [ref=e91] [cursor=pointer]:
+              - generic [ref=e92]:
+                - generic [ref=e93]: 👑
+                - generic [ref=e94]:
+                  - generic [ref=e95]: Super Admin
+                  - generic [ref=e96]: admin@conferenciaos.test
+              - generic [ref=e97]: →
+            - button "🛡️ Admin Geral admin_geral@conferenciaos.test →" [ref=e98] [cursor=pointer]:
+              - generic [ref=e99]:
+                - generic [ref=e100]: 🛡️
+                - generic [ref=e101]:
+                  - generic [ref=e102]: Admin Geral
+                  - generic [ref=e103]: admin_geral@conferenciaos.test
+              - generic [ref=e104]: →
+            - button "👔 Gestor do Evento gestor@conferenciaos.test →" [ref=e105] [cursor=pointer]:
+              - generic [ref=e106]:
+                - generic [ref=e107]: 👔
+                - generic [ref=e108]:
+                  - generic [ref=e109]: Gestor do Evento
+                  - generic [ref=e110]: gestor@conferenciaos.test
+              - generic [ref=e111]: →
+            - button "🎓 Professor Avaliador avaliador@conferenciaos.test →" [ref=e112] [cursor=pointer]:
+              - generic [ref=e113]:
+                - generic [ref=e114]: 🎓
+                - generic [ref=e115]:
+                  - generic [ref=e116]: Professor Avaliador
+                  - generic [ref=e117]: avaliador@conferenciaos.test
+              - generic [ref=e118]: →
+            - button "🎫 Credenciamento credenciamento@... →" [ref=e119] [cursor=pointer]:
+              - generic [ref=e120]:
+                - generic [ref=e121]: 🎫
+                - generic [ref=e122]:
+                  - generic [ref=e123]: Credenciamento
+                  - generic [ref=e124]: credenciamento@...
+              - generic [ref=e125]: →
+            - button "🙋 Participante / Autor test@example.com Entrar →" [ref=e126] [cursor=pointer]:
+              - generic [ref=e127]:
+                - generic [ref=e128]: 🙋
+                - generic [ref=e129]:
+                  - generic [ref=e130]: Participante / Autor
+                  - generic [ref=e131]: test@example.com
+              - generic [ref=e132]: Entrar →
+  - generic:
+    - status
